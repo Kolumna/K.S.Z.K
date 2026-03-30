@@ -1,17 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-<<<<<<< HEAD
     <OutputType>Exe</OutputType>
-=======
->>>>>>> 239b156 (Added public class Point)
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-<<<<<<< HEAD
 </Project>
-=======
-</Project>
->>>>>>> 239b156 (Added public class Point)
