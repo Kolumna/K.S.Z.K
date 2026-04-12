@@ -25,4 +25,8 @@ dotnet test
 dotnet run --project src/Krasnoludki.Web
 ```
 
+<<<<<<< HEAD
 Po uruchomieniu aplikacji, interfejs będzie dostępny pod adresem `http://localhost:5000`.
+=======
+Po uruchomieniu aplikacji, interfejs będzie dostępny pod adresem `http://localhost:5000`.
+>>>>>>> 7d91b54 (init)
