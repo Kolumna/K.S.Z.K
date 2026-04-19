@@ -17,14 +17,16 @@
             Królewski System Zarządzania Królestwem
         </p>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+
+    <main class="container" role="main">
+        @RenderBody()
+    </main>
+
     <footer>
         <p>Projekt zaliczeniowy na przedmiot: Algorytmy i Struktury Danych II</p>
     </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 
 </html>
