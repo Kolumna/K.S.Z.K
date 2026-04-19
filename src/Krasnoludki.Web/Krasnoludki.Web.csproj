@@ -6,8 +6,20 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ElectronNET.Core" Version="0.4.1" />
+    <PackageReference Include="ElectronNET.Core.AspNet" Version="0.4.1" />
+  </ItemGroup>
 
 </Project>

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/refs/heads/master/packages/app-builder-lib/scheme.json",
+  "compression": "maximum",
+  "linux": {
+    "target": ["tar.xz"],
+    "executableArgs": ["--no-sandbox"],
+    "artifactName": "${name}-${arch}-${version}.${ext}"
+  },
+  "appId": "com.krasnoludki.app",
+  "productName": "KSZK",
+  "directories": {
+    "output": "../bin/desktop"
+  },
+  "win": {
+    "target": [
+      {
+        "target": "portable",
+        "arch": "x64"
+      }
+    ]
+  }
+}
