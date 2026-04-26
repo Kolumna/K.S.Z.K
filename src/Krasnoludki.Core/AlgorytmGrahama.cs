@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Krasnoludki.Core
 {
-    // Jeśli Twoi znajomi mają już plik Punkt.cs, możesz usunąć poniższą linijkę
+   
     public record Punkt(long X, long Y);
 
     public class WyznacznikOtoczki
