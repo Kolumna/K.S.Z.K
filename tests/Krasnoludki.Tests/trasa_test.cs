@@ -1,28 +1,44 @@
 using Xunit;
-using Krasnoludki.Core;
+using Dwarves.Core;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace Krasnoludki.Tests
+namespace Dwarves.Tests
 {
-    public class AlgorytmTests
+    public class ConvexHullSolverTests
     {
         [Fact]
-        public void TestOtoczkiGrahama()
+        public void GrahamScan_ShouldReturnCorrectHull_ForSquareWithInnerPoint()
         {
-            // Dane testowe: Kwadrat i jeden punkt w środku
-            var punkty = new List<Punkt>
+            // Arrange
+            var points = new List<Point>
             {
-                new Punkt(0, 0),
-                new Punkt(4, 0),
-                new Punkt(4, 4),
-                new Punkt(0, 4),
-                new Punkt(2, 2) // Ten jest w środku, nie powinien być w otoczce
+                new Point(0, 0),
+                new Point(4, 0),
+                new Point(4, 4),
+                new Point(0, 4),
+                new Point(2, 2) // punkt wewnętrzny
             };
 
-            var wynik = WyznacznikOtoczki.WykonajGrahamScan(punkty);
+            var expected = new List<Point>
+            {
+                new Point(0, 0),
+                new Point(4, 0),
+                new Point(4, 4),
+                new Point(0, 4)
+            };
 
-            // Powinniśmy dostać 4 punkty (wierzchołki kwadratu)
-            Assert.Equal(4, wynik.Count);
+            // Act
+            var result = ConvexHullSolver.GrahamScan(points);
+
+            // Assert 1: liczba punktów
+            Assert.Equal(4, result.Count);
+
+            // Assert 2: czy wynik zawiera dokładnie te punkty (kolejność nieistotna)
+            Assert.True(
+                expected.All(p => result.Contains(p)) &&
+                result.All(p => expected.Contains(p))
+            );
         }
     }
 }
