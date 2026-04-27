@@ -1,6 +1,6 @@
 namespace Krasnoludki.Core.Models;
 
-public class Point
+/*public class Point
 {
     public double X { get; }
     public double Y { get; }
@@ -19,4 +19,4 @@ public class Point
                 (this.Y - other.Y) * (this.Y - other.Y))
             );
     }
-}
+}*/
