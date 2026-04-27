@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dwarves.Core
+namespace Krasnoludki.Core
 {
     public record Point(long X, long Y);
 

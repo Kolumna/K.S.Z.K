@@ -3,7 +3,7 @@ using Dwarves.Core;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Dwarves.Tests
+namespace Krasnoludki.Tests
 {
     public class ConvexHullSolverTests
     {
