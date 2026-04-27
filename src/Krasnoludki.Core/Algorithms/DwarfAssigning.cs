@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using Krasnoludki.Core.Models;
-
+//dodąc uniwersalne źródło i ujście oraz automatyczne generowanie ścieżek 
 namespace Krasnoludki.Core
 {
     public class DwarfAssigning
