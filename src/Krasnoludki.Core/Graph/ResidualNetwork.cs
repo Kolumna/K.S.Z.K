@@ -14,9 +14,57 @@ class ResidualNetwork
 
         Edges = new List<EdgeFlow>();
 
-        SinkID = CurrId;
+        //Edges from artificial source to every Dwarf
+        foreach(Dwarf dwarf in dwarves)
+        {
+            EdgeFlow edge = new EdgeFlow(0, CurrId, 1);
+            EdgeFlow backwardEdge = new EdgeFlow(CurrId, 0, 0);
+            edge.BackwardEdge = backwardEdge;
+            backwardEdge.BackwardEdge = edge;
 
-        //distances 
+            Edges.Add(edge);
+            Edges.Add(backwardEdge);
+
+            CurrId++;
+        }
+
+        //Edges from every Dwarf to every Mine
+        int mine_id,dwarves_count = CurrId;
+        for(int dwarf_id = 1; dwarf_id < dwarves_count; dwarf_id++)
+        {
+            for(mine_id = dwarves_count; mine_id - dwarves_count < mines.Count; mine_id++)
+            {
+                double cost = distances[dwarf_id - 1][mine_id - dwarves_count];
+                EdgeFlow DwarfMineEdge = new EdgeFlow(dwarf_id, mine_id, 1, cost);
+                EdgeFlow MineDwarfEdge = new EdgeFlow(mine_id,dwarf_id, 0, -cost);
+
+                DwarfMineEdge.BackwardEdge = MineDwarfEdge;
+                MineDwarfEdge.BackwardEdge = DwarfMineEdge;
+
+                Edges.Add(DwarfMineEdge);
+                Edges.Add(MineDwarfEdge);
+
+            }
+        }
+
+        //Edges from every mine to artificial sink
+        SinkID = dwarves.Count + mines.Count + 1;
+        mine_id = dwarves_count;
+        foreach(Mine mine in mines)
+        {
+            EdgeFlow MineSinkEdge = new EdgeFlow(mine_id, SinkID, mine.Capacity);
+            EdgeFlow SinkMineEdge = new EdgeFlow(SinkID, mine_id, 0);
+
+            MineSinkEdge.BackwardEdge = SinkMineEdge;
+            SinkMineEdge.BackwardEdge = MineSinkEdge;
+
+            Edges.Add(MineSinkEdge);
+            Edges.Add(SinkMineEdge);
+
+            mine_id++;
+
+        }
+
 
     }
 
