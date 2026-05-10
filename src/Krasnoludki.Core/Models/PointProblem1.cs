@@ -1,25 +1,25 @@
 namespace Krasnoludki.Core.Models;
 
-public enum PointType
+public enum MineralType
 {
-    Dwarf,Mine
+    Gold,Quartz,Silver,Coal,None
 }
 
 public class Point
 {
-    public PointType Type;
-    public Dwarf? Dwarf;
-    public Mine? Mine;
+    private static int _PointCounter = 1;
+    public int PointId;
+    public double x;
+    public double y;
+    public bool IsSoruce;
+    public bool IsSink;
 
-    public Point(Mine mine)
+    public Point(/*double x, double y,*/bool isSoruce = false, bool isSink = false)
     {
-        Type = PointType.Mine;
-        Mine = mine;
-    }
-
-    public Point(Dwarf dwarf)
-    {
-        Type = PointType.Dwarf;
-        Dwarf = dwarf;
+        PointId = _PointCounter++;
+        /*this.x = x;
+        this.y = y;*/
+        IsSoruce = isSoruce;
+        IsSink = isSink;
     }
 }

@@ -1,55 +1,141 @@
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using Krasnoludki.Core.Graph;
 using Krasnoludki.Core.Models;
-//dodąc uniwersalne źródło i ujście oraz automatyczne generowanie ścieżek 
+
 namespace Krasnoludki.Core
 {
     public class DwarfAssigning
     {
-        public static int[] Dijkstra(Point start, Point[] points, EdgeWeight[] Edges)
+        public static List<EdgeFlow> GenerateEdges(List<Point> points)
         {
-            int n = points.Length;
-            int[] distances = new int[n];
-            for(int i = 0; i < n; i++)
+            List<EdgeFlow> result = new List<EdgeFlow>();
+            foreach(Point p in points)
             {
-                distances[i] = int.MaxValue;
-            }
-
-            int startIndex = Array.IndexOf(points, start);
-            distances[startIndex] = 0;
-
-            var pq = new PriorityQueue<(int distances, int index), int>();
-            pq.Enqueue((0, startIndex), 0);
-
-            while(pq.Count > 0)
-            {
-                var (currentDist, u) = pq.Dequeue();
-
-                if(currentDist > distances[u]) continue;
-
-                foreach(var edge in Edges)
+                if(p.IsSoruce)
                 {
-                    int v = -1;
-
-                    if(edge.Connecting[0] == points[u])
-                        v = Array.IndexOf(points, edge.Connecting[1]);
-                    else if(edge.Connecting[1] == points[u])
-                        v = Array.IndexOf(points, edge.Connecting[0]);
-
-                    if(v == -1) continue;
-
-                    int alt = distances[u] + edge.Length;
-
-                    if(alt < distances[v])
+                    foreach(Point d in points)
                     {
-                        distances[v] = alt;
-                        pq.Enqueue((alt, v), alt);
+                        if(d is Dwarf)
+                        {
+                            result.Add(new EdgeFlow(p.PointId, d.PointId, 1));
+                        }
+                    }
+                }
+                if(p is Dwarf)
+                {
+                    Dwarf dwarf = (Dwarf)p;
+                    foreach(Point m in points)
+                    {
+                        if(m is Mine)
+                        {
+                            Mine mine = (Mine)m;
+                            if(dwarf.PreferredMinerals.Contains(mine.Resource))
+                            {
+                                result.Add(new EdgeFlow(dwarf.PointId, mine.PointId, 1));
+                            }
+                        }
+                    }
+                }
+                if(p.IsSink)
+                {
+                    foreach(Point m in points)
+                    {
+                        if(m is Mine)
+                        {
+                            Mine mine = (Mine)m;
+                            result.Add(new EdgeFlow(mine.PointId, p.PointId, mine.Capacity));
+                        }
                     }
                 }
             }
-            return distances;
+            return result;
         }
-        public static void Assign(Point[] points, EdgeWeight[] edges)
+        public static bool BFS(int sourceId, int sink, List<EdgeFlow> edges, ref int[] parent)
+        {
+            HashSet<int> visited = new HashSet<int>();
+            Queue<int> q = new Queue<int>();
+            for(int i = 0; i < sink+1; i++)
+            {
+                parent[i] = -1;
+            }
+
+            q.Enqueue(sourceId);
+            visited.Add(sourceId);
+
+            while(q.Count > 0)
+            {
+                int p = q.Dequeue();
+
+                foreach(EdgeFlow edge in edges)
+                {
+                    if(edge.From == p && edge.CurrFlow < edge.Capacity && !visited.Contains(edge.To))
+                    {
+                        q.Enqueue(edge.To);
+                        visited.Add(edge.To);
+                        parent[edge.To] = p;
+                        if(edge.To == sink) return true;
+                    }
+                    if(edge.To == p && edge.BackCapacity > 0)
+                    {
+                        q.Enqueue(edge.From);
+                        visited.Add(edge.From);
+                        parent[edge.From] = p;
+                    }
+                }
+            }
+            return false;
+        }
+        public static int EdmondsKarp(int sourceId, int sink, List<EdgeFlow> edges)
+        {
+            int MaxFlow = 0;
+            Stack<EdgeFlow> currPath = new Stack<EdgeFlow>();
+            Stack<char> flowWay = new Stack<char>();
+
+            int[] parent = new int[sink+1];
+            while(BFS(sourceId, sink, edges, ref parent))
+            {
+                int newFlow = int.MaxValue;
+                int i = sink;
+                while(i != sourceId)
+                {
+                    foreach(EdgeFlow edge in edges)
+                    {
+                        if(edge.To == i && edge.From == parent[i])
+                        {
+                            currPath.Push(edge);
+                            flowWay.Push('f');
+                            newFlow = Math.Min(newFlow, edge.Capacity - edge.CurrFlow);
+                            break;
+                        }
+                        if(edge.From == i && edge.To == parent[i])
+                        {
+                            currPath.Push(edge);
+                            flowWay.Push('b');
+                            newFlow = Math.Min(newFlow, edge.BackCapacity);
+                            break;
+                        }
+                    }
+                    i = parent[i];
+                }
+                while(currPath.Count() > 0)
+                {
+                    EdgeFlow edge = currPath.Pop();
+                    char way = flowWay.Pop();
+                    if(way == 'f')
+                    {
+                        edge.AddFlow(newFlow);
+                    }
+                    else edge.AddBackFlow(newFlow);
+                }
+                MaxFlow += newFlow;
+            }
+
+            return MaxFlow;
+        }
+        /*public static void Assign(Point[] points, EdgeFlow[] edges)
         {
             foreach(Point d in points)
             {
@@ -75,7 +161,7 @@ namespace Krasnoludki.Core
                 d.Dwarf.AssignMine(AssignedMine);
                 AssignedMine.AddWorker();
             }
-        }
+        }*/
     }
 }
 

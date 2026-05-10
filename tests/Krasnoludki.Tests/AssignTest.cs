@@ -6,7 +6,7 @@ using Xunit.Sdk;
 
 namespace Krasnoludki.Tests
 {
-    public class Test2
+    /*public class Test2
     {    
         [Fact]
         public void AssignTest()
@@ -44,5 +44,5 @@ namespace Krasnoludki.Tests
             Assert.True(m1.Mine.IsFull);
             Assert.True(m2.Mine.IsFull);
         }
-    }
+    }*/
 }

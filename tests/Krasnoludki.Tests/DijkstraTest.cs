@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations.Schema;
+/*using System.ComponentModel.DataAnnotations.Schema;
 using Krasnoludki.Core;
 using Krasnoludki.Core.Models;
 using Xunit;
@@ -36,4 +36,4 @@ namespace Krasnoludki.Tests
             Assert.Equal(4, result[3]);
         }
     }
-}
+}*/

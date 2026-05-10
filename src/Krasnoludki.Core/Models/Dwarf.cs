@@ -1,15 +1,10 @@
 namespace Krasnoludki.Core.Models;
 
-public enum MineralType
+public class Dwarf : Point
 {
-    Gold,Quartz,Silver,Coal,None
-}
+    //private static int _DwarfCounter = 1;
 
-public class Dwarf
-{
-    private static int _DwarfCounter = 1;
-
-    public int Id{ get; }
+    //public int Id{ get; }
     //public int GraphID{ get; set;}        //Zakomentowałem to co nie było mi obecnie potrzebne
     //public Point HomeLocation{ get; }
     //public int VoiceLoudness{ get; }
@@ -21,7 +16,7 @@ public class Dwarf
         //HomeLocation = new Point(x,y);
         //VoiceLoudness = loudness;
         PreferredMinerals = minerals;
-        Id = _DwarfCounter++;
+        //Id = _DwarfCounter++;
     }
     public void AssignMine(Mine m)      //funkcja przydzielania kopalni
     {
