@@ -8,9 +8,8 @@ public enum MineralType
 public class Dwarf
 {
     private static int _DwarfCounter = 1;
-
+    
     public int Id{ get; }
-    public int GraphID{ get; set;}
     public Point HomeLocation{ get; }
     public int VoiceLoudness{ get; }
     public List<MineralType> PreferredMinerals { get; } // Zmienilem na List, bo w zadaniu jest mowa o "preferowanych minerałach" (w liczbie mnogiej), a nie o jednym preferowanym minerale
