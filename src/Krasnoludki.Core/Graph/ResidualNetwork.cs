@@ -4,12 +4,20 @@ namespace Krasnoludki.Core.Graph;
 
 class ResidualNetwork
 {
+    public List<IGraphNode> Nodes;
     public List<EdgeFlow> Edges{get;}
     public int SourceID = 0;
     public int SinkID;
 
     public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines, List<List<int>> distances)
     {
+
+        Nodes = new List<IGraphNode>();
+
+        IGraphNode Source = new GraphNode<object>(0,null);
+        Nodes.Add(Source);
+
+
         int CurrId = 1;
 
         Edges = new List<EdgeFlow>();
@@ -17,6 +25,9 @@ class ResidualNetwork
         //Edges from artificial source to every Dwarf
         foreach(Dwarf dwarf in dwarves)
         {
+            GraphNode<Dwarf> new_node = new GraphNode<Dwarf>(CurrId,dwarf);
+            Nodes.Add(new_node);
+
             EdgeFlow edge = new EdgeFlow(0, CurrId, 1);
             EdgeFlow backwardEdge = new EdgeFlow(CurrId, 0, 0);
             edge.BackwardEdge = backwardEdge;
@@ -52,6 +63,9 @@ class ResidualNetwork
         mine_id = dwarves_count;
         foreach(Mine mine in mines)
         {
+            GraphNode<Mine> new_node = new GraphNode<Mine>(mine_id, mine);
+            Nodes.Add(new_node);
+
             EdgeFlow MineSinkEdge = new EdgeFlow(mine_id, SinkID, mine.Capacity);
             EdgeFlow SinkMineEdge = new EdgeFlow(SinkID, mine_id, 0);
 
@@ -65,6 +79,9 @@ class ResidualNetwork
 
         }
 
+
+        IGraphNode Sink = new GraphNode<object>(SinkID,null);
+        Nodes.Add(Sink);
 
     }
 

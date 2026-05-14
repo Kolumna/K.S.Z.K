@@ -1,4 +1,4 @@
-public class GraphNode<T>
+public class GraphNode<T>:IGraphNode
 {
   public int GraphId { get; }
   public T Data { get; }
