@@ -2,12 +2,12 @@ using Krasnoludki.Core.Models;
 
 namespace Krasnoludki.Core.Graph;
 
-class ResidualNetwork
+public class ResidualNetwork
 {
-    public List<IGraphNode> Nodes;
+    public List<IGraphNode> Nodes { get; }
     public List<EdgeFlow> Edges{get;}
-    public int SourceID = 0;
-    public int SinkID;
+    public int SourceID { get; } = 0;
+    public int SinkID { get; }
 
     public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines, List<List<int>> distances)
     {
