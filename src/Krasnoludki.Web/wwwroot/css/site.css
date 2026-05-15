@@ -157,12 +157,12 @@ body {
   flex-direction: column;
 }
 
-header {
+.main-page-header {
   text-align: center;
   padding: 24px;
 }
 
-footer {
+.main-page-footer {
   text-align: center;
   padding: 24px;
 }
