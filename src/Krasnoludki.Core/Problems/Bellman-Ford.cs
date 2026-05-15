@@ -2,7 +2,7 @@ using Krasnoludki.Core.Graph;
 
 namespace Krasnoludki.Core.Algorithms;
 
-class BellmanFordAlgorithm
+public class BellmanFordAlgorithm
 {
 
     public List<EdgeFlow> bellmanFordAlgorithm(ResidualNetwork network,int src)

@@ -14,7 +14,7 @@ public class ResidualNetwork
 
         Nodes = new List<IGraphNode>();
 
-        IGraphNode Source = new GraphNode<object>(0,null);
+        IGraphNode Source = new GraphNode<object?>(0,null);
         Nodes.Add(Source);
 
 
@@ -80,9 +80,17 @@ public class ResidualNetwork
         }
 
 
-        IGraphNode Sink = new GraphNode<object>(SinkID,null);
+        IGraphNode Sink = new GraphNode<object?>(SinkID,null);
         Nodes.Add(Sink);
 
+    }
+
+    public ResidualNetwork(List<IGraphNode> nodes, List<EdgeFlow> edges, int sourceId, int sinkId)
+    {
+        Nodes = nodes;
+        Edges = edges;
+        SourceID = sourceId; 
+        SinkID = sinkId;
     }
 
 }
