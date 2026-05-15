@@ -157,6 +157,16 @@ body {
   flex-direction: column;
 }
 
+.main-page-header {
+  text-align: center;
+  padding: 24px;
+}
+
+.main-page-footer {
+  text-align: center;
+  padding: 24px;
+}
+
 .canvas-area {
   background-color: #333;
   width: 100%;
