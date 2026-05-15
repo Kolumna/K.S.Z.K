@@ -120,7 +120,7 @@ body {
 }
 
 .btn {
-  padding: 24px;
+  padding: 8px 16px;
   background-color: var(--gold-bg);
   color: white;
   border: none;
@@ -134,7 +134,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: 1.60rem;
+  font-size: 1.6rem;
 }
 
 .btn:hover {
@@ -218,4 +218,58 @@ footer {
 small {
   font-size: 1rem;
   color: var(--text-secondary);
+}
+
+header {
+  display: flex;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.logo {
+  font-size: 1.8rem;
+  color: var(--gold);
+  text-shadow:
+    1px 1px 0 var(--gold-border),
+    2px 2px 0 var(--gold-bg);
+  padding: 16px 0;
+}
+
+.main-page-header {
+  text-align: center;
+  padding: 24px;
+}
+
+.main-page-footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+nav {
+  display: flex;
+}
+
+.nav-button {
+  padding: 8px 24px;
+  background-color: var(--gold-bg);
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  transition: 200ms background-color ease;
+  display: flex;
+  align-items: center;
+  border-right: 2px solid var(--border-subtle);
+}
+
+.nav-button:hover {
+  background-color: var(--color-overlay);
+}
+
+.nav-button:last-child {
+  border-right: none;
+}
+
+.nav-button.active {
+  border-bottom: 2px solid gold;
 }
