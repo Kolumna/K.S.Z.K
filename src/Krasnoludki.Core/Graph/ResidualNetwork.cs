@@ -1,3 +1,4 @@
+using System.ComponentModel.Design.Serialization;
 using Krasnoludki.Core.Models;
 
 namespace Krasnoludki.Core.Graph;
@@ -46,6 +47,14 @@ public class ResidualNetwork
             for(mine_id = dwarves_count; mine_id - dwarves_count < mines.Count; mine_id++)
             {
                 double cost = distances[dwarf_id - 1][mine_id - dwarves_count];
+
+                // A massive artificial cost is added to non-preferred mines, ensuring the algorithm only picks
+                // them as an absolute last resort to prevent unemployment.
+                if(!dwarves[dwarf_id - 1].PreferredMinerals.Contains(mines[mine_id - dwarves_count].Resource)){
+                    cost += 1000000;
+                }
+
+
                 EdgeFlow DwarfMineEdge = new EdgeFlow(dwarf_id, mine_id, 1, cost);
                 EdgeFlow MineDwarfEdge = new EdgeFlow(mine_id,dwarf_id, 0, -cost);
 
@@ -85,6 +94,9 @@ public class ResidualNetwork
 
     }
 
+    // Artificial constructor designed exclusively for unit testing.
+    // Allows direct injection of predefined nodes and edges to simulate specific graph topologies
+    // and edge cases without breaking encapsulation.
     public ResidualNetwork(List<IGraphNode> nodes, List<EdgeFlow> edges, int sourceId, int sinkId)
     {
         Nodes = nodes;

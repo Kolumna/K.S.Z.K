@@ -5,6 +5,9 @@ namespace Krasnoludki.Core.Problems;
 
 public class MinCostMaxFlowProblem
 {
+    // Note: If the Final TotalCost is massive (e.g., >= 1,000,000),
+    //  it indicates that some dwarves were assigned to non-preferred mines due to capacity
+    //  limits. The real distance can be extracted using a modulo operation.
     public (double,double) MinCostMaxFlow(ResidualNetwork network)
     {
         int source = network.SourceID;

@@ -13,21 +13,26 @@ public class BellmanFordAlgorithm
         double[] distances = new double[nodes_count];
         EdgeFlow[] parentEdge = new EdgeFlow[nodes_count]; // array for tracking route
 
+        // Initialize all distances to infinity and the source node to 0.
         Array.Fill(distances, double.MaxValue);
         distances[src] = 0;
 
+
+        // Standard Bellman-Ford relaxation loop run V-1 times to find the single-source shortest paths.
         bool modified = false;
         for(int iteration_count = 0; iteration_count < nodes_count; iteration_count++)
         {
             modified = false;
             foreach(EdgeFlow edge in network.Edges)
             {
-                //Relaxation
+                // Verify residual capacity. We only consider edges that can take more flow (Capacity - CurrFlow > 0)
                 if (distances[edge.From] != double.MaxValue &&
                         edge.Capacity - edge.CurrFlow > 0 &&
                             distances[edge.From] + edge.Cost
                                 < distances[edge.To])
                 {
+                    // Relax the edge: update the shortest known distance to the target node
+                    // and record the predecessor to enable path reconstruction.
                     modified = true;
                     parentEdge[edge.To] = edge;
                     distances[edge.To] = distances[edge.From] + edge.Cost;
