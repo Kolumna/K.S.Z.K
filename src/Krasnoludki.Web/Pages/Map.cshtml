@@ -1,0 +1,31 @@
+@page
+@model IndexModel
+@{
+  ViewData["Title"] = "Mapa | Królewski System Zarządzania Królestwem";
+}
+
+<header>
+  <div class="container">
+    <div style="display: flex; gap: 36px;">
+       <a asp-page="/Index" class="logo"><span>K.S.Z.K</span></a>
+
+      <nav>
+        <a asp-page="/Index" class="nav-button active">Mapa</a>
+        <a asp-page="/Index" class="nav-button">Księga</a>
+      </nav>
+    </div>
+  </div>
+</header>
+
+
+@* <canvas id="mapCanvas" width="1500" height="1000"></canvas> *@
+
+
+@section Scripts {
+  <script src="~/js/map-editor.js" asp-append-version="true"></script>
+    
+  <script>
+    console.log("Królewski kartograf gotowy do pracy!");
+    // Tutaj wklejasz logikę klikania, którą omawialiśmy
+  </script>
+}

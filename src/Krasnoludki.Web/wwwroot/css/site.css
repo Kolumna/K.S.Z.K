@@ -1,3 +1,75 @@
+:root {
+  --color-bg: #0f0e0c;
+  --color-surface: #13120e;
+  --color-card: #1a1814;
+  --color-card-hover: #202018;
+  --color-overlay: #2a2520;
+
+  --border-subtle: #1a1814;
+  --border-default: #2a2520;
+  --border-strong: #3a3528;
+  --border-active: #c8a030;
+
+  --text-primary: #e8e4d8;
+  --text-secondary: #c0b898;
+  --text-tertiary: #8a8070;
+  --text-muted: #646156;
+  --text-disabled: #2a2820;
+
+  --gold: #e8c060;
+  --gold-border: #c8a030;
+  --gold-bg: #3a3020;
+  --gold-subtle: #2a2010;
+
+  --dwarf: #4a90c0;
+  --dwarf-bg: #1a3a5a;
+  --mine: #c07030;
+  --mine-bg: #3a2010;
+
+  --success: #6aaa6a;
+  --success-bg: #1a3020;
+  --warning: #c0a030;
+  --warning-bg: #2a2010;
+  --danger: #c05050;
+  --danger-bg: #3a1818;
+
+  --mineral-gold: #e8c060;
+  --mineral-silver: #c0c8d0;
+  --mineral-coal: #808878;
+  --mineral-quartz: #a0c0e0;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --font-sans: "Georgia", serif;
+  --font-mono: "Courier New", monospace;
+
+  --text-xs: 10px;
+  --text-sm: 11px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+
+  --tracking-tight: 0.02em;
+  --tracking-normal: 0.05em;
+  --tracking-wide: 0.1em;
+  --tracking-wider: 0.15em;
+  --tracking-widest: 0.25em;
+
+  --transition-fast: all 0.12s ease;
+  --transition-normal: all 0.2s ease;
+}
+
 @font-face {
   font-family: "Almendra-Local";
   src: url("../fonts/Almendra-Regular.ttf") format("truetype");
@@ -19,6 +91,24 @@ span {
   padding: 0;
 }
 
+.field-y {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-x {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+html {
+  background-color: var(--color-bg);
+}
+
 a {
   text-decoration: none;
 }
@@ -30,28 +120,31 @@ body {
 }
 
 .btn {
-  padding: 24px;
-  background-color: #000;
+  padding: 8px 16px;
+  background-color: var(--gold-bg);
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
   transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
 }
 
 .btn:hover {
-  background-color: #333;
+  background-color: var(--color-overlay);
 }
 
 .btn-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  flex: 1;
   width: 256px;
   height: 256px;
-  font-size: 1.25rem;
 }
 
 .container {
@@ -64,12 +157,12 @@ body {
   flex-direction: column;
 }
 
-header {
+.main-page-header {
   text-align: center;
   padding: 24px;
 }
 
-footer {
+.main-page-footer {
   text-align: center;
   padding: 24px;
 }
@@ -91,10 +184,92 @@ footer {
 
 .buttons-group {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
   justify-content: center;
   align-items: center;
   margin-top: 24px;
-  flex: 1;
   height: 100%;
+  max-width: 800px;
+  margin: 24px auto 0 auto;
+}
+
+h1 {
+  font-size: 4rem;
+  color: var(--gold);
+  text-shadow:
+    2px 2px 0 var(--gold-border),
+    4px 4px 0 var(--gold-bg);
+}
+
+.subtitle {
+  font-size: 2rem;
+  color: var(--text-secondary);
+  text-shadow:
+    1px 1px 0 var(--text-primary),
+    2px 2px 0 var(--text-muted);
+}
+
+footer {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+small {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+header {
+  display: flex;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.logo {
+  font-size: 1.8rem;
+  color: var(--gold);
+  text-shadow:
+    1px 1px 0 var(--gold-border),
+    2px 2px 0 var(--gold-bg);
+  padding: 16px 0;
+}
+
+.main-page-header {
+  text-align: center;
+  padding: 24px;
+}
+
+.main-page-footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+nav {
+  display: flex;
+}
+
+.nav-button {
+  padding: 8px 24px;
+  background-color: var(--gold-bg);
+  color: white;
+  cursor: pointer;
+  font-size: 20px;
+  transition: 200ms background-color ease;
+  display: flex;
+  align-items: center;
+  border-right: 2px solid var(--border-subtle);
+}
+
+.nav-button:hover {
+  background-color: var(--color-overlay);
+}
+
+.nav-button:last-child {
+  border-right: none;
+}
+
+.nav-button.active {
+  border-bottom: 2px solid gold;
 }
