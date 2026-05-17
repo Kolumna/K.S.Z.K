@@ -523,6 +523,19 @@ aside.algo-aside {
   width: 100%;
 }
 
-.modal-header {
-  text-align: left;
+.modal-content input[type="checkbox"] {
+  transform: scale(1.5);
+  margin-right: 8px;
+}
+
+#mineralsCheckboxGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
 }
