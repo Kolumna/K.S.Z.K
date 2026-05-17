@@ -30,7 +30,7 @@
 
       <div class="tool-buttons-group">
 
-        <button class="tool-button active" data-tool="add-dwarf"><svg xmlns="http://www.w3.org/2000/svg"
+        <button id="btn-dwarf" onclick="setMode('dwarf')" class="tool-button active" data-tool="add-dwarf"><svg xmlns="http://www.w3.org/2000/svg"
                                                                       viewBox="0 0 512 512" style="height: 48px; width: 48px;">
           <g class="" style="" transform="translate(0,0)">
             <path
@@ -40,7 +40,7 @@
         </svg>Krasnoludek</button>
 
    
-        <button class="tool-button" data-tool="add-mine"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+        <button id="btn-mine" onclick="setMode('mine')" class="tool-button" data-tool="add-mine"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
                                                               style="height: 48px; width: 48px;">
           <g class="" style="" transform="translate(0,0)">
             <path
@@ -241,7 +241,8 @@
 
 
 @section Scripts {
-  <script src="~/js/map-editor.js" asp-append-version="true"></script>
+  <script src="~/js/map/map-editor.js" asp-append-version="true"></script>
+   <script src="~/js/map/state.js" asp-append-version="true"></script>
 
   <script>
     console.log("Królewski kartograf gotowy do pracy!");
