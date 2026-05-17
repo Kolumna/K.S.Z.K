@@ -1,0 +1,41 @@
+@page
+@model IndexModel
+@{
+  ViewData["Title"] = "Algorytmy | Królewski System Zarządzania Królestwem";
+}
+
+<header>
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; gap: 36px;">
+      <a asp-page="/Index" class="logo">K.S.Z.K</a>
+
+      <nav>
+        <a asp-page="/Map" class="nav-button">Mapa</a>
+        <a asp-page="/Algorithms" class="nav-button">Algorytmy</a>
+        <a asp-page="/Book" class="nav-button active">Księga</a>
+      </nav>
+    </div>
+
+    <div>
+      <span>Nowa mapa</span>
+    </div>
+  </div>
+</header>
+
+<section class="container main-view">
+  <aside class="book-aside">
+    <div class="aside-item">
+      <div class="field-y" style="align-items: flex-start; padding: 0 16px;">
+        <span style="font-size: 1.2rem;">Scenariusze</span>
+        <small>Wybierz scenariusz</small>
+
+      </div>
+
+     
+    
+    </div>
+
+    <div class="book-aside-actions">
+    </div>
+  </aside>
+</section>
