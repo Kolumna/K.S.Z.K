@@ -89,6 +89,7 @@ span {
   font-family: "Almendra-Local", serif;
   margin: 0;
   padding: 0;
+  color: var(--text-primary);
 }
 
 .field-y {
@@ -148,13 +149,9 @@ body {
 }
 
 .container {
-  max-width: 1500px;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
-  height: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
 .main-page-header {
@@ -169,17 +166,18 @@ body {
 
 .canvas-area {
   background-color: #333;
-  width: 100%;
   height: 100%;
-  flex: 1;
+  flex-grow: 1;
   display: flex;
-  border-radius: 8px;
+  flex-direction: column;
 }
 
 #mapCanvas {
-  border: 2px solid #5d4037;
-  width: 1500px;
-  height: 1000px;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-bottom: 1px solid var(--border-strong);
+  background-color: var(--color-card);
 }
 
 .buttons-group {
@@ -272,4 +270,191 @@ nav {
 
 .nav-button.active {
   border-bottom: 2px solid gold;
+}
+
+.tool-button {
+  padding: 8px 16px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  width: 280px;
+}
+
+.tool-button:hover {
+  background-color: var(--color-overlay);
+}
+
+.tool-button.active {
+  background-color: var(--gold);
+  color: var(--color-bg);
+  border-color: var(--gold-border);
+}
+
+.tool-button.active svg {
+  filter: invert(100%);
+}
+
+.tool-buttons-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+aside.tool-aside {
+  border: 1px solid var(--border-strong);
+  border-top: none;
+}
+
+aside.tool-aside .aside-item {
+  border-bottom: 1px solid var(--border-strong);
+  padding: 16px;
+}
+
+.main-view {
+  display: flex;
+}
+
+.algo-buttons-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.algo-button {
+  padding: 24px 16px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  border-bottom: 1px solid var(--gold);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.algo-button:last-child {
+  border-bottom: none;
+}
+
+.algo-button span {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+}
+
+.algo-button .status {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.algo-button:hover {
+  background-color: var(--color-overlay);
+}
+
+.algo-button.active {
+  background-color: var(--gold);
+}
+
+.algo-button.active .status {
+  color: var(--color-bg);
+}
+
+.algo-button.active span,
+.algo-button.active small {
+  color: var(--color-bg);
+}
+
+aside.algo-aside .aside-item {
+  border-bottom: 1px solid var(--border-strong);
+  padding-top: 16px;
+}
+
+aside.algo-aside .aside-item:last-child {
+  border-bottom: none;
+}
+
+aside.algo-aside {
+  border: 1px solid var(--border-strong);
+  border-top: none;
+}
+
+.algo-aside-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.algo-aside-actions button {
+  padding: 12px 16px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.algo-aside-actions button:hover {
+  background-color: var(--color-overlay);
+}
+
+.points-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.point-item {
+  padding: 8px 16px;
+  background-color: var(--color-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.point-item button {
+  padding: 4px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 200ms background-color ease;
+  display: flex;
+  align-items: center;
+}
+
+.point-item button:hover {
+  background-color: var(--color-overlay);
 }

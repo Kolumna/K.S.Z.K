@@ -12,7 +12,7 @@ canvas.addEventListener("click", function (e) {
 
   if (nodes.length > 1) {
     const prev = nodes[nodes.length - 2];
-    drawConnection(prev.x, prev.y, newNode.x, newNode.y);
+    // drawConnection(prev.x, prev.y, newNode.x, newNode.y);
   }
 
   drawNode(x, y, "miner");
