@@ -1,4 +1,5 @@
 using System.ComponentModel.Design.Serialization;
+using System.Runtime.Serialization;
 using Krasnoludki.Core.Models;
 
 namespace Krasnoludki.Core.Graph;
@@ -10,6 +11,19 @@ public class ResidualNetwork
     public int SourceID { get; } = 0;
     public int SinkID { get; }
 
+
+    public IGraphNode GetNode(int id)
+    {
+        var node = Nodes.FirstOrDefault(n => n.GraphId == id);
+
+        if (node != null)
+        {
+            return node;
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(id), $"\aArgumentOutOfRangeException: Node with id: {id} doesn't exists in residual network!\n");
+    }
+    
     public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines, List<List<int>> distances)
     {
 
