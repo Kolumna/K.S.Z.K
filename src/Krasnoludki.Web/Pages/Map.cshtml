@@ -5,27 +5,114 @@
 }
 
 <header>
-  <div class="container">
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; gap: 36px;">
-       <a asp-page="/Index" class="logo"><span>K.S.Z.K</span></a>
+      <a asp-page="/Index" class="logo">K.S.Z.K</a>
 
       <nav>
-        <a asp-page="/Index" class="nav-button active">Mapa</a>
+        <a asp-page="/Map" class="nav-button active">Mapa</a>
+        <a asp-page="/Algorithms" class="nav-button">Algorytmy</a>
         <a asp-page="/Index" class="nav-button">Księga</a>
       </nav>
+    </div>
+
+    <div>
+      <span>Nowa mapa</span>
     </div>
   </div>
 </header>
 
+<section class="container main-view">
 
-@* <canvas id="mapCanvas" width="1500" height="1000"></canvas> *@
+  <aside class="tool-aside">
+    <div class="aside-item">
+      <span>Wybierz narzędzie</span>
+
+      <div class="tool-buttons-group">
+
+        <button id="btn-dwarf" onclick="setMode('dwarf')" class="tool-button active" data-tool="add-dwarf"><svg
+          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 48px; width: 48px;">
+          <g class="" style="" transform="translate(0,0)">
+            <path
+            d="M240.028 26v221.481L257.065 256l17.037-8.519V26h-34.074zM222.99 60.074c-80.22 0-136.297 56.077-136.297 136.296h119.26l17.037 17.037V60.074zm66.018 0v153.333l17.037-17.037h119.26c0-80.219-56.077-136.296-136.297-136.296zM69.657 213.407v34.074h50.047l-33.01-34.074H69.657zm41.528 0 34.074 34.074h34.074l-34.074-34.074h-34.074zm58.565 0 34.074 34.074h19.167v-8.518l-25.556-25.556H169.75zm144.815 0-25.556 25.556v8.518h19.167l34.074-34.074h-27.685zm52.176 0-34.074 34.074h34.074l34.074-34.074H366.74zm58.565 0-33.01 34.074h50.047v-34.074h-17.037zM86.694 264.52v34.074l120.325 60.694 5.68-36.497-100.449-41.234-8.519-17.037H86.694zm321.575 0-8.519 17.037-100.448 41.234 5.68 36.497 120.324-60.694V264.52h-17.037zm-168.241 2.13L222.99 366.74l34.074 17.037 34.074-17.037-17.037-100.093-17.037 8.519-17.037-8.519zM78.176 314.564l-46.852 41.528v59.63l61.76-93.704-14.908-7.454zm355.648 0-14.907 7.454 61.759 93.703v-59.63l-46.852-41.527zm-324.768 15.972L40.907 432.759l64.954 44.722 58.565-119.259-55.37-27.685zm293.888 0-55.37 27.685 58.565 119.26 64.954-44.723-68.149-102.222zm-222.546 35.139L120.768 486h89.445l12.778-51.111h25.555v-36.204l-68.148-33.01zm151.204 0-68.148 33.01v36.203h25.555L301.787 486h89.444l-59.63-120.324z"
+            fill="#fff" fill-opacity="1" />
+          </g>
+        </svg>Krasnoludek</button>
+
+   
+        <button id="btn-mine" onclick="setMode('mine')" class="tool-button" data-tool="add-mine"><svg
+          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 48px; width: 48px;">
+          <g class="" style="" transform="translate(0,0)">
+            <path
+            d="m403.818 33.117-369.554 15.4v46.012L426.97 79.425l-23.152-46.31zM385.334 99.04l-30.408 1.17 9.78 185.806 38.554-7.71L385.334 99.04zm-135.152 5.198-18.39.71-2.694 15.61-26.578 18.75.13.866-.273-.047-3.063 17.738 6.188 1.07 4.617 30.395 31.532 5.445 14.543-27.088 6.186 1.07 3.063-17.74-.273-.046.416-.773-18.75-26.578 3.346-19.382zm-77.444 2.98-22.82.878-39.47 54.775-1.692 33.138 63.982-88.79zm-77.625 2.985-31.275 1.203-28.72 272.832 45.66 6.733 14.335-280.767zM236.928 128.1l14.457 20.49-34.947-6.035 20.49-14.455zm-20.516 32.718 28.87 4.985-7.012 13.064-19.63-3.39-2.228-14.66zM437.12 289.89l-76.434 15.288-44.99-14.998-28.706 28.703h169.457L437.12 289.89zm-260.05 2.268-9.42 20.725h-16.386v18h8.205l-7.275 16h-22.93v18h14.75l-8.183 18h-26.568v18h18.386l-13.636 30h-24.75v18h16.568l-8.762 19.275 16.387 7.45 12.147-26.725h143.423l-6.75-18H133.785l13.637-30h103.605l-6.75-18h-88.673l8.18-18h73.74l-6.75-18h-58.807l7.273-16h45.535l-4.498-12h41.258l6-6h-80.113l6.035-13.276-16.387-7.45zm69.182 44.725 40.36 107.635c6.022-8.242 15.748-13.635 26.652-13.635 11.916 0 22.43 6.438 28.234 16h55.53c5.804-9.562 16.32-16 28.236-16 10.424 0 19.768 4.93 25.832 12.564l26.64-106.564H246.252zm67.012 112c-8.39 0-15 6.61-15 15s6.61 15 15 15 15-6.61 15-15-6.61-15-15-15zm112 0c-8.39 0-15 6.61-15 15s6.61 15 15 15 15-6.61 15-15-6.61-15-15-15z"
+            fill="#fff" fill-opacity="1"></path>
+          </g>
+        </svg>Kopalnia</button>
+
+      </div>
+    </div>
+
+    <div class="aside-item points">
+      <span>Punkty na mapie</span>
+
+      <div id="pointsList" class="points-list">
+      </div>
+    </div>
+
+    <div class="tool-aside-actions">
+      <button><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 24px; width: 24px;">
+        <g class="" style="" transform="translate(0,0)">
+          <path
+          d="M64 48c-8.726 0-16 7.274-16 16v384c0 8.726 7.274 16 16 16h215v-16H64V64h63.375v97.53c0 3.924 3.443 7.095 7.72 7.095h169.81c4.277 0 7.72-3.17 7.72-7.094V64h69.22c.428.318.8.548 1.467 1.094 2.05 1.675 4.962 4.264 8.375 7.406 6.827 6.283 15.65 14.837 24.313 23.5 8.663 8.663 17.217 17.486 23.5 24.313 3.142 3.413 5.73 6.324 7.406 8.374.546.668.776 1.04 1.094 1.47V330.25l16 16V128c0-2.68-.657-3.402-1.03-4.156a15.312 15.312 0 0 0-1.095-1.844c-.74-1.1-1.575-2.19-2.594-3.438-2.036-2.492-4.768-5.55-8.03-9.093-6.524-7.09-15.155-16-23.938-24.782-8.782-8.783-17.692-17.414-24.78-23.938-3.545-3.262-6.6-5.994-9.094-8.03-1.247-1.02-2.337-1.855-3.438-2.595-.55-.37-1.09-.72-1.844-1.094-.754-.373-1.477-1.03-4.156-1.03H64zm87.72 16h48.56c4.277 0 7.72 4.425 7.72 9.938v70.124c0 5.513-3.443 9.938-7.72 9.938h-48.56c-4.277 0-7.72-4.425-7.72-9.938V73.938c0-5.512 3.443-9.937 7.72-9.937zM114 212c-4.432 0-8 3.568-8 8v184c0 4.432 3.568 8 8 8h165v-28h-76.72l15.345-15.375 128-128L352 234.28l6.375 6.345L406 288.25V220c0-4.432-3.568-8-8-8H114zm238 47.75L245.75 366H297v128h110V366h51.25L352 259.75zM448 384v64h-23v16h23c8.726 0 16-7.274 16-16v-64h-16z"
+          fill="#fff" fill-opacity="1"></path>
+        </g>
+      </svg>Zapisz mapę</button>
+    </div>
+  </aside>
+
+  <main>
+    <canvas id="mapCanvas" width="1500" height="1000"></canvas>
+  </main>
+</section>
+
+<div id="dwarfModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Wybierz zasoby w kopalni:</h3>
+    <select id="nodeTypeSelect">
+      <option value="coal">Węgiel</option>
+      <option value="iron">Żelazo</option>
+      <option value="gold">Złoto</option>
+      <option value="diamond">Diament</option>
+    </select>
+    <div class="modal-actions">
+      <button onclick="confirmNode()">Dodaj</button>
+      <button onclick="closeModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<div id="mineModal" class="modal-overlay">
+  <div class="modal-content">
+    <h3>Wybierz zasoby w kopalni:</h3>
+    <div id="mineralsCheckboxGroup">
+      <label><input type="checkbox" value="coal"> Węgiel</label><br>
+      <label><input type="checkbox" value="iron"> Żelazo</label><br>
+      <label><input type="checkbox" value="gold"> Złoto</label><br>
+      <label><input type="checkbox" value="diamond"> Diament</label>
+    </div>
+    <div class="modal-actions">
+      <button onclick="confirmNode()">Dodaj</button>
+      <button onclick="closeModal()">Anuluj</button>
+    </div>
+  </div>
+</div>
+
+<pre class="container" style="font-size: large;" id="debugOutput">
+
+</pre>
 
 
 @section Scripts {
-  <script src="~/js/map-editor.js" asp-append-version="true"></script>
-    
-  <script>
-    console.log("Królewski kartograf gotowy do pracy!");
-    // Tutaj wklejasz logikę klikania, którą omawialiśmy
-  </script>
+  <script src="~/js/map/map-editor.js" asp-append-version="true"></script>
+  <script src="~/js/map/state.js" asp-append-version="true"></script>
 }
