@@ -12,7 +12,7 @@
       <nav>
         <a asp-page="/Map" class="nav-button active">Mapa</a>
         <a asp-page="/Algorithms" class="nav-button">Algorytmy</a>
-        <a asp-page="/Index" class="nav-button">Księga</a>
+        <a asp-page="/Book" class="nav-button">Księga</a>
       </nav>
     </div>
 
@@ -75,7 +75,7 @@
   </main>
 </section>
 
-<div id="dwarfModal" class="modal-overlay">
+<div id="mineModal" class="modal-overlay">
   <div class="modal-content">
     <h3>Wybierz zasoby w kopalni:</h3>
     <select id="nodeTypeSelect">
@@ -91,9 +91,9 @@
   </div>
 </div>
 
-<div id="mineModal" class="modal-overlay">
+<div id="dwarfModal" class="modal-overlay">
   <div class="modal-content">
-    <h3>Wybierz zasoby w kopalni:</h3>
+    <h3>Wybierz preferencje:</h3>
     <div id="mineralsCheckboxGroup">
       <label><input type="checkbox" value="coal"> Węgiel</label><br>
       <label><input type="checkbox" value="iron"> Żelazo</label><br>

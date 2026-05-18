@@ -23,11 +23,11 @@ function redrawAll() {
 function redrawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  nodes.forEach((node, i) => {
-    if (i > 0) {
-      drawConnection(nodes[i - 1].x, nodes[i - 1].y, node.x, node.y);
-    }
-  });
+  // nodes.forEach((node, i) => {
+  //   if (i > 0) {
+  //     drawConnection(nodes[i - 1].x, nodes[i - 1].y, node.x, node.y);
+  //   }
+  // });
 
   nodes.forEach((node) => {
     drawNodeGraphics(node.x, node.y, node.type);
@@ -102,7 +102,7 @@ function confirmNode() {
 
   let selectedTypes = [];
 
-  if (MapState.mode === "dwarf") {
+  if (MapState.mode === "mine") {
     const val = document.getElementById("nodeTypeSelect").value;
     selectedTypes = [val];
   } else {
