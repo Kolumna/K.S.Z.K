@@ -6,6 +6,9 @@ namespace Krasnoludki.Core.Graph;
 
 public class ResidualNetwork
 {
+    public int DwarvesCount {get;}
+    public int MinesCount {get;}
+
     public List<IGraphNode> Nodes { get; }
     public List<EdgeFlow> Edges{get;}
     public int SourceID { get; } = 0;
@@ -26,6 +29,9 @@ public class ResidualNetwork
     
     public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines, List<List<int>> distances)
     {
+        DwarvesCount = dwarves.Count;
+        MinesCount = mines.Count;
+
 
         Nodes = new List<IGraphNode>();
 
