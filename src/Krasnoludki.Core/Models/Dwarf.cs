@@ -2,21 +2,17 @@ namespace Krasnoludki.Core.Models;
 
 public class Dwarf : Point
 {
-    //private static int _DwarfCounter = 1;
-
-    //public int Id{ get; }
-    //public int GraphID{ get; set;}        //Zakomentowałem to co nie było mi obecnie potrzebne
-    //public Point HomeLocation{ get; }
-    //public int VoiceLoudness{ get; }
-    public List<MineralType> PreferredMinerals { get; } // Zmienilem na List, bo w zadaniu jest mowa o "preferowanych minerałach" (w liczbie mnogiej), a nie o jednym preferowanym minerale
+    private static int _DwarfCounter = 1;
+    public int Id{ get; }
+    public int VoiceLoudness{ get; }
+    public List<MineralType> PreferredMinerals { get; } 
     public Mine? WorksIn;
 
-    public Dwarf(/*double x, double y, */List<MineralType> minerals/*, int loudness*/)
+    public Dwarf(double x, double y, List<MineralType> minerals, int loudness) : base(x, y)
     {
-        //HomeLocation = new Point(x,y);
-        //VoiceLoudness = loudness;
+        VoiceLoudness = loudness;
         PreferredMinerals = minerals;
-        //Id = _DwarfCounter++;
+        Id = _DwarfCounter++;
     }
     public void AssignMine(Mine m)      //funkcja przydzielania kopalni
     {

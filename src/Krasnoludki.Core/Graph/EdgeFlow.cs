@@ -6,27 +6,28 @@ public class EdgeFlow
     public int To;
     public int Capacity;
     public int CurrFlow;
-    public int BackCapacity;
+    public double Cost;
+    public EdgeFlow BackwardEdge;
 
-    public EdgeFlow(int from, int to, int capacity/*, double cost = 0*/)
+    public EdgeFlow(Models.Point from, Models.Point to, int capacity)
     {
-        From = from;
-        To = to;
+        From = from.PointId;
+        To = to.PointId;
         Capacity = capacity;
-        //Cost = cost;
+        Cost = Math.Sqrt(Math.Pow(from.x - to.x, 2) + Math.Pow(from.y - to.y, 2));
         CurrFlow = 0;
-        BackCapacity = 0;
+        BackwardEdge = new EdgeFlow(to, from, 0);
     }
 
-    public void AddFlow(int Flow)
+    public void AddFlow(int flow)
     {
-        CurrFlow += Flow;
-        BackCapacity += Flow;
+        CurrFlow += flow;
+        BackwardEdge.Capacity += flow;
     }
 
-    public void AddBackFlow(int Flow)
+    public void AddBackFlow(int flow)
     {
-        BackCapacity -= Flow;
-        CurrFlow -= Flow;
+        BackwardEdge.Capacity -= flow;
+        CurrFlow -= flow;
     }
 }

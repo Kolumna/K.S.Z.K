@@ -14,7 +14,7 @@ namespace Krasnoludki.Tests
         public void EdmondsKarpTest()
         {
             List<Point> points = new List<Point>();
-            points.Add(new Point(true));
+            points.Add(new Point());
             List<MineralType> pref1 = new List<MineralType> {MineralType.Coal, MineralType.Silver};
             List<MineralType> pref2 = new List<MineralType> {MineralType.Coal, MineralType.Quartz};
             points.Add(new Dwarf(pref1));
@@ -23,7 +23,7 @@ namespace Krasnoludki.Tests
             points.Add(new Mine(MineralType.Silver, 1));
             
             
-            points.Add(new Point(false, true));
+            points.Add(new Point());
 
             List<EdgeFlow> edges = DwarfAssigning.GenerateEdges(points);
 
