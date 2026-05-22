@@ -16,7 +16,16 @@ public class EdgeFlow
         Capacity = capacity;
         Cost = Math.Sqrt(Math.Pow(from.x - to.x, 2) + Math.Pow(from.y - to.y, 2));
         CurrFlow = 0;
-        BackwardEdge = new EdgeFlow(to, from, 0);
+        BackwardEdge = new EdgeFlow(to, from, this);
+    }
+    public EdgeFlow(Models.Point from, Models.Point to, EdgeFlow mainEdge)
+    {
+        From = from.PointId;
+        To = to.PointId;
+        Capacity = 0;
+        Cost = Math.Sqrt(Math.Pow(from.x - to.x, 2) + Math.Pow(from.y - to.y, 2));
+        CurrFlow = 0;
+        BackwardEdge = mainEdge;
     }
 
     public void AddFlow(int flow)
