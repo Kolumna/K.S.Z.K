@@ -28,49 +28,6 @@ namespace Krasnoludki.Core
             }
             return result;
         }
-        /*{
-            List<EdgeFlow> result = new List<EdgeFlow>();
-            foreach(Point p in points)
-            {
-                if(p.IsSoruce)
-                {
-                    foreach(Point d in points)
-                    {
-                        if(d is Dwarf)
-                        {
-                            result.Add(new EdgeFlow(p.PointId, d.PointId, 1));
-                        }
-                    }
-                }
-                if(p is Dwarf)
-                {
-                    Dwarf dwarf = (Dwarf)p;
-                    foreach(Point m in points)
-                    {
-                        if(m is Mine)
-                        {
-                            Mine mine = (Mine)m;
-                            if(dwarf.PreferredMinerals.Contains(mine.Resource))
-                            {
-                                result.Add(new EdgeFlow(dwarf.PointId, mine.PointId, 1));
-                            }
-                        }
-                    }
-                }
-                if(p.IsSink)
-                {
-                    foreach(Point m in points)
-                    {
-                        if(m is Mine)
-                        {
-                            Mine mine = (Mine)m;
-                            result.Add(new EdgeFlow(mine.PointId, p.PointId, mine.Capacity));
-                        }
-                    }
-                }
-            }
-            return result;
-        }*/
         public static bool BFS(int sourceId, int sink, List<EdgeFlow> edges, ref int[] parent)
         {
             HashSet<int> visited = new HashSet<int>();

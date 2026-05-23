@@ -6,7 +6,7 @@ public class Mine : Point
     public int Id;
     public MineralType Resource{ get; }
     public int Capacity{ get; }
-    public List<int> Workers;     //tablica na Id pracujących w kopalni krasnoludków
+    public List<int> Workers;     //lista na Id pracujących w kopalni krasnoludków
     public bool IsFull;     //czy kopalnia ma maks pracowników
 
     public Mine(double x, double y, MineralType mineral, int capacity) : base(x, y)

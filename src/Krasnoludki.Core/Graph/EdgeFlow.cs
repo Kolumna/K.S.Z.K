@@ -22,10 +22,10 @@ public class EdgeFlow
     {
         From = mainEdge.To;
         To = mainEdge.From;
-        Capacity = 0;
-        Cost = 0 - mainEdge.Cost;
-        CurrFlow = 0;
-        BackwardEdge = mainEdge;
+        Capacity = mainEdge.Capacity;   //ustawia takie samo capacity jak w krawedzi głównej
+        Cost = 0 - mainEdge.Cost;       //
+        CurrFlow = Capacity;            //zapycha od razu pływ
+        BackwardEdge = mainEdge;        //zmiany te pozwalają obsługiwać pływ za pomocą jednej metody
     }
 
     public void BadResource()   //metoda ustawia koszt na abstrakcyjnie wysoki, użwyna w momencie generowania krawędzi między krasnoludkiem a kopalnią o niezgodnych preferencjach i surowcach
@@ -36,12 +36,6 @@ public class EdgeFlow
     public void AddFlow(int flow)
     {
         CurrFlow += flow;
-        if(CurrFlow > BackwardEdge.Capacity) BackwardEdge.Capacity = CurrFlow;
+        BackwardEdge.CurrFlow -= flow;
     }
-
-    /*public void AddBackFlow(int flow)
-    {
-        BackwardEdge.Capacity -= flow;
-        CurrFlow -= flow;
-    }*/
 }
