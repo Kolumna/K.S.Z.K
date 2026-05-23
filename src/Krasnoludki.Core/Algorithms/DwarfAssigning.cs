@@ -9,8 +9,26 @@ namespace Krasnoludki.Core
 {
     public class DwarfAssigning
     {
-        public static List<EdgeFlow> GenerateEdges(List<Point> points)
+        public static List<EdgeFlow> GenerateEdges(List<Dwarf> dwarves, List<Mine> mines, Source source, Sink sink)
         {
+            List<EdgeFlow> result = new List<EdgeFlow>();
+            foreach(Dwarf d in dwarves)
+            {
+                result.Add(new EdgeFlow(source, d, 1));       //tworzenie krawędzi od source do każdego krasnoludka
+                foreach(Mine m in mines)
+                {
+                    EdgeFlow newEdge = new EdgeFlow(d, m, 1);       //tworzenie krawędzi od kranolduka do każdej koaplni
+                    if(!d.PreferredMinerals.Contains(m.Resource)) newEdge.BadResource();    //ustawiania sztucznie wysokiego dystansu w przypadku niezgodności surowców i preferencji
+                    result.Add(newEdge);
+                }
+            }
+            foreach(Mine m in mines)
+            {
+                result.Add(new EdgeFlow(m, sink, m.Capacity));      //tworzenie krawędzi od każdej kopalni do sink
+            }
+            return result;
+        }
+        /*{
             List<EdgeFlow> result = new List<EdgeFlow>();
             foreach(Point p in points)
             {
@@ -52,7 +70,7 @@ namespace Krasnoludki.Core
                 }
             }
             return result;
-        }
+        }*/
         public static bool BFS(int sourceId, int sink, List<EdgeFlow> edges, ref int[] parent)
         {
             HashSet<int> visited = new HashSet<int>();
@@ -78,17 +96,17 @@ namespace Krasnoludki.Core
                         parent[edge.To] = p;
                         if(edge.To == sink) return true;
                     }
-                    if(edge.To == p && edge.BackCapacity > 0)
+                    /*if(edge.To == p && edge.BackCapacity > 0)
                     {
                         q.Enqueue(edge.From);
                         visited.Add(edge.From);
                         parent[edge.From] = p;
-                    }
+                    }*/
                 }
             }
             return false;
         }
-        public static int EdmondsKarp(int sourceId, int sink, List<EdgeFlow> edges)
+        /*public static int EdmondsKarp(int sourceId, int sink, List<EdgeFlow> edges)
         {
             int MaxFlow = 0;
             Stack<EdgeFlow> currPath = new Stack<EdgeFlow>();
@@ -134,7 +152,7 @@ namespace Krasnoludki.Core
             }
 
             return MaxFlow;
-        }
+        }*/
         /*public static void Assign(Point[] points, EdgeFlow[] edges)
         {
             foreach(Point d in points)

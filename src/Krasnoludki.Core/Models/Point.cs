@@ -14,7 +14,7 @@ public class Point
 {
     private static int _PointCounter = 1;
     public int PointId;
-    public double x;
+    public double x { get; init; }
     public double y;
     public PointType? Type;
 
