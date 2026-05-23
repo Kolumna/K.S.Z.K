@@ -77,13 +77,14 @@
 
 <div id="mineModal" class="modal-overlay">
   <div class="modal-content">
-    <h3>Wybierz zasoby w kopalni:</h3>
+    <h3>Dodaj kopalnię</h3>
     <select id="nodeTypeSelect">
       <option value="coal">Węgiel</option>
       <option value="iron">Żelazo</option>
       <option value="gold">Złoto</option>
       <option value="diamond">Diament</option>
     </select>
+    <input type="number" id="capacityInput" placeholder="Pojemność" min="1">
     <div class="modal-actions">
       <button onclick="confirmNode()">Dodaj</button>
       <button onclick="closeModal()">Anuluj</button>
@@ -93,7 +94,7 @@
 
 <div id="dwarfModal" class="modal-overlay">
   <div class="modal-content">
-    <h3>Wybierz preferencje:</h3>
+    <h3>Dodaj krasnoludka</h3>
     <div id="mineralsCheckboxGroup">
       <label><input type="checkbox" value="coal"> Węgiel</label><br>
       <label><input type="checkbox" value="iron"> Żelazo</label><br>

@@ -539,3 +539,12 @@ aside.algo-aside {
   gap: 16px;
   justify-content: center;
 }
+
+input {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  background-color: var(--color-surface);
+  color: var(--text-primary);
+}

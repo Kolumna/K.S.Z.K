@@ -121,6 +121,7 @@ function confirmNode() {
     x: pendingCoords.x,
     y: pendingCoords.y,
     type: MapState.mode,
+    capacity: MapState.mode === "mine" ? parseInt(document.getElementById("capacityInput").value) || 0 : undefined,
     minerals: selectedTypes,
   });
 
