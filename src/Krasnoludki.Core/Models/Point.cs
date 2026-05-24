@@ -15,7 +15,7 @@ public class Point
     private static int _PointCounter = 1;
     public int PointId;
     public double x { get; init; }
-    public double y;
+    public double y { get; init; }
     public PointType? Type;
 
     public Point(double x, double y)
@@ -23,5 +23,10 @@ public class Point
         PointId = _PointCounter++;
         this.x = x;
         this.y = y;
+    }
+
+    public int HowManyPoints()  //metoda zwraca ile punktów istnieje w momencie wywołania metody
+    {
+        return _PointCounter-1;
     }
 }

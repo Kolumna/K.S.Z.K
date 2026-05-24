@@ -14,8 +14,8 @@ public class Dwarf : Point
         PreferredMinerals = minerals;
         Id = _DwarfCounter++;
     }
-    public void AssignMine(Mine m)      //funkcja przydzielania kopalni
+    public void AssignMine(Mine mine)      //funkcja przydzielania kopalni
     {
-        WorksIn = m;
+        WorksIn = mine;
     }
 }

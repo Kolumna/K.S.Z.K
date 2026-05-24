@@ -6,7 +6,7 @@ public class Mine : Point
     public int Id;
     public MineralType Resource{ get; }
     public int Capacity{ get; }
-    public List<int> Workers;     //lista na Id pracujących w kopalni krasnoludków
+    public List<Dwarf> Workers;     //lista na Id pracujących w kopalni krasnoludków
     public bool IsFull;     //czy kopalnia ma maks pracowników
 
     public Mine(double x, double y, MineralType mineral, int capacity) : base(x, y)
@@ -14,13 +14,13 @@ public class Mine : Point
         Id = _MineCounter++;
         Resource = mineral;
         Capacity = capacity;
-        Workers = new List<int>();
+        Workers = new List<Dwarf>();
         IsFull = false;
     }
 
-    public void AddWorker(int DwarfId)
+    public void AddWorker(Dwarf dwarf)
     {
-        Workers.Add(DwarfId);
+        Workers.Add(dwarf);
         if(Workers.Count >= Capacity) IsFull = true;
     }
 

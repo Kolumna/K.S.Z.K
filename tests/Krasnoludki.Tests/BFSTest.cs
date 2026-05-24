@@ -13,30 +13,33 @@ namespace Krasnoludki.Tests
         [Fact]
         public void BFSTest()
         {
-            /*List<Point> points = new List<Point>();
-            points.Add(new Point(true));
-            List<MineralType> pref1 = new List<MineralType> {MineralType.Coal, MineralType.Silver};
-            List<MineralType> pref2 = new List<MineralType> {MineralType.Coal, MineralType.Quartz};
-            points.Add(new Dwarf(pref1));
-            points.Add(new Dwarf(pref2));
-            points.Add(new Mine(MineralType.Coal, 2));
-            points.Add(new Mine(MineralType.Quartz, 5));
-            points.Add(new Point(false, true));
+            /*Sink sink = new Sink();     //id = 1
+            List<Dwarf> dwarves = new List<Dwarf>
+            {
+                new Dwarf(1, 1, new List<MineralType> { MineralType.Gold }, 5),                     //id = 2
+                new Dwarf(2, 2, new List<MineralType> { MineralType.Quartz, MineralType.Gold}, 3)   //id = 3
+            };
+            List<Mine> mines = new List<Mine>
+            {
+                new Mine(3, 3, MineralType.Gold, 2),        //id = 4
+                new Mine(4, 4, MineralType.Quartz, 1),      //id = 5
+            };
+            Source source = new Source();       //id = 6
+            
 
-            List<EdgeFlow> edges = DwarfAssigning.GenerateEdges(points);
+            List<EdgeFlow> edges = DwarfAssigning.GenerateEdges(dwarves, mines, source, sink);
 
-            int[] parent = new int[points.Count+1];
+            int[] parent = new int[sink.HowManyPoints()];
 
-            bool test = DwarfAssigning.BFS(1, points.Count, edges, ref parent);
+            bool test = DwarfAssigning.BFS(source, sink, edges, ref parent);
 
             Assert.True(test);
-            Assert.Equal(-1, parent[0]);
-            Assert.Equal(-1, parent[1]);
-            Assert.Equal(1, parent[2]);
-            Assert.Equal(1, parent[3]);
-            Assert.Equal(2, parent[4]);
-            Assert.Equal(3, parent[5]);
-            Assert.Equal(4, parent[6]);*/
+            Assert.Equal(-1, parent[source.PointId-1]);     //-1 ponieważ tablica jest indeksowana od 0, a punkty od 1
+            Assert.Equal(6, parent[dwarves[0].PointId-1]);
+            Assert.Equal(6, parent[dwarves[1].PointId-1]);
+            Assert.Equal(2, parent[mines[0].PointId-1]);
+            Assert.Equal(2, parent[mines[1].PointId-1]);
+            Assert.Equal(4, parent[sink.PointId-1]);*/
         }
     }
-}
+} 
