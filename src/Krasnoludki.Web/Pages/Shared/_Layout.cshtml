@@ -11,14 +11,21 @@
 </head>
 
 <body>
+    <header>
+        <h1 style="font-size: 4rem;">K.S.Z.K</H1>
+        <p style="font-size: 2rem;">
+            Królewski System Zarządzania Królestwem
+        </p>
+    </header>
 
- 
+    <main class="container" role="main">
+        @RenderBody()
+    </main>
 
-    @RenderBody()
+    <footer>
+        <p>Projekt zaliczeniowy na przedmiot: Algorytmy i Struktury Danych II</p>
+    </footer>
 
- 
-
- 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
