@@ -1,5 +1,5 @@
 @page
-@model IndexModel
+@model AlgorithmsModel
 @{
   ViewData["Title"] = "Algorytmy | Królewski System Zarządzania Królestwem";
 }
@@ -12,12 +12,12 @@
       <nav>
         <a asp-page="/Map" class="nav-button">Mapa</a>
         <a asp-page="/Algorithms" class="nav-button active">Algorytmy</a>
-        <a asp-page="/Index" class="nav-button">Księga</a>
+        <a asp-page="/Book" class="nav-button">Księga</a>
       </nav>
     </div>
 
     <div>
-      <span>Nowa mapa</span>
+      <span>@Model.ActiveScenarioName</span>
     </div>
   </div>
 </header>
