@@ -31,7 +31,6 @@ setupCanvas();
 function redrawAll() {
   redrawCanvas();
   redrawList();
-  redrawDebugCode();
 }
 
 function redrawCanvas() {
@@ -167,11 +166,6 @@ function cancelNode() {
 }
 function closeModal() {
   closeAllModals();
-}
-
-function redrawDebugCode() {
-  const debug = document.getElementById("debugOutput");
-  debug.textContent = JSON.stringify(nodes, null, 2);
 }
 
 function showLoading(message = "Zapisywanie mapy...") {
