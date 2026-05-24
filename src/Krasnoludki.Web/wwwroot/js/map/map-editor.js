@@ -1,6 +1,20 @@
 const canvas = document.getElementById("mapCanvas");
 const ctx = canvas.getContext("2d");
-let nodes = [];
+
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+let nodes =
+  typeof INITIAL_NODES !== "undefined" && Array.isArray(INITIAL_NODES)
+    ? INITIAL_NODES
+    : [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  setupCanvas();
+  if (nodes.length > 0) {
+    redrawAll();
+  }
+});
+
 let pendingCoords = null;
 
 function setupCanvas() {
@@ -23,11 +37,11 @@ function redrawAll() {
 function redrawCanvas() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  nodes.forEach((node, i) => {
-    if (i > 0) {
-      drawConnection(nodes[i - 1].x, nodes[i - 1].y, node.x, node.y);
-    }
-  });
+  // nodes.forEach((node, i) => {
+  //   if (i > 0) {
+  //     drawConnection(nodes[i - 1].x, nodes[i - 1].y, node.x, node.y);
+  //   }
+  // });
 
   nodes.forEach((node) => {
     drawNodeGraphics(node.x, node.y, node.type);
@@ -102,7 +116,7 @@ function confirmNode() {
 
   let selectedTypes = [];
 
-  if (MapState.mode === "dwarf") {
+  if (MapState.mode === "mine") {
     const val = document.getElementById("nodeTypeSelect").value;
     selectedTypes = [val];
   } else {
@@ -121,6 +135,10 @@ function confirmNode() {
     x: pendingCoords.x,
     y: pendingCoords.y,
     type: MapState.mode,
+    capacity:
+      MapState.mode === "mine"
+        ? parseInt(document.getElementById("capacityInput").value) || 0
+        : undefined,
     minerals: selectedTypes,
   });
 
@@ -136,16 +154,126 @@ function deleteNode(index) {
 function closeAllModals() {
   document.getElementById("dwarfModal").style.display = "none";
   document.getElementById("mineModal").style.display = "none";
-  
-  document.querySelectorAll('#mineralsCheckboxGroup input').forEach(cb => cb.checked = false);
-  
+
+  document
+    .querySelectorAll("#mineralsCheckboxGroup input")
+    .forEach((cb) => (cb.checked = false));
+
   pendingCoords = null;
 }
 
-function cancelNode() { closeAllModals(); }
-function closeModal() { closeAllModals(); }
+function cancelNode() {
+  closeAllModals();
+}
+function closeModal() {
+  closeAllModals();
+}
 
 function redrawDebugCode() {
   const debug = document.getElementById("debugOutput");
   debug.textContent = JSON.stringify(nodes, null, 2);
 }
+
+function showLoading(message = "Zapisywanie mapy...") {
+  const overlay = document.getElementById("loading-overlay");
+  overlay.querySelector("span").textContent = message;
+  overlay.style.display = "flex";
+}
+
+function hideLoading() {
+  document.getElementById("loading-overlay").style.display = "none";
+}
+
+async function saveMapBtn() {
+  const scenarioId = document.getElementById("currentScenarioId").value;
+
+  const token = document.querySelector(
+    'input[name="__RequestVerificationToken"]',
+  ).value;
+
+  try {
+    showLoading("Zapisywanie mapy...");
+
+    const odpowiedz = await fetch("?handler=SaveHoffApi", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        scenarioId,
+        nodes: JSON.stringify(nodes),
+      }),
+    });
+
+    if (!odpowiedz.ok) {
+      hideLoading();
+      throw new Error("Błąd podczas generowania pliku .hoff");
+    }
+
+    const plikBlob = await odpowiedz.blob();
+
+    // const adresUrl = window.URL.createObjectURL(plikBlob);
+    // const link = document.createElement("a");
+    // link.href = adresUrl;
+
+    // link.download = `${scenarioId || "mapa_królestwa"}.hoff`;
+
+    // document.body.appendChild(link);
+    // link.click();
+
+    // document.body.removeChild(link);
+    // window.URL.revokeObjectURL(adresUrl);
+
+    showLoading("Wczytywanie scenariusza...");
+    await sleep(1000);
+    window.location.reload();
+  } catch (blad) {
+    hideLoading();
+    console.error(blad);
+    alert("Nie udało się zapisać mapy: " + blad.message);
+  }
+}
+
+async function updateMapBtn() {
+  const scenarioId = document.getElementById("currentScenarioId").value;
+
+  const token = document.querySelector(
+    'input[name="__RequestVerificationToken"]',
+  ).value;
+
+  try {
+    const odpowiedz = await fetch("?handler=UpdateHoffApi", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        scenarioId,
+        nodes: JSON.stringify(nodes),
+      }),
+    });
+
+    if (!odpowiedz.ok) throw new Error("Błąd podczas generowania pliku .hoff");
+
+    const plikBlob = await odpowiedz.blob();
+
+    // const adresUrl = window.URL.createObjectURL(plikBlob);
+    // const link = document.createElement("a");
+    // link.href = adresUrl;
+
+    // link.download = `${scenarioId || "mapa_królestwa"}.hoff`;
+
+    // document.body.appendChild(link);
+    // link.click();
+
+    // document.body.removeChild(link);
+    // window.URL.revokeObjectURL(adresUrl);
+  } catch (blad) {
+    console.error(blad);
+    alert("Nie udało się zapisać mapy: " + blad.message);
+  }
+}
+
+window.addEventListener("pageshow", () => {
+  hideLoading();
+});
