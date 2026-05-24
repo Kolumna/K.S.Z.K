@@ -426,8 +426,7 @@ aside.algo-aside {
   padding: 16px;
 }
 
-.tool-aside-actions button,
-.action-button {
+.tool-aside-actions button, .action-button {
   padding: 12px 16px;
   background-color: var(--gold-bg);
   color: white;
@@ -443,8 +442,7 @@ aside.algo-aside {
   justify-content: center;
 }
 
-.tool-aside-actions button:hover,
-.action-button:hover {
+.tool-aside-actions button:hover, .action-button:hover {
   background-color: var(--color-overlay);
 }
 
