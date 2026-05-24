@@ -1,3 +1,4 @@
+
 # Królewski System Zarządzania Królestwem (K.S.Z.K)
 
 Projekt zaliczeniowy realizowany w ramach przedmiotu **Algorytmy i Struktury Danych II**.
@@ -26,3 +27,4 @@ dotnet run --project src/Krasnoludki.Web
 ```
 
 Po uruchomieniu aplikacji, interfejs będzie dostępny pod adresem `http://localhost:5145`.
+ f28a25f79fc8f9c3fc60feb93e302ce04c9a92f7
