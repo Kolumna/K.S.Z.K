@@ -540,6 +540,10 @@ aside.algo-aside {
   width: 100%;
 }
 
+.modal-content button:hover {
+  background-color: var(--color-overlay);
+}
+
 .modal-content input[type="checkbox"] {
   transform: scale(1.5);
   margin-right: 8px;
