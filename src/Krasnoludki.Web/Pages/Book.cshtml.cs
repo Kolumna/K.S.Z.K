@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Krasnoludki.Web.Pages;
 
 [IgnoreAntiforgeryToken]
-public class AlgorithmsModel : PageModel
+public class BookModel : PageModel
 {
   [BindProperty(SupportsGet = true)]
   public string? SelectedScenarioId { get; set; }
@@ -17,13 +17,17 @@ public class AlgorithmsModel : PageModel
 
   private readonly ScenarioFileService _scenarios;
 
-  public AlgorithmsModel(ScenarioFileService scenarios)
+  public BookModel(ScenarioFileService scenarios)
   {
     _scenarios = scenarios;
   }
 
+  public IEnumerable<dynamic> SavedScenarios { get; set; } = new List<dynamic>();
+
   public void OnGet()
   {
+    SavedScenarios = _scenarios.GetManifest();
+
     var id = HttpContext.Session.GetString("activeScenarioId");
     if (id != null)
     {
@@ -56,5 +60,31 @@ public class AlgorithmsModel : PageModel
     ActiveScenarioName = "Nowa mapa";
     NodesJson = "[]";
     SelectedScenarioId = null;
+  }
+
+  public IActionResult OnPostLoadScenario(string id)
+  {
+    if (!string.IsNullOrEmpty(id) && _scenarios.Exists(id))
+    {
+      HttpContext.Session.SetString("activeScenarioId", id);
+    }
+
+    return RedirectToPage();
+  }
+
+  public IActionResult OnPostDeleteScenario(string id)
+  {
+    Console.WriteLine($"Request to delete scenario with id: {id}");
+    if (!string.IsNullOrEmpty(id) && _scenarios.Exists(id))
+    {
+      _scenarios.Delete(id);
+      var currentSessionId = HttpContext.Session.GetString("activeScenarioId");
+      if (currentSessionId == id)
+      {
+        HttpContext.Session.Remove("activeScenarioId");
+      }
+    }
+
+    return RedirectToPage();
   }
 }
