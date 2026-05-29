@@ -1,11 +1,11 @@
 const canvas = document.getElementById("mapCanvas");
 const ctx = canvas.getContext("2d");
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let nodes =
   typeof INITIAL_NODES !== "undefined" && Array.isArray(INITIAL_NODES)
-    ? INITIAL_NODES
+    ? structuredClone(INITIAL_NODES)
     : [];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,7 +15,26 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
+console.log(INITIAL_NODES);
+
 let pendingCoords = null;
+let draggedNode = null;
+let isDragging = false;
+let hasUnsavedChanges = false;
+
+function markAsChanged() {
+  if (!hasUnsavedChanges) {
+    hasUnsavedChanges = true;
+    document.getElementById("unsavedChangesWarning").style.display = "flex";
+    console.log(INITIAL_NODES);
+    console.log(INITIAL_NODES.length);
+    if (INITIAL_NODES && INITIAL_NODES.length > 0) {
+      document.getElementById("updateButton").disabled = false;
+    } else {
+      document.getElementById("saveButton").disabled = false;
+    }
+  }
+}
 
 function setupCanvas() {
   const dpr = window.devicePixelRatio || 1;
@@ -96,10 +115,60 @@ function drawConnection(x1, y1, x2, y2) {
   ctx.setLineDash([]);
 }
 
-canvas.addEventListener("click", function (e) {
+canvas.addEventListener("mousedown", function (e) {
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
+
+  const clickedNode = getNodeAt(x, y);
+  if (clickedNode) {
+    draggedNode = clickedNode;
+    isDragging = false;
+  }
+});
+
+canvas.addEventListener("mousemove", function (e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  if (draggedNode) {
+    draggedNode.x = x;
+    draggedNode.y = y;
+    isDragging = true;
+    redrawAll();
+  } else {
+    const hoveredNode = getNodeAt(x, y);
+    canvas.style.cursor = hoveredNode ? "grab" : "default";
+  }
+});
+
+canvas.addEventListener("mouseup", function () {
+  if (draggedNode && isDragging) {
+    markAsChanged();
+  }
+  draggedNode = null;
+  isDragging = false;
+});
+
+canvas.addEventListener("mouseleave", function () {
+  draggedNode = null;
+  canvas.style.cursor = "default";
+});
+
+canvas.addEventListener("click", function (e) {
+  if (isDragging) {
+    isDragging = false;
+    return;
+  }
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  if (getNodeAt(x, y)) {
+    return;
+  }
 
   pendingCoords = { x, y };
 
@@ -109,6 +178,19 @@ canvas.addEventListener("click", function (e) {
     document.getElementById("mineModal").style.display = "flex";
   }
 });
+
+function getNodeAt(x, y) {
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    const node = nodes[i];
+    const dx = x - node.x;
+    const dy = y - node.y;
+
+    if (Math.sqrt(dx * dx + dy * dy) <= 22) {
+      return node;
+    }
+  }
+  return null;
+}
 
 function confirmNode() {
   if (!pendingCoords) return;
@@ -141,12 +223,14 @@ function confirmNode() {
     minerals: selectedTypes,
   });
 
+  markAsChanged();
   redrawAll();
   closeAllModals();
 }
 
 function deleteNode(index) {
   nodes.splice(index, 1);
+  markAsChanged();
   redrawAll();
 }
 
@@ -187,44 +271,39 @@ async function saveMapBtn() {
 
   try {
     showLoading("Zapisywanie mapy...");
+    const nodesWithCorrectIds = nodes.map((node, index) => ({
+      ...node,
+      id: index + 1,
+    }));
 
-    const odpowiedz = await fetch("?handler=SaveHoffApi", {
+    console.log("Wysyłanie danych do serwera:", {
+      scenarioId,
+      nodes: nodesWithCorrectIds,
+    });
+
+    const res = await fetch("?handler=SaveHoffApi", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         scenarioId,
-        nodes: JSON.stringify(nodes),
+        nodes: JSON.stringify(nodesWithCorrectIds),
       }),
     });
 
-    if (!odpowiedz.ok) {
+    if (!res.ok) {
       hideLoading();
       throw new Error("Błąd podczas generowania pliku .hoff");
     }
 
-    const plikBlob = await odpowiedz.blob();
-
-    // const adresUrl = window.URL.createObjectURL(plikBlob);
-    // const link = document.createElement("a");
-    // link.href = adresUrl;
-
-    // link.download = `${scenarioId || "mapa_królestwa"}.hoff`;
-
-    // document.body.appendChild(link);
-    // link.click();
-
-    // document.body.removeChild(link);
-    // window.URL.revokeObjectURL(adresUrl);
-
     showLoading("Wczytywanie scenariusza...");
     await sleep(1000);
     window.location.reload();
-  } catch (blad) {
+  } catch (err) {
     hideLoading();
-    console.error(blad);
-    alert("Nie udało się zapisać mapy: " + blad.message);
+    console.error(err);
+    alert("Nie udało się zapisać mapy: " + err.message);
   }
 }
 
@@ -236,7 +315,19 @@ async function updateMapBtn() {
   ).value;
 
   try {
-    const odpowiedz = await fetch("?handler=UpdateHoffApi", {
+    showLoading("Zapisywanie mapy...");
+
+    const nodesWithCorrectIds = nodes.map((node, index) => ({
+      ...node,
+      id: index + 1,
+    }));
+
+    console.log("Wysyłanie danych do serwera:", {
+      scenarioId,
+      nodes: nodesWithCorrectIds,
+    });
+
+    const res = await fetch("?handler=UpdateHoffApi", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -247,24 +338,18 @@ async function updateMapBtn() {
       }),
     });
 
-    if (!odpowiedz.ok) throw new Error("Błąd podczas generowania pliku .hoff");
+    if (!res.ok) {
+      hideLoading();
+      throw new Error("Błąd podczas generowania pliku .hoff");
+    }
 
-    const plikBlob = await odpowiedz.blob();
-
-    // const adresUrl = window.URL.createObjectURL(plikBlob);
-    // const link = document.createElement("a");
-    // link.href = adresUrl;
-
-    // link.download = `${scenarioId || "mapa_królestwa"}.hoff`;
-
-    // document.body.appendChild(link);
-    // link.click();
-
-    // document.body.removeChild(link);
-    // window.URL.revokeObjectURL(adresUrl);
-  } catch (blad) {
-    console.error(blad);
-    alert("Nie udało się zapisać mapy: " + blad.message);
+    showLoading("Wczytywanie scenariusza...");
+    await sleep(1000);
+    window.location.reload();
+  } catch (err) {
+    hideLoading();
+    console.error(err);
+    alert("Nie udało się zapisać mapy: " + err.message);
   }
 }
 
