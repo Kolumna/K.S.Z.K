@@ -22,57 +22,68 @@
   </div>
 </header>
 
-<section class="container main-view">
-  <main>
-    <canvas id="mapCanvas" width="1500" height="1000"></canvas>
-  </main>
+@if (Model.SelectedScenarioId == null)
+{
+  <div class="container" style="margin-top: 32px; text-align: center;">
+    <h2 style="margin-bottom: 32px;">Wybierz scenariusz, aby zobaczyć dostępne algorytmy</h2>
+  </div>
+}
+else
+{
 
-  <aside class="algo-aside">
-    <div class="aside-item">
-      <div class="field-y" style="align-items: flex-start; padding: 0 16px;">
-        <span style="font-size: 1.2rem;">Algorytmy</span>
-        <small>Wybierz algorytm</small>
-      </div>
+  <section class="container main-view">
+    <main>
+      <canvas id="mapCanvas" width="1500" height="1000"></canvas>
+    </main>
 
-      <div style="padding: 0 16px; margin-top: 16px;">
-        <button class="algo-run-button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
-            <g class="" style="" transform="translate(0,0)">
-              <path
-              d="M106.854 106.002a26.003 26.003 0 0 0-25.64 29.326c16 124 16 117.344 0 241.344a26.003 26.003 0 0 0 35.776 27.332l298-124a26.003 26.003 0 0 0 0-48.008l-298-124a26.003 26.003 0 0 0-10.136-1.994z"
-              fill="#fff" fill-opacity="1" />
-            </g>
-          </svg>
-          Uruchom wybrany algorytm
-        </button>
-      </div>
+    <aside class="algo-aside">
+      <div class="aside-item">
+        <div class="field-y" style="align-items: flex-start; padding: 0 16px;">
+          <span style="font-size: 1.2rem;">Algorytmy</span>
+          <small>Wybierz algorytm</small>
+        </div>
+
+        <div style="padding: 0 16px; margin-top: 16px;">
+          <button class="algo-run-button">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
+              <g class="" style="" transform="translate(0,0)">
+                <path
+                d="M106.854 106.002a26.003 26.003 0 0 0-25.64 29.326c16 124 16 117.344 0 241.344a26.003 26.003 0 0 0 35.776 27.332l298-124a26.003 26.003 0 0 0 0-48.008l-298-124a26.003 26.003 0 0 0-10.136-1.994z"
+                fill="#fff" fill-opacity="1" />
+              </g>
+            </svg>
+            Uruchom wybrany algorytm
+          </button>
+        </div>
 
      
-      <div class="algo-buttons-group">
-        <button class="algo-button active" data-tool="algo1"><span>Algorytm 1</span><small>
-          Rozmieść krasnoludki optymalnie, by wydobywały jak najwięcej surowców!
-        </small>
-        <p class="status">Uruchiomiono</p>
-      </button>
-      <button class="algo-button" data-tool="algo2"><span>Algorytm 2</span>
-        <p class="status">Nie uruchiomiono</p>
-      </button>
-      <button class="algo-button" data-tool="algo3"><span>Algorytm 3</span>
-        <p class="status">Nie uruchiomiono</p>
-      </button>
-      <button class="algo-button" data-tool="algo4"><span>Algorytm 4</span>
-        <p class="status">Nie uruchiomiono</p>
-      </button>
-      <button class="algo-button" data-tool="algo4"><span>Algorytm 4</span>
-        <p class="status">Nie uruchiomiono</p>
-      </button>
+        <div class="algo-buttons-group">
+          <button class="algo-button active" data-tool="algo1"><span>Algorytm 1</span><small>
+            Rozmieść krasnoludki optymalnie, by wydobywały jak najwięcej surowców!
+          </small>
+          <p class="status">Uruchiomiono</p>
+        </button>
+        <button class="algo-button" data-tool="algo2"><span>Algorytm 2</span>
+          <p class="status">Nie uruchiomiono</p>
+        </button>
+        <button class="algo-button" data-tool="algo3"><span>Algorytm 3</span>
+          <p class="status">Nie uruchiomiono</p>
+        </button>
+        <button class="algo-button" data-tool="algo4"><span>Algorytm 4</span>
+          <p class="status">Nie uruchiomiono</p>
+        </button>
+        <button class="algo-button" data-tool="algo4"><span>Algorytm 4</span>
+          <p class="status">Nie uruchiomiono</p>
+        </button>
+      </div>
     </div>
-  </div>
 
-  <div class="algo-aside-actions">
-  </div>
-</aside>
+    <div class="algo-aside-actions">
+    </div>
+  </aside>
 </section>
+
+}
 
 
 @* <canvas id="mapCanvas" width="1500" height="1000"></canvas> *@
