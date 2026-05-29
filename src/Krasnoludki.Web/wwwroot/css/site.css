@@ -181,6 +181,16 @@ body {
   background-color: var(--color-surface);
   cursor: crosshair;
   box-sizing: border-box;
+  background-color: #e8dcc4;
+  background-image:
+    radial-gradient(
+      circle at center,
+      transparent 40%,
+      rgba(101, 67, 33, 0.6) 120%
+    ),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>');
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  cursor: crosshair;
 }
 
 main {
@@ -426,7 +436,8 @@ aside.algo-aside {
   padding: 16px;
 }
 
-.tool-aside-actions button, .action-button {
+.tool-aside-actions button,
+.action-button {
   padding: 12px 16px;
   background-color: var(--gold-bg);
   color: white;
@@ -442,7 +453,8 @@ aside.algo-aside {
   justify-content: center;
 }
 
-.tool-aside-actions button:hover, .action-button:hover {
+.tool-aside-actions button:hover,
+.action-button:hover {
   background-color: var(--color-overlay);
 }
 
@@ -642,4 +654,23 @@ input {
   align-items: center;
   gap: 8px;
   width: 100%;
+}
+
+#unsavedChangesWarning {
+  display: none;
+  position: absolute;
+  inset: 0;
+  height: 20px;
+  width: auto;
+  background: var(--danger-bg);
+  padding: 10px;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+button:disabled {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  cursor: not-allowed;
 }
