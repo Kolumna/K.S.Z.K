@@ -22,4 +22,20 @@ public class Dwarf
         PreferredMinerals = minerals;
         Id = _DwarfCounter++;
     }
+
+    public Dwarf(int loudness)
+    {
+        Id = _DwarfCounter++;
+        VoiceLoudness = loudness;
+    }
+
+    public int getId()
+    {
+        return Id;
+    }
+
+    public int getLoudness()
+    {
+        return VoiceLoudness;
+    }
 }

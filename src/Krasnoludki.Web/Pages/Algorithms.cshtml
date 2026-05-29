@@ -1,5 +1,5 @@
 @page
-@model IndexModel
+@model AlgorithmsModel
 @{
   ViewData["Title"] = "Algorytmy | Królewski System Zarządzania Królestwem";
 }
@@ -12,12 +12,12 @@
       <nav>
         <a asp-page="/Map" class="nav-button">Mapa</a>
         <a asp-page="/Algorithms" class="nav-button active">Algorytmy</a>
-        <a asp-page="/Index" class="nav-button">Księga</a>
+        <a asp-page="/Book" class="nav-button">Księga</a>
       </nav>
     </div>
 
     <div>
-      <span>Nowa mapa</span>
+      <span>@Model.ActiveScenarioName</span>
     </div>
   </div>
 </header>
@@ -32,7 +32,19 @@
       <div class="field-y" style="align-items: flex-start; padding: 0 16px;">
         <span style="font-size: 1.2rem;">Algorytmy</span>
         <small>Wybierz algorytm</small>
+      </div>
 
+      <div style="padding: 0 16px; margin-top: 16px;">
+        <button class="algo-run-button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
+            <g class="" style="" transform="translate(0,0)">
+              <path
+              d="M106.854 106.002a26.003 26.003 0 0 0-25.64 29.326c16 124 16 117.344 0 241.344a26.003 26.003 0 0 0 35.776 27.332l298-124a26.003 26.003 0 0 0 0-48.008l-298-124a26.003 26.003 0 0 0-10.136-1.994z"
+              fill="#fff" fill-opacity="1" />
+            </g>
+          </svg>
+          Uruchom wybrany algorytm
+        </button>
       </div>
 
      
