@@ -8,7 +8,7 @@ public class Dwarf : Point
     public List<MineralType> PreferredMinerals { get; } 
     public Mine? WorksIn;
 
-    public Dwarf(double x, double y, List<MineralType> minerals, int loudness) : base(x, y)
+    public Dwarf(int id, double x, double y, List<MineralType> minerals, int loudness) : base(id, x, y)
     {
         VoiceLoudness = loudness;
         PreferredMinerals = minerals;

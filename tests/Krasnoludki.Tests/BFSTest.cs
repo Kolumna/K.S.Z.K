@@ -13,33 +13,32 @@ namespace Krasnoludki.Tests
         [Fact]
         public void BFSTest()
         {
-            /*Sink sink = new Sink();     //id = 1
+            Source source = new Source();   //id = 0
             List<Dwarf> dwarves = new List<Dwarf>
             {
-                new Dwarf(1, 1, new List<MineralType> { MineralType.Gold }, 5),                     //id = 2
-                new Dwarf(2, 2, new List<MineralType> { MineralType.Quartz, MineralType.Gold}, 3)   //id = 3
+                new Dwarf(1, 1, 1, new List<MineralType> { MineralType.Gold }, 5),                     //id = 1
+                new Dwarf(2, 2, 2, new List<MineralType> { MineralType.Quartz, MineralType.Gold}, 3)   //id = 2
             };
             List<Mine> mines = new List<Mine>
             {
-                new Mine(3, 3, MineralType.Gold, 2),        //id = 4
-                new Mine(4, 4, MineralType.Quartz, 1),      //id = 5
+                new Mine(3, 3, 3, MineralType.Gold, 2),        //id = 3
+                new Mine(4, 4, 4, MineralType.Quartz, 1),      //id = 4
             };
-            Source source = new Source();       //id = 6
+            Sink sink = new Sink(mines.Count() + dwarves.Count());       //id = 5
             
 
-            List<EdgeFlow> edges = DwarfAssigning.GenerateEdges(dwarves, mines, source, sink);
+            List<EdgeFlow> edges = EdgeGen.GenerateEdges(dwarves, mines, source, sink);
 
-            int[] parent = new int[sink.HowManyPoints()];
+            EdgeFlow[] parent = new EdgeFlow[sink.PointId+1];
 
             bool test = DwarfAssigning.BFS(source, sink, edges, ref parent);
 
             Assert.True(test);
-            Assert.Equal(-1, parent[source.PointId-1]);     //-1 ponieważ tablica jest indeksowana od 0, a punkty od 1
-            Assert.Equal(6, parent[dwarves[0].PointId-1]);
-            Assert.Equal(6, parent[dwarves[1].PointId-1]);
-            Assert.Equal(2, parent[mines[0].PointId-1]);
-            Assert.Equal(2, parent[mines[1].PointId-1]);
-            Assert.Equal(4, parent[sink.PointId-1]);*/
+            Assert.Equal(0, parent[dwarves[0].PointId].From);
+            Assert.Equal(0, parent[dwarves[1].PointId].From);
+            Assert.Equal(1, parent[mines[0].PointId].From);
+            Assert.Equal(2, parent[mines[1].PointId].From);
+            Assert.Equal(3, parent[sink.PointId].From);
         }
     }
 } 

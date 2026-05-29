@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -9,36 +10,14 @@ namespace Krasnoludki.Core
 {
     public class DwarfAssigning
     {
-        public static List<EdgeFlow> GenerateEdges(List<Dwarf> dwarves, List<Mine> mines, Source source, Sink sink)
-        {
-            List<EdgeFlow> result = new List<EdgeFlow>();
-            foreach(Dwarf d in dwarves)
-            {
-                result.Add(new EdgeFlow(source, d, 1));       //tworzenie krawędzi od source do każdego krasnoludka
-                foreach(Mine m in mines)
-                {
-                    EdgeFlow newEdge = new EdgeFlow(d, m, 1);       //tworzenie krawędzi od kranolduka do każdej koaplni
-                    if(!d.PreferredMinerals.Contains(m.Resource)) newEdge.BadResource();    //ustawiania sztucznie wysokiego dystansu w przypadku niezgodności surowców i preferencji
-                    result.Add(newEdge);
-                }
-            }
-            foreach(Mine m in mines)
-            {
-                result.Add(new EdgeFlow(m, sink, m.Capacity));      //tworzenie krawędzi od każdej kopalni do sink
-            }
-            return result;
-        }
-        public static bool BFS(Point from, Point to, List<EdgeFlow> edges, ref int[] parent)
+        public static bool BFS(Source source, Sink sink, List<EdgeFlow> edges, ref EdgeFlow[] parent)
         {
             HashSet<int> visited = new HashSet<int>();
             Queue<int> q = new Queue<int>();
-            for(int i = 0; i < to.HowManyPoints(); i++)
-            {
-                parent[i] = -1;
-            }
+            parent = new EdgeFlow[sink.PointId+1];
 
-            q.Enqueue(from.PointId);
-            visited.Add(from.PointId);
+            q.Enqueue(source.PointId);
+            visited.Add(source.PointId);
 
             while(q.Count > 0)
             {
@@ -50,67 +29,46 @@ namespace Krasnoludki.Core
                     {
                         q.Enqueue(edge.To);
                         visited.Add(edge.To);
-                        parent[edge.To-1] = p;
-                        if(edge.To == to.PointId) return true;
-                    }
-                    if(edge.BackwardEdge.From == p && edge.BackwardEdge.CurrFlow < edge.BackwardEdge.Capacity && !visited.Contains(edge.BackwardEdge.To) && edge.Cost < 1000000)
-                    {
-                        q.Enqueue(edge.BackwardEdge.To);
-                        visited.Add(edge.BackwardEdge.To);
-                        parent[edge.BackwardEdge.To-1] = p;
-                        if(edge.BackwardEdge.To == to.PointId) return true;     //teoretycznie nigdy nie trafi się do sink przez krawędź wsteczną ale tak na wszelki to zostawiam
+                        parent[edge.To] = edge;
+                        if(edge.To == sink.PointId) return true;
                     }
                 }
             }
             return false;
         }
-        public static int EdmondsKarp(Point source, Point sink, List<EdgeFlow> edges)
+        public static int EdmondsKarp(Source source, Sink sink, List<EdgeFlow> edges)
         {
             int MaxFlow = 0;
-            Stack<EdgeFlow> currPath = new Stack<EdgeFlow>();
-            int sourceId = source.PointId;
             int sinkId = sink.PointId;
 
-            int[] parent = new int[sink.HowManyPoints()];
-            while(BFS(source, sink, edges, ref parent))
+            EdgeFlow[] parent = new EdgeFlow[sinkId+1];
+            while(BFS(source, sink, edges, ref parent))     
             {
+                Stack<EdgeFlow> currPath = new Stack<EdgeFlow>();
                 int newFlow = int.MaxValue;
-                int i = sinkId;
-                while(i != sourceId)        //pętla odtwarza ściężkę z source do sink na podstawie tablicy zwróconej przez bfs i znajduję maksymalny pływ
+
+                for(EdgeFlow e = parent[sinkId]; e != null; e = parent[e.From])
                 {
-                    foreach(EdgeFlow edge in edges)
-                    {
-                        if(edge.To == i && edge.From == parent[i-1])
-                        {
-                            currPath.Push(edge);
-                            newFlow = Math.Min(newFlow, edge.Capacity - edge.CurrFlow);
-                            break;
-                        }
-                        if(edge.BackwardEdge.To == i && edge.BackwardEdge.From == parent[i-1])
-                        {
-                            currPath.Push(edge.BackwardEdge);
-                            newFlow = Math.Min(newFlow, edge.BackwardEdge.Capacity - edge.BackwardEdge.CurrFlow);
-                            break;
-                        }
-                    }
-                    i = parent[i-1];
+                    newFlow = Math.Min(newFlow, e.ReturnCapacity());
+                    currPath.Push(e);
                 }
+
                 while(currPath.Count() > 0)     //pętla dodaje pływ do każdej krawędzi przed kolejnym wywołaniem bfs
                 {
                     EdgeFlow edge = currPath.Pop();
                     edge.AddFlow(newFlow);
                 }
                 MaxFlow += newFlow;         //dodanie wysłanego pływ do w obecniej iteracji do całkowitego pływu
+                parent = new EdgeFlow[sinkId+1];      //reset tablicy
             }
-
             return MaxFlow;
         }
         public static void Assign(List<Dwarf> dwarves, List<Mine> mines)
         {
             Source source = new Source();
-            Sink sink = new Sink();
+            Sink sink = new Sink(dwarves.Count() + mines.Count());
 
-            List<EdgeFlow> edges = GenerateEdges(dwarves, mines, source, sink);
+            List<EdgeFlow> edges = EdgeGen.GenerateEdges(dwarves, mines, source, sink);
 
             EdmondsKarp(source, sink, edges);
 
@@ -126,6 +84,7 @@ namespace Krasnoludki.Core
                             {
                                 dwarf.AssignMine(mine);     //przypisuje kopalnie krasnoluskowi
                                 mine.AddWorker(dwarf);      //i krasnoludka kopalni
+                                break;
                             }
                         }
                     }
@@ -134,4 +93,5 @@ namespace Krasnoludki.Core
         }
     }
 }
+
 

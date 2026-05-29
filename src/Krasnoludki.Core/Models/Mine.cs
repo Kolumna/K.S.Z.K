@@ -9,7 +9,7 @@ public class Mine : Point
     public List<Dwarf> Workers;     //lista na Id pracujących w kopalni krasnoludków
     public bool IsFull;     //czy kopalnia ma maks pracowników
 
-    public Mine(double x, double y, MineralType mineral, int capacity) : base(x, y)
+    public Mine(int id, double x, double y, MineralType mineral, int capacity) : base(id, x, y)
     {
         Id = _MineCounter++;
         Resource = mineral;

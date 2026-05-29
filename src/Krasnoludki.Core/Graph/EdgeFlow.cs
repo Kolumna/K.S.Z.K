@@ -9,15 +9,42 @@ public class EdgeFlow
     public double Cost;
     public EdgeFlow BackwardEdge;
 
-    public EdgeFlow(Models.Point from, Models.Point to, int capacity)
+    public EdgeFlow(Models.Source source, Models.Dwarf dwarf)      //konstruktor od source do krasnoludków
     {
-        From = from.PointId;
-        To = to.PointId;
-        Capacity = capacity;
-        Cost = Math.Sqrt(Math.Pow(from.x - to.x, 2) + Math.Pow(from.y - to.y, 2));
+        From = source.PointId;
+        To = dwarf.PointId;
+        Capacity = 1;
+        Cost = 0;
         CurrFlow = 0;
         BackwardEdge = new EdgeFlow(this);
     }
+    public EdgeFlow(Models.Dwarf dwarf, Models.Mine mine)        //konstruktor od krasnoludka do kopalni
+    {
+        From = dwarf.PointId;
+        To = mine.PointId;
+        Capacity = 1;
+        if(dwarf.PreferredMinerals.Contains(mine.Resource))
+            {
+                Cost = Math.Sqrt(Math.Pow(dwarf.x - mine.x, 2) + Math.Pow(dwarf.y - mine.y, 2));
+            }
+        else
+            {
+                Cost = 1000000;
+            }
+        CurrFlow = 0;
+        BackwardEdge = new EdgeFlow(this);
+    }
+
+        public EdgeFlow(Models.Mine mine, Models.Sink sink)     //konstruktor od mine do sink
+    {
+        From = mine.PointId;
+        To = sink.PointId;
+        Capacity = mine.Capacity;
+        Cost = 0;
+        CurrFlow = 0;
+        BackwardEdge = new EdgeFlow(this);
+    }
+
     private EdgeFlow(EdgeFlow mainEdge) //konstruktor prywatny do tworzenia krawędzi powrotnej
     {
         From = mainEdge.To;
@@ -28,11 +55,10 @@ public class EdgeFlow
         BackwardEdge = mainEdge;        //zmiany te pozwalają obsługiwać pływ za pomocą jednej metody
     }
 
-    public void BadResource()   //metoda ustawia koszt na abstrakcyjnie wysoki, użwyna w momencie generowania krawędzi między krasnoludkiem a kopalnią o niezgodnych preferencjach i surowcach
+    public int ReturnCapacity()
     {
-        Cost = 1000000;
+        return Capacity - CurrFlow;
     }
-
     public void AddFlow(int flow)
     {
         CurrFlow += flow;
