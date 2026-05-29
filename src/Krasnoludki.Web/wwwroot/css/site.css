@@ -332,7 +332,6 @@ aside.book-aside {
 
 aside.tool-aside .aside-item,
 aside.book-aside .aside-item {
-  border-bottom: 1px solid var(--border-strong);
   padding: 16px;
 }
 
@@ -620,6 +619,35 @@ input {
   border-radius: 8px;
 }
 
-.scenarios-list {
-  margin-top: 24px;
+.book-aside-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+#book-search-input {
+  width: 100%;
+}
+
+.book-search-form {
+  display: flex;
+  gap: 8px;
+}
+
+.book-search-form button {
+  padding: 8px 16px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+}
+
+.book-search-form button:hover {
+  background-color: var(--color-overlay);
 }
