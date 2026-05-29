@@ -675,11 +675,10 @@ input {
   font-size: 16px;
   transition: 200ms background-color ease;
   border: 1px solid var(--gold-border);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
+}
+
+.book-search-form button:hover {
+  background-color: var(--color-overlay);
 }
 
 .algo-run-button {
