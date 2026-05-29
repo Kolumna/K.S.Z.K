@@ -193,6 +193,17 @@ body {
   cursor: crosshair;
 }
 
+#algoCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-bottom: 1px solid var(--border-strong);
+  border-left: 1px solid var(--border-strong);
+  background-color: var(--color-surface);
+  cursor: crosshair;
+  box-sizing: border-box;
+}
+
 main {
   flex: 1;
 }
@@ -233,6 +244,7 @@ footer {
 small {
   font-size: 1rem;
   color: var(--text-secondary);
+  font-family: var(--font-sans);
 }
 
 header {
@@ -395,6 +407,7 @@ aside.book-aside .aside-item {
 .algo-button .status {
   font-size: 1rem;
   color: var(--text-secondary);
+  font-family: var(--font-mono);
 }
 
 .algo-button:hover {
@@ -662,8 +675,13 @@ input {
   font-size: 16px;
   transition: 200ms background-color ease;
   border: 1px solid var(--gold-border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
-.book-search-form button:hover {
+.algo-run-button:hover {
   background-color: var(--color-overlay);
 }
