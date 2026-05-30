@@ -4,11 +4,20 @@ using Krasnoludki.Core.Models;
 
 namespace Krasnoludki.Core.Problems;
 
+/// <summary>
+/// Solves the Min-Cost Max-Flow problem.
+/// Combines the concept of the Ford-Fulkerson algorithm (maximum flow) 
+/// with the Bellman-Ford algorithm for finding the minimum cost augmenting paths.
+/// </summary>
+/// <param name="network">The initialized residual network with nodes and capacities.</param>
+/// <returns>A tuple containing the total minimum cost (MinCost) and the maximum flow (MaxFlow).</returns>
+/// <remarks>
+/// If the final TotalCost is massive (e.g., >= 1,000,000), 
+/// it indicates that some dwarves were assigned to non-preferred mines due to capacity 
+/// limits. The real distance can then be extracted using a modulo operation.
+/// </remarks>
 public class MinCostMaxFlowProblem
 {
-    // Note: If the Final TotalCost is massive (e.g., >= 1,000,000),
-    //  it indicates that some dwarves were assigned to non-preferred mines due to capacity
-    //  limits. The real distance can be extracted using a modulo operation.
     public (double,double) MinCostMaxFlow(ResidualNetwork network)
     {
         int source = network.SourceID;
@@ -19,20 +28,21 @@ public class MinCostMaxFlowProblem
 
         while (true)
         {
+            // Searching for the new augmenting path with Bellman-Ford algorithm
             path = algorithm.bellmanFordAlgorithm(network,source);
+            //If there's no more augmenting path Min Cost Max Flow Algorithm can stop
             if(path.Count == 0)
                 break;
             
             int residualCapacity = int.MaxValue;
-            foreach (EdgeFlow edge in path)
+            foreach (EdgeFlow edge in path) // Searching for the residual capacity of a path: \(c_f(p)\)
             {
                 residualCapacity = (edge.Capacity - edge.CurrFlow) < residualCapacity?
                     (edge.Capacity - edge.CurrFlow): residualCapacity;
             }
 
             MaxFlow += residualCapacity;
-
-            foreach(EdgeFlow edge in path)
+            foreach(EdgeFlow edge in path) // For every edge in graph increase flow by new residual capacity of a path
             {   
                 if(edge.BackwardEdge is not null)
                     edge.BackwardEdge.CurrFlow -= residualCapacity;
@@ -47,13 +57,19 @@ public class MinCostMaxFlowProblem
        
     }
 
-
+/// <summary>
+/// Extracts the final dwarf-to-mine assignments from the residual network after the algorithm's execution.
+/// </summary>
+/// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
+/// <returns>A list of point-to-point pairs (Start - End) ready for frontend visualization.</returns>
     public List<Tuple<Krasnoludki.Core.Models.Point,Krasnoludki.Core.Models.Point>> GetReadyPointToPointEdges(ResidualNetwork networkAfterMCMF)
     {
         List<Tuple<Krasnoludki.Core.Models.Point,Krasnoludki.Core.Models.Point>> ReadyEdges =
              new List<Tuple<Krasnoludki.Core.Models.Point, Krasnoludki.Core.Models.Point>>();
 
 
+        // WARNING: The index calculation below strictly depends on the exact edge insertion order 
+        // inside the ResidualNetwork. Modifying the generation order will break this extraction logic.
         int index = 2 * networkAfterMCMF.DwarvesCount + 1;
         int last_dwarf_mine_index =  2 * (networkAfterMCMF.DwarvesCount * networkAfterMCMF.MinesCount) + 1;
 

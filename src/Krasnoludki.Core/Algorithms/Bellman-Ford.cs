@@ -4,7 +4,6 @@ namespace Krasnoludki.Core.Algorithms;
 
 public class BellmanFordAlgorithm
 {
-
     public List<EdgeFlow> bellmanFordAlgorithm(ResidualNetwork network,int src)
     {
 
@@ -43,24 +42,27 @@ public class BellmanFordAlgorithm
         }
 
 
-        List<int> AffectedNodes = new List<int>();
-        List<int> NegativeCycle = new List<int>();
+        // List<int> AffectedNodes = new List<int>();
+        // List<int> NegativeCycle = new List<int>();
 
         //Finding nodes from negative cycles
-        foreach(EdgeFlow edge in network.Edges)
-        {
-            
-            if (distances[edge.From] != double.MaxValue &&
-                        edge.Capacity - edge.CurrFlow > 0 &&
-                            distances[edge.From] + edge.Cost
-                                < distances[edge.To])
-            {
-                distances[edge.To] = distances[edge.From] + edge.Cost;
 
-                if(!AffectedNodes.Contains(edge.To))
-                    AffectedNodes.Add(edge.To);
-            }
-        }
+        // foreach(EdgeFlow edge in network.Edges)
+        // {
+            
+        //     if (distances[edge.From] != double.MaxValue &&
+        //                 edge.Capacity - edge.CurrFlow > 0 &&
+        //                     distances[edge.From] + edge.Cost
+        //                         < distances[edge.To])
+        //     {
+        //         distances[edge.To] = distances[edge.From] + edge.Cost;
+
+        //         if(!AffectedNodes.Contains(edge.To))
+        //             AffectedNodes.Add(edge.To);
+        //     }
+        // }
+
+        //
 
 
         //Finding the shortest path
