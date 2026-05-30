@@ -11,6 +11,9 @@ public class BookModel : PageModel
   [BindProperty(SupportsGet = true)]
   public string? SelectedScenarioId { get; set; }
 
+  [BindProperty(SupportsGet = true)]
+  public string? Q { get; set; }
+
   public string ActiveScenarioName { get; set; } = "Nowa mapa";
 
   public string NodesJson { get; set; } = "[]";

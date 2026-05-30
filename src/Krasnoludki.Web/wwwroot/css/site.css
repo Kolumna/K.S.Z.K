@@ -181,6 +181,27 @@ body {
   background-color: var(--color-surface);
   cursor: crosshair;
   box-sizing: border-box;
+  background-color: #e8dcc4;
+  background-image:
+    radial-gradient(
+      circle at center,
+      transparent 40%,
+      rgba(101, 67, 33, 0.6) 120%
+    ),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>');
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  cursor: crosshair;
+}
+
+#algoCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-bottom: 1px solid var(--border-strong);
+  border-left: 1px solid var(--border-strong);
+  background-color: var(--color-surface);
+  cursor: crosshair;
+  box-sizing: border-box;
 }
 
 main {
@@ -223,6 +244,7 @@ footer {
 small {
   font-size: 1rem;
   color: var(--text-secondary);
+  font-family: var(--font-sans);
 }
 
 header {
@@ -332,7 +354,6 @@ aside.book-aside {
 
 aside.tool-aside .aside-item,
 aside.book-aside .aside-item {
-  border-bottom: 1px solid var(--border-strong);
   padding: 16px;
 }
 
@@ -386,6 +407,7 @@ aside.book-aside .aside-item {
 .algo-button .status {
   font-size: 1rem;
   color: var(--text-secondary);
+  font-family: var(--font-mono);
 }
 
 .algo-button:hover {
@@ -426,7 +448,8 @@ aside.algo-aside {
   padding: 16px;
 }
 
-.tool-aside-actions button, .action-button {
+.tool-aside-actions button,
+.action-button {
   padding: 12px 16px;
   background-color: var(--gold-bg);
   color: white;
@@ -442,7 +465,8 @@ aside.algo-aside {
   justify-content: center;
 }
 
-.tool-aside-actions button:hover, .action-button:hover {
+.tool-aside-actions button:hover,
+.action-button:hover {
   background-color: var(--color-overlay);
 }
 
@@ -624,8 +648,37 @@ input {
   border-radius: 8px;
 }
 
-.scenarios-list {
-  margin-top: 24px;
+.book-aside-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+#book-search-input {
+  width: 100%;
+}
+
+.book-search-form {
+  display: flex;
+  gap: 8px;
+}
+
+.book-search-form button {
+  padding: 8px 16px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+}
+
+.book-search-form button:hover {
+  background-color: var(--color-overlay);
 }
 
 .algo-run-button {
@@ -642,4 +695,27 @@ input {
   align-items: center;
   gap: 8px;
   width: 100%;
+}
+
+.algo-run-button:hover {
+  background-color: var(--color-overlay);
+}
+
+#unsavedChangesWarning {
+  display: none;
+  position: absolute;
+  inset: 0;
+  height: 20px;
+  width: auto;
+  background: var(--danger-bg);
+  padding: 10px;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+button:disabled {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  cursor: not-allowed;
 }
