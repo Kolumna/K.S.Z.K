@@ -1,9 +1,10 @@
 namespace Krasnoludki.Core.Models;
 
-public class Sink : Point
+public class Sink
 {
-    public Sink(int id, double x = 0, double y = 0) : base(id+1, x, y)
+    public int PointId;
+    public Sink(int id)
     {
-        Type = PointType.Sink;
+        PointId = id+1;
     }
 }

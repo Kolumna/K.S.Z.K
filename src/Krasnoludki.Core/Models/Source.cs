@@ -1,9 +1,12 @@
+using System.Security.Cryptography.X509Certificates;
+
 namespace Krasnoludki.Core.Models;
 
-public class Source : Point
+public class Source
 {
-    public Source(double x = 0, double y = 0) : base(0, x, y)
+    public int PointId;
+    public Source()
     {
-        Type = PointType.Source;
+        PointId = 0;
     }
 }

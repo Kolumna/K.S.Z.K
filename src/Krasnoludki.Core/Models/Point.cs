@@ -9,8 +9,7 @@ public enum MineralType
 {
     Gold,Quartz,Silver,Coal,None
 }
-
-public class Point
+public abstract class Point
 {
     public int PointId;
     public double x { get; init; }
