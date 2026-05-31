@@ -58,10 +58,10 @@ public class MinCostMaxFlowProblem
 /// Extracts the final dwarf-to-mine assignments from the residual network after the algorithm's execution.
 /// </summary>
 /// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
-/// <returns>A list of point-to-point pairs (Start - End) ready for frontend visualization.</returns>
-    public List<Tuple<int,int>> GetReadyPointToPointEdges(ResidualNetwork networkAfterMCMF)
+/// <returns>A list of type ValueTuple DwarfId-to-MineId-distance trio (Start - End - Distance) ready for frontend visualization.</returns>
+    public List<(int DwarfId, int MineId, double Distance)> ExtractAssignments(ResidualNetwork networkAfterMCMF)
     {
-        var ReadyEdges = new List<Tuple<int, int>>();
+        var ReadyEdges = new List<(int, int, double)>();
 
         foreach (var edge in networkAfterMCMF.Edges)
         {
@@ -73,7 +73,9 @@ public class MinCostMaxFlowProblem
                 int dwarf_id = ((GraphNode<Dwarf>)networkAfterMCMF.GetNode(edge.From)).Data.Id;
                 int mine_id = ((GraphNode<Mine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
 
-                ReadyEdges.Add(new Tuple<int, int>(dwarf_id, mine_id));
+                // if the mine wasn't with dwarf preferred material we added artificial massive cost
+                ReadyEdges.Add((dwarf_id, mine_id, edge.Cost % 1000000)); 
+                // to get right distance we need to be sure not to count extra artificial massive cost
             }
         }
 
