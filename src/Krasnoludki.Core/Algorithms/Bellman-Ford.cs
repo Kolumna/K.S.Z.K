@@ -36,6 +36,16 @@ public class BellmanFordAlgorithm
                     parentEdge[edge.To] = edge;
                     distances[edge.To] = distances[edge.From] + edge.Cost;
                 }
+
+                EdgeFlow backEdge = edge.BackwardEdge;
+                if (distances[backEdge.From] != double.MaxValue &&
+                        backEdge.Capacity - backEdge.CurrFlow > 0 &&
+                            distances[backEdge.From] + backEdge.Cost < distances[backEdge.To])
+                {
+                    modified = true;
+                    parentEdge[backEdge.To] = backEdge;
+                    distances[backEdge.To] = distances[backEdge.From] + backEdge.Cost;
+                }
             }
 
             if(!modified) break;
