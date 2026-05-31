@@ -2,12 +2,12 @@ namespace Krasnoludki.Core.Graph;
 
 public class EdgeFlow
 {
-    public int From;
-    public int To;
-    public int Capacity;
-    public int CurrFlow;
-    public double Cost;
-    public EdgeFlow BackwardEdge;
+    public int From{ get; }
+    public int To{ get; }
+    public int Capacity{ get; }
+    public int CurrFlow{ get; private set;}
+    public double Cost { get; }
+    public EdgeFlow BackwardEdge{ get; }
 
     
     public EdgeFlow(int from, int to, int capacity, double cost = 0)
