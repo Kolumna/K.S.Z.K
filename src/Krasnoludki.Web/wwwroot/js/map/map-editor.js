@@ -15,8 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 });
 
-console.log(INITIAL_NODES);
-
 let pendingCoords = null;
 let draggedNode = null;
 let isDragging = false;

@@ -46,7 +46,7 @@ else
         @if (Model.Algorithm != null)
         {
           <div style="padding: 0 16px; margin-bottom: 16px;">
-            <button class="algo-run-button">
+            <button onClick="runAlgorithm('@(Model.Algorithm ?? "")')" id="algo-run-button">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                 <g class="" style="" transform="translate(0,0)">
                   <path
@@ -59,19 +59,19 @@ else
           </div>
         }
 
-        <a asp-page="/Algorithms" asp-route-algorithm="1" class="algo-button@(Model.Algorithm == "1" ? " active" : "")"
+        <a asp-page="/Algorithms" asp-route-algorithm="matching" class="algo-button@(Model.Algorithm == "matching" ? " active" : "")"
            data-tool="algo1"><span>Przydział do Kopalni</span>
           <p class="status">Nie uruchiomiono</p>
         </a>
-        <a asp-page="/Algorithms" asp-route-algorithm="2" class="algo-button@(Model.Algorithm == "2" ? " active" : "")"
+        <a asp-page="/Algorithms" asp-route-algorithm="minCost" class="algo-button@(Model.Algorithm == "minCost" ? " active" : "")"
            data-tool="algo2"><span>Optymalizacja z Owsianką</span>
           <p class="status">Nie uruchiomiono</p>
         </a>
-        <a asp-page="/Algorithms" asp-route-algorithm="3" class="algo-button@(Model.Algorithm == "3" ? " active" : "")"
+        <a asp-page="/Algorithms" asp-route-algorithm="convexHull" class="algo-button@(Model.Algorithm == "convexHull" ? " active" : "")"
            data-tool="algo3"><span>Wyznaczenie granicy Królestwa</span>
           <p class="status">Nie uruchiomiono</p>
         </a>
-        <a asp-page="/Algorithms" asp-route-algorithm="4" class="algo-button@(Model.Algorithm == "4" ? " active" : "")"
+        <a asp-page="/Algorithms" asp-route-algorithm="rmq" class="algo-button@(Model.Algorithm == "rmq" ? " active" : "")"
            data-tool="algo4"><span>Najgłośniejszy dekamentrysta</span>
           <p class="status">Nie uruchiomiono</p>
         </a>
@@ -90,5 +90,11 @@ else
 
 
 @section Scripts {
-  <script src="~/js/algo-visualizer.js" asp-append-version="true"></script>
+  <script>
+    const INITIAL_NODES = @Html.Raw(Model.NodesJson);
+    const ALGORITHM_RESULTS = @Html.Raw(Model.ResultsJson);
+  </script>
+  <script src="~/js/map/state.js" asp-append-version="true"></script>
+  <script src="~/js/services/api-service.js" asp-append-version="true"></script>
+  <script src="~/js/algorithms/algo-visualizer.js" asp-append-version="true"></script>
 }

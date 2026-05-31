@@ -1,4 +1,5 @@
 
+using System.Text.Json;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -17,6 +18,7 @@ public class BookModel : PageModel
   public string ActiveScenarioName { get; set; } = "Nowa mapa";
 
   public string NodesJson { get; set; } = "[]";
+  public string ResultsJson { get; set; } = "{}";
 
   private readonly ScenarioFileService _scenarios;
 
@@ -32,36 +34,39 @@ public class BookModel : PageModel
     SavedScenarios = _scenarios.GetManifest();
 
     var id = HttpContext.Session.GetString("activeScenarioId");
-    if (id != null)
+    if (id == null)
     {
-      if (!_scenarios.Exists(id))
-      {
-        HttpContext.Session.Remove("activeScenarioId");
-        ActiveScenarioName = "Nowa mapa";
-        SelectedScenarioId = null;
-        NodesJson = "[]";
-        return;
-      }
-
-      var manifest = _scenarios.GetManifest();
-      var scenario = manifest.FirstOrDefault(m => m.Id == id);
-      if (scenario != null)
-      {
-        ActiveScenarioName = scenario.Name;
-        SelectedScenarioId = scenario.Id;
-        var json = _scenarios.Load(id);
-        NodesJson = json;
-
-        return;
-      }
-      else
-      {
-        HttpContext.Session.Remove("activeScenarioId");
-      }
+      Reset();
+      return;
     }
 
+    if (!_scenarios.Exists(id))
+    {
+      HttpContext.Session.Remove("activeScenarioId");
+      Reset();
+      return;
+    }
+
+    var entry = SavedScenarios.FirstOrDefault(m => m.Id == id);
+    if (entry == null)
+    {
+      HttpContext.Session.Remove("activeScenarioId");
+      Reset();
+      return;
+    }
+
+    var scenarioData = _scenarios.Load(id);
+    ActiveScenarioName = scenarioData.Name;
+    SelectedScenarioId = id;
+    NodesJson = JsonSerializer.Serialize(scenarioData.Nodes);
+    ResultsJson = JsonSerializer.Serialize(scenarioData.Results);
+  }
+
+  private void Reset()
+  {
     ActiveScenarioName = "Nowa mapa";
     NodesJson = "[]";
+    ResultsJson = "{}";
     SelectedScenarioId = null;
   }
 

@@ -16,62 +16,91 @@ public class ScenarioFileService
         Directory.CreateDirectory(_baseDir);
     }
 
+    private void WriteHoff(string id, string json)
+    {
+        Directory.CreateDirectory(_baseDir);
+
+        var compressed = HuffmanCompressor.Compress(json);
+        File.WriteAllBytes(Path.Combine(_baseDir, $"{id}.hoff"), compressed);
+    }
+
     public string Save(string nodesJson, string name)
     {
         var id = Guid.NewGuid().ToString("N")[..8];
+        var nodes = JsonSerializer.Deserialize<List<NodeDto>>(nodesJson) ?? [];
 
-        var compressed = HuffmanCompressor.Compress(nodesJson);
-        var filePath = Path.Combine(_baseDir, $"{id}.hoff");
-        File.WriteAllBytes(filePath, compressed);
+        var scenario = new ScenarioDto
+        {
+            Id = id,
+            Name = name,
+            CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
+            Nodes = nodes,
+            Results = new ScenarioResults(),
+        };
+
+        WriteHoff(id, JsonSerializer.Serialize(scenario));
 
         var manifest = GetManifest();
-        var nodes = JsonSerializer.Deserialize<List<NodeDto>>(nodesJson);
-
         manifest.Add(new ManifestEntry
         {
             Id = id,
             Name = name,
             CreatedAt = DateTime.Now,
+            UpdatedAt = DateTime.Now,
             File = $"{id}.hoff",
-            Dwarves = nodes?.Count(n => n.Type == "dwarf") ?? 0,
-            Mines = nodes?.Count(n => n.Type == "mine") ?? 0,
-            Minerals = nodes?
+            Dwarves = nodes.Count(n => n.Type == "dwarf"),
+            Mines = nodes.Count(n => n.Type == "mine"),
+            Minerals = nodes
                 .Where(n => n.Type == "mine")
                 .SelectMany(n => n.Minerals ?? new())
                 .Distinct()
-                .ToList() ?? new(),
+                .ToList(),
         });
 
         SaveManifest(manifest);
         return id;
     }
 
-    public void Update(string id, string nodesJson, string newName)
+    public void Update(ScenarioDto oldScenario, string nodesJson, string newName)
     {
+        var id = oldScenario.Id;
         var filePath = Path.Combine(_baseDir, $"{id}.hoff");
         if (!File.Exists(filePath))
-            throw new FileNotFoundException($"Scenariusz {id} nie istnieje");
+            throw new FileNotFoundException($"Scenario {id} does not exist");
 
-        var compressed = HuffmanCompressor.Compress(nodesJson);
-        File.WriteAllBytes(filePath, compressed);
+        var scenario = new ScenarioDto
+        {
+            Id = id,
+            Name = newName,
+            CreatedAt = oldScenario.CreatedAt,
+            UpdatedAt = DateTime.Now,
+            Nodes = JsonSerializer.Deserialize<List<NodeDto>>(nodesJson) ?? [],
+            Results = new ScenarioResults(),
+        };
+
+        WriteHoff(id, JsonSerializer.Serialize(scenario));
 
         var manifest = GetManifest();
         var entry = manifest.FirstOrDefault(m => m.Id == id);
         if (entry != null)
         {
             entry.Name = newName;
+            entry.UpdatedAt = DateTime.Now;
+            entry.HasConvexHull = false;
         }
         SaveManifest(manifest);
     }
 
-    public string Load(string id)
+    public ScenarioDto Load(string id)
     {
         var filePath = Path.Combine(_baseDir, $"{id}.hoff");
         if (!File.Exists(filePath))
-            throw new FileNotFoundException($"Scenariusz {id} nie istnieje");
+            throw new FileNotFoundException($"Scenario {id} does not exist");
 
         var compressed = File.ReadAllBytes(filePath);
-        return HuffmanCompressor.Decompress(compressed);
+        var json = HuffmanCompressor.Decompress(compressed);
+        return JsonSerializer.Deserialize<ScenarioDto>(json)!;
     }
 
     public List<ManifestEntry> GetManifest()
@@ -113,6 +142,36 @@ public class ScenarioFileService
     {
         return File.Exists(Path.Combine(_baseDir, $"{id}.hoff"));
     }
+
+    public void SaveResult(string id, string resultKey, object result)
+    {
+        var scenario = Load(id) ?? throw new Exception($"Cannot find scenario with id: {id}");
+        switch (resultKey)
+        {
+            case "convexHull":
+                scenario.Results.ConvexHull =
+                    JsonSerializer.Deserialize<ConvexHullResultDto>(JsonSerializer.Serialize(result));
+                break;
+        }
+
+        scenario.UpdatedAt = DateTime.Now;
+
+        var updatedJson = JsonSerializer.Serialize(scenario);
+        var compressed = HuffmanCompressor.Compress(updatedJson);
+        File.WriteAllBytes(Path.Combine(_baseDir, $"{id}.hoff"), compressed);
+
+        var manifest = GetManifest();
+        var entry = manifest.FirstOrDefault(m => m.Id == id);
+        if (entry != null)
+        {
+            entry.UpdatedAt = DateTime.Now;
+            switch (resultKey)
+            {
+                case "convexHull": entry.HasConvexHull = true; break;
+            }
+            SaveManifest(manifest);
+        }
+    }
 }
 
 public class ManifestEntry
@@ -120,8 +179,11 @@ public class ManifestEntry
     public string Id { get; set; }
     public string Name { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
     public string File { get; set; }
     public int Dwarves { get; set; }
     public int Mines { get; set; }
     public List<string> Minerals { get; set; } = new();
+
+    public bool HasConvexHull { get; set; }
 }
