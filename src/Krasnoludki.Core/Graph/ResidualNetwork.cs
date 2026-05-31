@@ -1,5 +1,3 @@
-using System.ComponentModel.Design.Serialization;
-using System.Runtime.Serialization;
 using Krasnoludki.Core.Models;
 
 namespace Krasnoludki.Core.Graph;
@@ -9,7 +7,7 @@ public class ResidualNetwork
     public int DwarvesCount {get;}
     public int MinesCount {get;}
 
-    public List<IGraphNode> Nodes { get; }
+    private readonly List<IGraphNode> _nodes;
     public List<EdgeFlow> Edges{get;}
     public int SourceID { get; } = 0;
     public int SinkID { get; }
@@ -17,100 +15,74 @@ public class ResidualNetwork
 
     public IGraphNode GetNode(int id)
     {
-        var node = Nodes.FirstOrDefault(n => n.GraphId == id);
-
-        if (node != null)
+        if (id > 0 && id <= _nodes.Count)
         {
-            return node;
+            return _nodes[id - 1];
         }
 
         throw new ArgumentOutOfRangeException(nameof(id), $"\aArgumentOutOfRangeException: Node with id: {id} doesn't exists in residual network!\n");
     }
     
-    public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines, List<List<int>> distances)
+    public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines)
     {
         DwarvesCount = dwarves.Count;
         MinesCount = mines.Count;
+        SinkID = DwarvesCount + MinesCount + 1;
 
 
-        Nodes = new List<IGraphNode>();
+        _nodes = new List<IGraphNode>();
 
-        IGraphNode Source = new GraphNode<object?>(0,null);
-        Nodes.Add(Source);
-
-
-        int CurrId = 1;
+        int CurrDwarfId = 1,CurrMineId;
 
         Edges = new List<EdgeFlow>();
 
         //Edges from artificial source to every Dwarf
         foreach(Dwarf dwarf in dwarves)
         {
-            GraphNode<Dwarf> new_node = new GraphNode<Dwarf>(CurrId,dwarf);
-            Nodes.Add(new_node);
+            GraphNode<Dwarf> new_node = new GraphNode<Dwarf>(CurrDwarfId,dwarf); //adding new node with dwarf in list of nodes
+            _nodes.Add(new_node);
 
-            EdgeFlow edge = new EdgeFlow(0, CurrId, 1);
-            EdgeFlow backwardEdge = new EdgeFlow(CurrId, 0, 0);
-            edge.BackwardEdge = backwardEdge;
-            backwardEdge.BackwardEdge = edge;
+            EdgeFlow edge = new EdgeFlow(SourceID, CurrDwarfId, 1); // source -> dwarf edge + dwarf -> source ege
 
             Edges.Add(edge);
-            Edges.Add(backwardEdge);
+            Edges.Add(edge.BackwardEdge);
 
-            CurrId++;
-        }
-
-        //Edges from every Dwarf to every Mine
-        int mine_id,dwarves_count = CurrId;
-        for(int dwarf_id = 1; dwarf_id < dwarves_count; dwarf_id++)
-        {
-            for(mine_id = dwarves_count; mine_id - dwarves_count < mines.Count; mine_id++)
+            CurrMineId = DwarvesCount + 1;
+            foreach(Mine mine in mines) //Edges from every Dwarf to every Mine
             {
-                double cost = distances[dwarf_id - 1][mine_id - dwarves_count];
-
+                double cost = Math.Sqrt(Math.Pow(dwarf.HomeLocation.x - mine.Location.x, 2) + Math.Pow(dwarf.HomeLocation.y - mine.Location.y, 2));
                 // A massive artificial cost is added to non-preferred mines, ensuring the algorithm only picks
                 // them as an absolute last resort to prevent unemployment.
-                if(!dwarves[dwarf_id - 1].PreferredMinerals.Contains(mines[mine_id - dwarves_count].Resource)){
+                if (!dwarf.PreferredMinerals.Contains(mine.Resource))
+                {
                     cost += 1000000;
                 }
-
-
-                EdgeFlow DwarfMineEdge = new EdgeFlow(dwarf_id, mine_id, 1, cost);
-                EdgeFlow MineDwarfEdge = new EdgeFlow(mine_id,dwarf_id, 0, -cost);
-
-                DwarfMineEdge.BackwardEdge = MineDwarfEdge;
-                MineDwarfEdge.BackwardEdge = DwarfMineEdge;
+                EdgeFlow DwarfMineEdge = new EdgeFlow(CurrDwarfId,CurrMineId, 1, cost);
 
                 Edges.Add(DwarfMineEdge);
-                Edges.Add(MineDwarfEdge);
+                Edges.Add(DwarfMineEdge.BackwardEdge);
 
+                CurrMineId++;
             }
+            CurrDwarfId++;
         }
 
+    
+        
+        CurrMineId = DwarvesCount + 1;
         //Edges from every mine to artificial sink
-        SinkID = dwarves.Count + mines.Count + 1;
-        mine_id = dwarves_count;
         foreach(Mine mine in mines)
         {
-            GraphNode<Mine> new_node = new GraphNode<Mine>(mine_id, mine);
-            Nodes.Add(new_node);
+            GraphNode<Mine> new_node = new GraphNode<Mine>(CurrMineId, mine); // adding new node with mine in list of nodes
+            _nodes.Add(new_node);
 
-            EdgeFlow MineSinkEdge = new EdgeFlow(mine_id, SinkID, mine.Capacity);
-            EdgeFlow SinkMineEdge = new EdgeFlow(SinkID, mine_id, 0);
-
-            MineSinkEdge.BackwardEdge = SinkMineEdge;
-            SinkMineEdge.BackwardEdge = MineSinkEdge;
+            EdgeFlow MineSinkEdge = new EdgeFlow(CurrMineId, SinkID, mine.Capacity);
 
             Edges.Add(MineSinkEdge);
-            Edges.Add(SinkMineEdge);
+            Edges.Add(MineSinkEdge.BackwardEdge);
 
-            mine_id++;
-
+            CurrMineId++;
         }
-
-
-        IGraphNode Sink = new GraphNode<object?>(SinkID,null);
-        Nodes.Add(Sink);
 
     }
 
@@ -119,7 +91,7 @@ public class ResidualNetwork
     // and edge cases without breaking encapsulation.
     public ResidualNetwork(List<IGraphNode> nodes, List<EdgeFlow> edges, int sourceId, int sinkId)
     {
-        Nodes = nodes;
+        _nodes = nodes;
         Edges = edges;
         SourceID = sourceId; 
         SinkID = sinkId;

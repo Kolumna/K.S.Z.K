@@ -1,22 +1,30 @@
 namespace Krasnoludki.Core.Models;
 
+public enum PointType
+{
+    Source,Dwarf,Mine,Sink
+}
+
+public enum MineralType
+{
+    Gold,Quartz,Silver,Coal,None
+}
 public class Point
 {
-    public double X { get; }
-    public double Y { get; }
+    public int PointId;
+    public double x { get; init; }
+    public double y { get; init; }
+    public PointType? Type;
 
-    public Point(double x, double y)
+    public Point(int id, double x, double y)
     {
-        X = x;
-        Y = y;
+        PointId = id;
+        this.x = x;
+        this.y = y;
     }
 
-    public double CalculateDistance(Point other)
+    /*public int HowManyPoints()  //metoda zwraca ile punktów istnieje w momencie wywołania metody
     {
-        return (Math.Sqrt(
-                (this.X - other.X) * (this.X - other.X)
-            + 
-                (this.Y - other.Y) * (this.Y - other.Y))
-            );
-    }
+        return _PointCounter-1;
+    }*/
 }

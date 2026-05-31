@@ -1,40 +1,29 @@
 namespace Krasnoludki.Core.Models;
 
-public enum MineralType
-{
-    Gold,Quartz,Silver,Coal
-}
-
 public class Dwarf
 {
-    private static int _DwarfCounter = 1;
-    
-    public int Id{ get; }
     public Point HomeLocation{ get; }
+    public int Id => HomeLocation.PointId; // the same id as we got from frontend
     public int VoiceLoudness{ get; }
-    public List<MineralType> PreferredMinerals { get; } // Zmienilem na List, bo w zadaniu jest mowa o "preferowanych minerałach" (w liczbie mnogiej), a nie o jednym preferowanym minerale
+    public List<MineralType> PreferredMinerals { get; } 
+    public Mine? WorksIn { get; private set; }
 
-    public Dwarf(double x, double y, List<MineralType> minerals, int loudness)
+    public Dwarf(int id, double x, double y, List<MineralType> minerals, int loudness)
     {
-        HomeLocation = new Point(x,y);
+        HomeLocation = new Point(id, x, y);
         VoiceLoudness = loudness;
         PreferredMinerals = minerals;
-        Id = _DwarfCounter++;
     }
 
-    public Dwarf(int loudness)
+    /// <summary>
+    /// Sets a reference to the mine where the dwarf works.
+    /// NOTE: This method is part of an internal two-way binding.
+    /// Do not call it manually! Instead, use the <see cref="Mine.AddWorker(Dwarf)"/>.
+    /// </summary>
+    /// <param name="dwarf"></param>
+    /// <exception cref="InvalidOperationException"></exception>
+    internal void AssignMine(Mine mine)      //funkcja przydzielania kopalni
     {
-        Id = _DwarfCounter++;
-        VoiceLoudness = loudness;
-    }
-
-    public int getId()
-    {
-        return Id;
-    }
-
-    public int getLoudness()
-    {
-        return VoiceLoudness;
+        WorksIn = mine;
     }
 }
