@@ -1,6 +1,7 @@
 using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Graph;
 using Krasnoludki.Core.Models;
+using Krasnoludki.Core.Routing;
 
 namespace Krasnoludki.Core.Problems;
 
@@ -58,10 +59,10 @@ public class MinCostMaxFlowProblem
 /// Extracts the final dwarf-to-mine assignments from the residual network after the algorithm's execution.
 /// </summary>
 /// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
-/// <returns>A list of type ValueTuple DwarfId-to-MineId-distance trio (Start - End - Distance) ready for frontend visualization.</returns>
-    public List<(int DwarfId, int MineId, double Distance)> ExtractAssignments(ResidualNetwork networkAfterMCMF)
+/// <returns>A list of AssignmentDto containing DwarfId, MineId, and Distance ready for frontend visualization.</returns>
+    public List<AssignmentDto> ExtractAssignments(ResidualNetwork networkAfterMCMF)
     {
-        var ReadyEdges = new List<(int, int, double)>();
+        var ReadyEdges = new List<AssignmentDto>();
 
         foreach (var edge in networkAfterMCMF.Edges)
         {
@@ -74,7 +75,7 @@ public class MinCostMaxFlowProblem
                 int mine_id = ((GraphNode<Mine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
 
                 // if the mine wasn't with dwarf preferred material we added artificial massive cost
-                ReadyEdges.Add((dwarf_id, mine_id, edge.Cost % 1000000)); 
+                ReadyEdges.Add(new AssignmentDto(dwarf_id, mine_id, edge.Cost % 1000000)); 
                 // to get right distance we need to be sure not to count extra artificial massive cost
             }
         }
