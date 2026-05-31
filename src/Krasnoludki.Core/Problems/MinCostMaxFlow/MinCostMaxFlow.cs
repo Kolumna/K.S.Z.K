@@ -44,10 +44,7 @@ public class MinCostMaxFlowProblem
             MaxFlow += residualCapacity;
             foreach(EdgeFlow edge in path) // For every edge in graph increase flow by new residual capacity of a path
             {   
-                if(edge.BackwardEdge is not null)
-                    edge.BackwardEdge.CurrFlow -= residualCapacity;
-                
-                edge.CurrFlow += residualCapacity;
+                edge.AddFlow(residualCapacity); 
 
                 MinCost += (residualCapacity * edge.Cost);
             }
@@ -62,36 +59,21 @@ public class MinCostMaxFlowProblem
 /// </summary>
 /// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
 /// <returns>A list of point-to-point pairs (Start - End) ready for frontend visualization.</returns>
-    public List<Tuple<Krasnoludki.Core.Models.Point,Krasnoludki.Core.Models.Point>> GetReadyPointToPointEdges(ResidualNetwork networkAfterMCMF)
+    public List<Tuple<int,int>> GetReadyPointToPointEdges(ResidualNetwork networkAfterMCMF)
     {
-        List<Tuple<Krasnoludki.Core.Models.Point,Krasnoludki.Core.Models.Point>> ReadyEdges =
-             new List<Tuple<Krasnoludki.Core.Models.Point, Krasnoludki.Core.Models.Point>>();
+        var ReadyEdges = new List<Tuple<int, int>>();
 
-
-        // WARNING: The index calculation below strictly depends on the exact edge insertion order 
-        // inside the ResidualNetwork. Modifying the generation order will break this extraction logic.
-        int index = 2 * networkAfterMCMF.DwarvesCount + 1;
-        int last_dwarf_mine_index =  2 * (networkAfterMCMF.DwarvesCount * networkAfterMCMF.MinesCount) + 1;
-
-        for(; index < last_dwarf_mine_index; index++)
+        foreach (var edge in networkAfterMCMF.Edges)
         {
-            if(networkAfterMCMF.Edges[index].CurrFlow > 0)
+            if (edge.CurrFlow > 0 &&        // there is a flow                              
+                edge.From > 0 && edge.From <= networkAfterMCMF.DwarvesCount && // the edge is : dwarf -> mine edge
+                edge.To > networkAfterMCMF.DwarvesCount && edge.To < networkAfterMCMF.SinkID)
             {
-                // Searching for Dwarf's Home Location on map 
-                var FromNode = networkAfterMCMF.GetNode(networkAfterMCMF.Edges[index].From);
-                var CurrDwarf = ((GraphNode<Dwarf>)FromNode).Data;
-                Krasnoludki.Core.Models.Point DwarfLoc = CurrDwarf.HomeLocation;
-
-                // Searching for Mine's map location
-                var ToNode = networkAfterMCMF.GetNode(networkAfterMCMF.Edges[index].To);
-                var CurrMine = ((GraphNode<Mine>)ToNode).Data;
-                Krasnoludki.Core.Models.Point MineLoc = CurrMine.Location;
-
-                //Adding new Point to Point Edge for visualization
-                Tuple<Krasnoludki.Core.Models.Point, Krasnoludki.Core.Models.Point> DwarfToMinePointsEdge =
-                     new Tuple<Krasnoludki.Core.Models.Point, Krasnoludki.Core.Models.Point>(DwarfLoc,MineLoc);
                 
-                ReadyEdges.Add(DwarfToMinePointsEdge);
+                int dwarf_id = ((GraphNode<Dwarf>)networkAfterMCMF.GetNode(edge.From)).Data.Id;
+                int mine_id = ((GraphNode<Mine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
+
+                ReadyEdges.Add(new Tuple<int, int>(dwarf_id, mine_id));
             }
         }
 

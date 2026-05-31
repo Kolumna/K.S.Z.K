@@ -7,7 +7,7 @@ public class BellmanFordAlgorithm
     public List<EdgeFlow> bellmanFordAlgorithm(ResidualNetwork network,int src)
     {
 
-        int nodes_count = network.Nodes.Count + 1;
+        int nodes_count = network.SinkID + 1;
 
         double[] distances = new double[nodes_count];
         EdgeFlow[] parentEdge = new EdgeFlow[nodes_count]; // array for tracking route
