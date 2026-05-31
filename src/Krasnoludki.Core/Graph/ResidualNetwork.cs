@@ -45,7 +45,7 @@ public class ResidualNetwork
             EdgeFlow edge = new EdgeFlow(SourceID, CurrDwarfId, 1); // source -> dwarf edge + dwarf -> source ege
 
             Edges.Add(edge);
-            Edges.Add(edge.BackwardEdge);
+            //Edges.Add(edge.BackwardEdge);
 
             CurrMineId = DwarvesCount + 1;
             foreach(Mine mine in mines) //Edges from every Dwarf to every Mine
@@ -60,7 +60,7 @@ public class ResidualNetwork
                 EdgeFlow DwarfMineEdge = new EdgeFlow(CurrDwarfId,CurrMineId, 1, cost);
 
                 Edges.Add(DwarfMineEdge);
-                Edges.Add(DwarfMineEdge.BackwardEdge);
+                //Edges.Add(DwarfMineEdge.BackwardEdge);
 
                 CurrMineId++;
             }
@@ -79,7 +79,7 @@ public class ResidualNetwork
             EdgeFlow MineSinkEdge = new EdgeFlow(CurrMineId, SinkID, mine.Capacity);
 
             Edges.Add(MineSinkEdge);
-            Edges.Add(MineSinkEdge.BackwardEdge);
+            //Edges.Add(MineSinkEdge.BackwardEdge);
 
             CurrMineId++;
         }
