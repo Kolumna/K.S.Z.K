@@ -19,4 +19,6 @@ public class NodeDto
 
     [JsonPropertyName("capacity")]
     public int? Capacity { get; set; }
+    [JsonPropertyName("loudness")]
+    public int? Loudness { get; set; }
 }
