@@ -1,5 +1,6 @@
 
 using System.Text.Json;
+using Krasnoludki.Core.Dto;
 using Krasnoludki.Core.DTOs;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,13 @@ public class AlgorithmsModel : PageModel
 
   public string NodesJson { get; set; } = "[]";
   public string ResultsJson { get; set; } = "{}";
+
+  public ScenarioResultsDto ParsedResults { get; set; } = new ScenarioResultsDto();
+
+  public bool HasConvexHullResult => ParsedResults?.ConvexHull != null;
+  // public bool HasMinCostResult => ResultsJson.Contains("minCost");
+  // public bool HasMatchingResult => ResultsJson.Contains("matching");
+  // public bool HasRmqResult => ResultsJson.Contains("rmq");
 
   private readonly ScenarioFileService _scenarios;
 
@@ -51,6 +59,14 @@ public class AlgorithmsModel : PageModel
         SelectedScenarioId = id;
         NodesJson = JsonSerializer.Serialize(loaded.Nodes);
         ResultsJson = JsonSerializer.Serialize(loaded.Results);
+
+        if (!string.IsNullOrWhiteSpace(ResultsJson) && ResultsJson != "{}")
+        {
+          ParsedResults = JsonSerializer.Deserialize<ScenarioResultsDto>(ResultsJson) ?? new ScenarioResultsDto();
+        }
+
+        Console.WriteLine($"Loaded scenario: {loaded.Name}, Nodes: {loaded.Nodes.Count}, Results: {ResultsJson}");
+        Console.WriteLine($"Parsed Convex Hull: {ParsedResults.ConvexHull?.HullPoints.Count ?? 0} points");
         return;
       }
       else
@@ -64,9 +80,9 @@ public class AlgorithmsModel : PageModel
     SelectedScenarioId = null;
   }
 
-   /// <summary>
-    /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=CalculateGraham
-    /// </summary>
+  /// <summary>
+  /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=CalculateGraham
+  /// </summary>
   public IActionResult OnPostCalculateGraham([FromBody] List<PointDto> incomingPoints)
   {
     if (incomingPoints == null || incomingPoints.Count < 3)

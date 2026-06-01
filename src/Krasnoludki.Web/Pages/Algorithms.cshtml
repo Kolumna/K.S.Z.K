@@ -59,21 +59,53 @@ else
           </div>
         }
 
-        <a asp-page="/Algorithms" asp-route-algorithm="matching" class="algo-button@(Model.Algorithm == "matching" ? " active" : "")"
-           data-tool="algo1"><span>Przydział do Kopalni</span>
-          <p class="status">Nie uruchiomiono</p>
+        <a asp-page="/Algorithms" asp-route-algorithm="matching"
+           class="algo-button@(Model.Algorithm == "matching" ? " active" : "")" data-tool="algo1"><span>Przydział do
+          Kopalni</span>
+          @* @if (Model.HasMatchingResult)
+          {
+            <p class="status active">Uruchomiono</p>
+          }
+          else
+          {
+            <p class="status">Nie uruchomiono</p>
+          } *@
         </a>
-        <a asp-page="/Algorithms" asp-route-algorithm="minCost" class="algo-button@(Model.Algorithm == "minCost" ? " active" : "")"
-           data-tool="algo2"><span>Optymalizacja z Owsianką</span>
-          <p class="status">Nie uruchiomiono</p>
+        <a asp-page="/Algorithms" asp-route-algorithm="minCost"
+           class="algo-button@(Model.Algorithm == "minCost" ? " active" : "")" data-tool="algo2"><span>Optymalizacja z
+          Owsianką</span>
+          @* @if (Model.HasMinCostResult)
+          {
+            <p class="status active">Uruchomiono</p>
+          }
+          else
+          {
+            <p class="status">Nie uruchomiono</p>
+          } *@
         </a>
-        <a asp-page="/Algorithms" asp-route-algorithm="convexHull" class="algo-button@(Model.Algorithm == "convexHull" ? " active" : "")"
-           data-tool="algo3"><span>Wyznaczenie granicy Królestwa</span>
-          <p class="status">Nie uruchiomiono</p>
+        <a asp-page="/Algorithms" asp-route-algorithm="convexHull"
+           class="algo-button@(Model.Algorithm == "convexHull" ? " active" : "")" data-tool="algo3"><span>Wyznaczenie
+          granicy Królestwa</span>
+          @if (Model.HasConvexHullResult)
+          {
+            <p class="status active">Uruchomiono</p>
+          }
+          else
+          {
+            <p class="status">Nie uruchomiono</p>
+          }
         </a>
-        <a asp-page="/Algorithms" asp-route-algorithm="rmq" class="algo-button@(Model.Algorithm == "rmq" ? " active" : "")"
-           data-tool="algo4"><span>Najgłośniejszy dekamentrysta</span>
-          <p class="status">Nie uruchiomiono</p>
+        <a asp-page="/Algorithms" asp-route-algorithm="rmq"
+           class="algo-button@(Model.Algorithm == "rmq" ? " active" : "")" data-tool="algo4"><span>Najgłośniejszy
+          dekamentrysta</span>
+          @* @if (Model.HasRmqResult)
+          {
+            <p class="status active">Uruchomiono</p>
+          }
+          else
+          {
+            <p class="status">Nie uruchomiono</p>
+          } *@
         </a>
 
       </div>
