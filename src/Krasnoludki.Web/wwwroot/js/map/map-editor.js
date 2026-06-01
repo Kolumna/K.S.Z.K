@@ -219,6 +219,10 @@ function confirmNode() {
         ? parseInt(document.getElementById("capacityInput").value) || 0
         : undefined,
     minerals: selectedTypes,
+    loudness:
+      MapState.mode === "dwarf"
+        ? parseInt(document.getElementById("loudnessInput").value) || 0
+        : undefined,
   });
 
   markAsChanged();
