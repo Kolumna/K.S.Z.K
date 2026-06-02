@@ -59,10 +59,14 @@ public class MinCostMaxFlowProblem
 /// Extracts the final dwarf-to-mine assignments from the residual network after the algorithm's execution.
 /// </summary>
 /// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
-/// <returns>A list of AssignmentDto containing DwarfId, MineId, and Distance ready for frontend visualization.</returns>
-    public List<AssignmentDto> ExtractAssignments(ResidualNetwork networkAfterMCMF)
+/// <returns>A list of AssignmentDto containing DwarfId, MineId, and Distance, real cost, total employed 
+/// dwarves count, count of dwarves employed due to the distance.</returns>
+    public (List<AssignmentDto>, double, int, int) ExtractAssignments(ResidualNetwork networkAfterMCMF)
     {
         var ReadyEdges = new List<AssignmentDto>();
+        double realCost = 0;
+        int employedDwarfsCount = 0;
+        int distanceEmployedDwarfs = 0;
 
         foreach (var edge in networkAfterMCMF.Edges)
         {
@@ -74,12 +78,27 @@ public class MinCostMaxFlowProblem
                 int dwarf_id = ((GraphNode<Dwarf>)networkAfterMCMF.GetNode(edge.From)).Data.Id;
                 int mine_id = ((GraphNode<Mine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
 
+
                 // if the mine wasn't with dwarf preferred material we added artificial massive cost
-                ReadyEdges.Add(new AssignmentDto(dwarf_id, mine_id, edge.Cost % 1000000)); 
+                double actualDistance;
+                if(edge.Cost >= 1000000)
+                {
+                    actualDistance = edge.Cost % 1000000;
+                    distanceEmployedDwarfs++;
+                }
+                else
+                {
+                    actualDistance = edge.Cost;
+                }
+
+                realCost += actualDistance;
+                ReadyEdges.Add(new AssignmentDto(dwarf_id, mine_id, actualDistance)); 
                 // to get right distance we need to be sure not to count extra artificial massive cost
+
+                employedDwarfsCount++;
             }
         }
 
-        return ReadyEdges;
+        return (ReadyEdges, realCost, employedDwarfsCount, distanceEmployedDwarfs);
     }
 }
