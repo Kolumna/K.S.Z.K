@@ -28,7 +28,7 @@ namespace Krasnoludki.Tests
 
             List<EdgeFlow> edges = EdgeGen.GenerateEdges(dwarves, mines, source, sink);
 
-            Assert.Equal(16, edges.Count);
+            Assert.Equal(8, edges.Count);
 
             //od source do dwarves[0]
             Assert.Equal(1, edges[0].Capacity);
@@ -36,87 +36,87 @@ namespace Krasnoludki.Tests
             Assert.Equal(1, edges[0].To);
 
             //powrotna
-            Assert.Equal(1, edges[1].Capacity);
-            Assert.Equal(1, edges[1].From);
-            Assert.Equal(0, edges[1].To);
+            Assert.Equal(1, edges[0].BackwardEdge.Capacity);
+            Assert.Equal(1, edges[0].BackwardEdge.From);
+            Assert.Equal(0, edges[0].BackwardEdge.To);
 
             //od dwarves[0] do mines[0]
-            Assert.Equal(1, edges[2].Capacity);
-            Assert.Equal(1, edges[2].From);
-            Assert.Equal(3, edges[2].To);
-            Assert.Equal(Math.Sqrt(8), edges[2].Cost);
+            Assert.Equal(1, edges[1].Capacity);
+            Assert.Equal(1, edges[1].From);
+            Assert.Equal(3, edges[1].To);
+            Assert.Equal(Math.Sqrt(8), edges[1].Cost);
 
             //powrotna
-            Assert.Equal(1, edges[3].Capacity);
-            Assert.Equal(3, edges[3].From);
-            Assert.Equal(1, edges[3].To);
-            Assert.Equal(-Math.Sqrt(8), edges[3].Cost);
+            Assert.Equal(1, edges[1].BackwardEdge.Capacity);
+            Assert.Equal(3, edges[1].BackwardEdge.From);
+            Assert.Equal(1, edges[1].BackwardEdge.To);
+            Assert.Equal(-Math.Sqrt(8), edges[1].BackwardEdge.Cost);
 
             //od dwarves[0] do mines[1]
-            Assert.Equal(1, edges[4].Capacity);
-            Assert.Equal(1, edges[4].From);
-            Assert.Equal(4, edges[4].To);
-            Assert.Equal(1000000, edges[4].Cost);
+            Assert.Equal(1, edges[2].Capacity);
+            Assert.Equal(1, edges[2].From);
+            Assert.Equal(4, edges[2].To);
+            Assert.Equal(1000000, edges[2].Cost);
 
             //powrotna
-            Assert.Equal(1, edges[5].Capacity);
-            Assert.Equal(4, edges[5].From);
-            Assert.Equal(1, edges[5].To);
-            Assert.Equal(-1000000, edges[5].Cost);
+            Assert.Equal(1, edges[2].BackwardEdge.Capacity);
+            Assert.Equal(4, edges[2].BackwardEdge.From);
+            Assert.Equal(1, edges[2].BackwardEdge.To);
+            Assert.Equal(-1000000, edges[2].BackwardEdge.Cost);
 
             //od source do dwarves[1]
-            Assert.Equal(1, edges[6].Capacity);
-            Assert.Equal(0, edges[6].From);
-            Assert.Equal(2, edges[6].To);
+            Assert.Equal(1, edges[3].Capacity);
+            Assert.Equal(0, edges[3].From);
+            Assert.Equal(2, edges[3].To);
 
             //powrotna
-            Assert.Equal(1, edges[7].Capacity);
-            Assert.Equal(2, edges[7].From);
-            Assert.Equal(0, edges[7].To);
+            Assert.Equal(1, edges[3].BackwardEdge.Capacity);
+            Assert.Equal(2, edges[3].BackwardEdge.From);
+            Assert.Equal(0, edges[3].BackwardEdge.To);
 
             //od dwarves[1] do mines[0]
-            Assert.Equal(1, edges[8].Capacity);
-            Assert.Equal(2, edges[8].From);
-            Assert.Equal(3, edges[8].To);
-            Assert.Equal(Math.Sqrt(2), edges[8].Cost);
+            Assert.Equal(1, edges[4].Capacity);
+            Assert.Equal(2, edges[4].From);
+            Assert.Equal(3, edges[4].To);
+            Assert.Equal(Math.Sqrt(2), edges[4].Cost);
 
             //powrotna
-            Assert.Equal(1, edges[9].Capacity);
-            Assert.Equal(3, edges[9].From);
-            Assert.Equal(2, edges[9].To);
-            Assert.Equal(-Math.Sqrt(2), edges[9].Cost);
+            Assert.Equal(1, edges[4].BackwardEdge.Capacity);
+            Assert.Equal(3, edges[4].BackwardEdge.From);
+            Assert.Equal(2, edges[4].BackwardEdge.To);
+            Assert.Equal(-Math.Sqrt(2), edges[4].BackwardEdge.Cost);
 
             //od dwarves[1] do mines[1]
-            Assert.Equal(1, edges[10].Capacity);
-            Assert.Equal(2, edges[10].From);
-            Assert.Equal(4, edges[10].To);
-            Assert.Equal(Math.Sqrt(8), edges[10].Cost);
+            Assert.Equal(1, edges[5].Capacity);
+            Assert.Equal(2, edges[5].From);
+            Assert.Equal(4, edges[5].To);
+            Assert.Equal(Math.Sqrt(8), edges[5].Cost);
 
             //powrotna
-            Assert.Equal(1, edges[11].Capacity);
-            Assert.Equal(4, edges[11].From);
-            Assert.Equal(2, edges[11].To);
-            Assert.Equal(-Math.Sqrt(8), edges[11].Cost);
+            Assert.Equal(1, edges[5].BackwardEdge.Capacity);
+            Assert.Equal(4, edges[5].BackwardEdge.From);
+            Assert.Equal(2, edges[5].BackwardEdge.To);
+            Assert.Equal(-Math.Sqrt(8), edges[5].BackwardEdge.Cost);
 
             //od mines[0] do sink
-            Assert.Equal(2, edges[12].Capacity);
-            Assert.Equal(3, edges[12].From);
-            Assert.Equal(5, edges[12].To);
+            Assert.Equal(2, edges[6].Capacity);
+            Assert.Equal(3, edges[6].From);
+            Assert.Equal(5, edges[6].To);
 
             //powrotna
-            Assert.Equal(2, edges[13].Capacity);
-            Assert.Equal(5, edges[13].From);
-            Assert.Equal(3, edges[13].To);
+            Assert.Equal(2, edges[6].BackwardEdge.Capacity);
+            Assert.Equal(5, edges[6].BackwardEdge.From);
+            Assert.Equal(3, edges[6].BackwardEdge.To);
 
             //od mines[0] do sink
-            Assert.Equal(1, edges[14].Capacity);
-            Assert.Equal(4, edges[14].From);
-            Assert.Equal(5, edges[14].To);
+            Assert.Equal(1, edges[7].Capacity);
+            Assert.Equal(4, edges[7].From);
+            Assert.Equal(5, edges[7].To);
 
             //powrotna
-            Assert.Equal(1, edges[15].Capacity);
-            Assert.Equal(5, edges[15].From);
-            Assert.Equal(4, edges[15].To);
+            Assert.Equal(1, edges[7].BackwardEdge.Capacity);
+            Assert.Equal(5, edges[7].BackwardEdge.From);
+            Assert.Equal(4, edges[7].BackwardEdge.To);
         }
     }
 }

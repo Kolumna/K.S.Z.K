@@ -23,9 +23,15 @@ namespace Krasnoludki.Tests
                 new Mine(4, 4, 4, MineralType.Silver, 1)
             };
 
-            DwarfAssigning.Assign(dwarves, mines);
-            Assert.True(dwarves[1].WorksIn.PointId == mines[0].PointId);
-            Assert.True(dwarves[0].WorksIn.PointId == mines[1].PointId);
+            List<int[]> assigned = DwarfAssigning.Assign(dwarves, mines);
+
+            Assert.Equal(2, assigned.Count());      //ile krasnoludków przydzielono
+            //pierwszy przydzielony krasnoludek
+            Assert.Equal(1, assigned[0][0]);
+            Assert.Equal(4, assigned[0][1]);
+            //drugi przydzielony krasnoludek
+            Assert.Equal(2, assigned[1][0]);
+            Assert.Equal(3, assigned[1][1]);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.IO.Pipelines;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -32,6 +33,13 @@ namespace Krasnoludki.Core
                         parent[edge.To] = edge;
                         if(edge.To == sink.PointId) return true;
                     }
+                    EdgeFlow backEdge = edge.BackwardEdge;
+                    if(backEdge.From == p && backEdge.CurrFlow < backEdge.Capacity && !visited.Contains(backEdge.To) && backEdge.Cost < 1000000)    //krawędzi utworzone z brakiem preferencji między krasnoludkiem i kopalnią są ognorowane
+                    {
+                        q.Enqueue(backEdge.To);
+                        visited.Add(backEdge.To);
+                        parent[backEdge.To] = backEdge;
+                    }
                 }
             }
             return false;
@@ -63,8 +71,9 @@ namespace Krasnoludki.Core
             }
             return MaxFlow;
         }
-        public static void Assign(List<Dwarf> dwarves, List<Mine> mines)
+        public static List<int[]> Assign(List<Dwarf> dwarves, List<Mine> mines)
         {
+            List<int[]> result = new List<int[]>();
             Source source = new Source();
             Sink sink = new Sink(dwarves.Count() + mines.Count());
 
@@ -72,24 +81,19 @@ namespace Krasnoludki.Core
 
             EdmondsKarp(source, sink, edges);
 
-            foreach(Dwarf dwarf in dwarves)         //dla każdego krasnoludka po wykonaniu przypisania
+            foreach(EdgeFlow e in edges)
             {
-                foreach(EdgeFlow edge in edges)     
+                if(e.From == 0 || e.CurrFlow <= 0)      //sprawdza czy krawędź nie jest od source lub czy jest nie używana
                 {
-                    if(edge.From == dwarf.PointId && edge.CurrFlow == 1)    //sprawdza która krawędź została wykorzystana do wysłania go do kopalni
-                    {
-                        foreach(Mine mine in mines)
-                        {
-                            if(mine.PointId == edge.To)     //na podstawie tego szuka tej kopalni
-                            {
-                                dwarf.AssignMine(mine);     //przypisuje kopalnie krasnoluskowi
-                                mine.AddWorker(dwarf);      //i krasnoludka kopalni
-                                break;
-                            }
-                        }
-                    }
+                    continue;           //jeśli tak to pomija
                 }
+                if(e.To == sink.PointId)        //krawedzie do sink sa ostanie w liscie wiec gdy petal do nich dotrze, zostaje przerwana
+                {
+                    break;
+                }
+                result.Add(new int[]{e.From, e.To});    //dodaje do listy wyników tab int[2] gdzie tab[0] = id krasnoludka, a tab[1] = id kopalni do  której został przydzielony
             }
+            return result;
         }
     }
 }

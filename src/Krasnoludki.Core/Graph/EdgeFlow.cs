@@ -23,14 +23,14 @@ public class EdgeFlow
         From = dwarf.PointId;
         To = mine.PointId;
         Capacity = 1;
-        if(dwarf.PreferredMinerals.Contains(mine.Resource))
+        if(dwarf.PreferredMinerals.Contains(mine.Resource))     //sprawdza czy w koaplni jest preferowany zasób krasnoludka
             {
                 Cost = Math.Sqrt(Math.Pow(dwarf.x - mine.x, 2) + Math.Pow(dwarf.y - mine.y, 2));
-            }
+            }   //jeśli tak, liczy koszt
         else
             {
                 Cost = 1000000;
-            }
+            }   //jeśli nie, ustawia sztucznie wysoki koszt
         CurrFlow = 0;
         BackwardEdge = new EdgeFlow(this);
     }
