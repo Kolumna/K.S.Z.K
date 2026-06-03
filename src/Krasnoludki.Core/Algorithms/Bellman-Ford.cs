@@ -9,11 +9,11 @@ public class BellmanFordAlgorithm
 
         int nodes_count = network.SinkID + 1;
 
-        double[] distances = new double[nodes_count];
+        long[] distances = new long[nodes_count];
         EdgeFlow[] parentEdge = new EdgeFlow[nodes_count]; // array for tracking route
 
         // Initialize all distances to infinity and the source node to 0.
-        Array.Fill(distances, double.MaxValue);
+        Array.Fill(distances, long.MaxValue);
         distances[src] = 0;
 
 
@@ -25,7 +25,7 @@ public class BellmanFordAlgorithm
             foreach(EdgeFlow edge in network.Edges)
             {
                 // Verify residual capacity. We only consider edges that can take more flow (Capacity - CurrFlow > 0)
-                if (distances[edge.From] != double.MaxValue &&
+                if (distances[edge.From] != long.MaxValue &&
                         edge.Capacity - edge.CurrFlow > 0 &&
                             distances[edge.From] + edge.Cost
                                 < distances[edge.To])
@@ -38,7 +38,7 @@ public class BellmanFordAlgorithm
                 }
 
                 EdgeFlow backEdge = edge.BackwardEdge;
-                if (distances[backEdge.From] != double.MaxValue &&
+                if (distances[backEdge.From] != long.MaxValue &&
                         backEdge.Capacity - backEdge.CurrFlow > 0 &&
                             distances[backEdge.From] + backEdge.Cost < distances[backEdge.To])
                 {
@@ -80,7 +80,7 @@ public class BellmanFordAlgorithm
         EdgeFlow currEdge;
         List<EdgeFlow> path = new List<EdgeFlow>();
 
-        if(distances[currNode] == double.MaxValue) // there is no path
+        if(distances[currNode] == long.MaxValue) // there is no path
         {
             return path;
         }

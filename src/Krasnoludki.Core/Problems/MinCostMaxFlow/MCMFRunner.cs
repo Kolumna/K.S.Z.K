@@ -12,13 +12,13 @@ public class RoutingResultDto
 {
     public List<AssignmentDto> ReadyEdgesWithIdDistance { get; set; }
     public double MinCostResult { get; set; }
-    public double MaxFlowResult { get; set; }
+    public int MaxFlowResult { get; set; }
     public int EmployedOnlyByDistance { get; set; }
     public int UnemployedDwarvesCount{ get; set; }
 
     public long TimeInMilisecons { get; set; }
 
-    public RoutingResultDto(List<AssignmentDto> edges, double cost, double flow,int unemployedDwarvesCount,
+    public RoutingResultDto(List<AssignmentDto> edges, double cost, int flow, int unemployedDwarvesCount,
          int distanceEmployedDwarfs, long totalTime)
     {
         ReadyEdgesWithIdDistance = edges;

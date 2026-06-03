@@ -22,7 +22,13 @@ public class Point
         this.x = x;
         this.y = y;
     }
-
+    public double CalculateDistance(Point other)
+    {
+        return Math.Sqrt(
+                (this.x - other.x) * (this.x - other.x)
+            + 
+                (this.y - other.y) * (this.y - other.y));
+    }
     /*public int HowManyPoints()  //metoda zwraca ile punktów istnieje w momencie wywołania metody
     {
         return _PointCounter-1;

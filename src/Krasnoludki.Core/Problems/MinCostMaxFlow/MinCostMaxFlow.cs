@@ -19,12 +19,13 @@ namespace Krasnoludki.Core.Problems;
 /// </remarks>
 public class MinCostMaxFlowProblem
 {
-    public (double,double) MinCostMaxFlow(ResidualNetwork network)
+    public (double,int) MinCostMaxFlow(ResidualNetwork network)
     {
         int source = network.SourceID;
 
         BellmanFordAlgorithm algorithm = new BellmanFordAlgorithm();
-        double MinCost = 0, MaxFlow = 0;
+        long MinCost = 0;
+        int MaxFlow = 0;
         List<EdgeFlow> path = new List<EdgeFlow>();
 
         while (true)
@@ -51,7 +52,7 @@ public class MinCostMaxFlowProblem
             }
         }
 
-       return (MinCost,MaxFlow);
+       return (MinCost / 100000.0, MaxFlow);
        
     }
 
@@ -81,14 +82,14 @@ public class MinCostMaxFlowProblem
 
                 // if the mine wasn't with dwarf preferred material we added artificial massive cost
                 double actualDistance;
-                if(edge.Cost >= 1000000)
+                if(edge.Cost >= ResidualNetwork.NON_PREFERRED_PENALTY)
                 {
-                    actualDistance = edge.Cost % 1000000;
+                    actualDistance = (double)(edge.Cost % ResidualNetwork.NON_PREFERRED_PENALTY) / 100000;
                     distanceEmployedDwarfs++;
                 }
                 else
                 {
-                    actualDistance = edge.Cost;
+                    actualDistance = (double)edge.Cost / 100000;
                 }
 
                 realCost += actualDistance;
