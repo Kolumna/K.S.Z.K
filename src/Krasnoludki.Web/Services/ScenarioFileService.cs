@@ -152,6 +152,10 @@ public class ScenarioFileService
                 scenario.Results.ConvexHull =
                     JsonSerializer.Deserialize<ConvexHullResultDto>(JsonSerializer.Serialize(result));
                 break;
+            case "matching":
+                scenario.Results.Matching =
+                    JsonSerializer.Deserialize<MatchingResultDto>(JsonSerializer.Serialize(result));
+                break;
         }
 
         scenario.UpdatedAt = DateTime.Now;
@@ -168,6 +172,7 @@ public class ScenarioFileService
             switch (resultKey)
             {
                 case "convexHull": entry.HasConvexHull = true; break;
+                case "matching": entry.HasMatching = true; break;
             }
             SaveManifest(manifest);
         }
@@ -186,4 +191,5 @@ public class ManifestEntry
     public List<string> Minerals { get; set; } = new();
 
     public bool HasConvexHull { get; set; }
+    public bool HasMatching { get; set; }
 }

@@ -62,14 +62,14 @@ else
         <a asp-page="/Algorithms" asp-route-algorithm="matching"
            class="algo-button@(Model.Algorithm == "matching" ? " active" : "")" data-tool="algo1"><span>Przydział do
           Kopalni</span>
-          @* @if (Model.HasMatchingResult)
+          @if (Model.HasMatchingResult)
           {
             <p class="status active">Uruchomiono</p>
           }
           else
           {
             <p class="status">Nie uruchomiono</p>
-          } *@
+          }
         </a>
         <a asp-page="/Algorithms" asp-route-algorithm="minCost"
            class="algo-button@(Model.Algorithm == "minCost" ? " active" : "")" data-tool="algo2"><span>Optymalizacja z

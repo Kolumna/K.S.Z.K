@@ -1,15 +1,16 @@
 [
   {
-    "Id": "dae08915",
-    "Name": "Scenariusz 03.06.2026 14:14",
-    "CreatedAt": "2026-05-31T15:50:44.7979537+02:00",
-    "UpdatedAt": "2026-06-03T14:14:54.9087424+02:00",
-    "File": "dae08915.hoff",
-    "Dwarves": 2,
+    "Id": "3368e730",
+    "Name": "Scenariusz 03.06.2026 17:19",
+    "CreatedAt": "2026-06-03T16:45:37.8718645+02:00",
+    "UpdatedAt": "2026-06-03T17:19:07.1735948+02:00",
+    "File": "3368e730.hoff",
+    "Dwarves": 1,
     "Mines": 1,
     "Minerals": [
-      "coal"
+      "Coal"
     ],
-    "HasConvexHull": false
+    "HasConvexHull": true,
+    "HasMatching": true
   }
 ]

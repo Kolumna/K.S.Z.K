@@ -10,17 +10,59 @@ async function runAlgorithm(algorithmType) {
   btn.disabled = true;
   btn.innerText = "Trwają obliczenia...";
 
+  console.log("INITIAL_NODES", INITIAL_NODES);
+
   try {
     let res;
 
     switch (algorithmType) {
-      case "convexHull": // Otoczka wypukła
+      case "convexHull":
         const pointsPayload = INITIAL_NODES.map((n) => ({ x: n.x, y: n.y }));
 
         res = await MapApiService.calculateConvexHull(pointsPayload);
 
         if (res.success) {
           drawConvexHullOverlay(res.data);
+        }
+        break;
+      case "matching":
+        const nodesWithCorrectIds = INITIAL_NODES.map((node, index) => ({
+          ...node,
+          id: index + 1,
+        }));
+
+        const dwarves = nodesWithCorrectIds
+          .filter((n) => n.type === "dwarf")
+          .map((n) => ({
+            pointId: n.id,
+            x: n.x,
+            y: n.y,
+            preferredMinerals: n.minerals,
+            voiceLoudness: n.loudness,
+          }));
+        const mines = nodesWithCorrectIds
+          .filter((n) => n.type === "mine")
+          .map((n) => ({
+            pointId: n.id,
+            x: n.x,
+            y: n.y,
+            resource: n.minerals[0],
+            capacity: n.capacity,
+          }));
+        const matchingPayload = { dwarves, mines };
+
+        console.log("Payload JSON:", JSON.stringify(matchingPayload, null, 2));
+
+        console.log("INITIAL_NODES", INITIAL_NODES);
+
+        console.log("Sending matching payload:", matchingPayload);
+
+        res = await MapApiService.calculateMatching(matchingPayload);
+
+        console.log("Matching API response:", res.data);
+
+        if (res.success) {
+          drawDwarfAssignments(res.data);
         }
         break;
       default:
@@ -65,6 +107,54 @@ function drawConvexHullOverlay(hullPoints) {
   ctx.setLineDash([]);
 }
 
+function drawDwarfAssignments(matchingData) {
+  const canvas = document.getElementById("algoCanvas");
+  const ctx = canvas.getContext("2d");
+
+  console.log("Matching data received:", matchingData);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  matchingData.assignments.forEach((assignment) => {
+    const dwarf = INITIAL_NODES.find(
+      (n) => n.type === "dwarf" && n.id === Number(assignment.dwarfId),
+    );
+    const mine = INITIAL_NODES.find(
+      (n) => n.type === "mine" && n.id === Number(assignment.mineId),
+    );
+
+    if (dwarf && mine) {
+      ctx.beginPath();
+      ctx.strokeStyle = "#4ade80";
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 3]);
+      ctx.moveTo(dwarf.x, dwarf.y);
+      ctx.lineTo(mine.x, mine.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    } else {
+      console.warn(
+        `Could not find dwarf ${assignment.dwarfId} or mine ${assignment.mineId}`,
+      );
+    }
+  });
+
+  INITIAL_NODES.filter((n) => n.type === "dwarf").forEach((dwarf) => {
+    ctx.beginPath();
+    ctx.arc(dwarf.x, dwarf.y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = "#3b82f6";
+    ctx.fill();
+  });
+
+  INITIAL_NODES.filter((n) => n.type === "mine").forEach((mine) => {
+    const size = 20;
+    ctx.beginPath();
+    ctx.rect(mine.x - size / 2, mine.y - size / 2, size, size);
+    ctx.fillStyle = "#f59e0b";
+    ctx.fill();
+  });
+}
+
 function loadAlgorithmResults() {
   const selectedAlgorithm = new URLSearchParams(window.location.search).get(
     "algorithm",
@@ -73,6 +163,8 @@ function loadAlgorithmResults() {
   console.log("Selected algorithm from URL:", selectedAlgorithm);
   if (algorithmResults.convexHull && selectedAlgorithm === "convexHull") {
     drawConvexHullOverlay(algorithmResults.convexHull.hullPoints);
+  } else if (algorithmResults.matching && selectedAlgorithm === "matching") {
+    drawDwarfAssignments(algorithmResults.matching);
   }
 }
 

@@ -5,6 +5,8 @@ namespace Krasnoludki.Core.DTOs;
 
 public class NodeDto
 {
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
     [JsonPropertyName("x")]
     public double X { get; set; }
 

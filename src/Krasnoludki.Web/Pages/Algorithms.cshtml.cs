@@ -1,7 +1,9 @@
 
 using System.Text.Json;
+using Krasnoludki.Core;
 using Krasnoludki.Core.Dto;
 using Krasnoludki.Core.DTOs;
+using Krasnoludki.Core.Models;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,9 +26,10 @@ public class AlgorithmsModel : PageModel
 
   public ScenarioResultsDto ParsedResults { get; set; } = new ScenarioResultsDto();
 
+  public bool HasMatchingResult => ParsedResults.Matching != null;
   public bool HasConvexHullResult => ParsedResults?.ConvexHull != null;
   // public bool HasMinCostResult => ResultsJson.Contains("minCost");
-  // public bool HasMatchingResult => ResultsJson.Contains("matching");
+
   // public bool HasRmqResult => ResultsJson.Contains("rmq");
 
   private readonly ScenarioFileService _scenarios;
@@ -142,5 +145,47 @@ public class AlgorithmsModel : PageModel
         message = "Error: " + ex.Message
       });
     }
+  }
+
+  public IActionResult OnPostCalculateMatching(
+    [FromBody] MatchingInputDto input
+  )
+  {
+    Console.WriteLine("Received matching request with input: " + JsonSerializer.Serialize(input));
+    List<Dwarf> dwarves = input.Dwarves;
+    List<Mine> mines = input.Mines;
+
+    Console.WriteLine($"Received {dwarves.Count} dwarves and {mines.Count} mines for matching.");
+
+    foreach (var dwarf in dwarves)
+    {
+      Console.WriteLine($"Dwarf {dwarf.PointId}: Prefers {string.Join(", ", dwarf.PreferredMinerals)}");
+    }
+
+    foreach (var mine in mines)
+    {
+      Console.WriteLine($"Mine {mine.PointId}: Contains {mine.Resource} with capacity {mine.Capacity}");
+    }
+
+    List<int[]> assigned = DwarfAssigning.Assign(dwarves, mines);
+
+    var result = new MatchingResultDto
+    {
+      Assignments = [.. assigned.Select(pair => new DwarfAssignmentDto
+      {
+        DwarfId = pair[0].ToString(),
+        MineId = pair[1].ToString()
+      })]
+    };
+
+    Console.WriteLine("Matching result: " + JsonSerializer.Serialize(result));
+
+    var id = HttpContext.Session.GetString("activeScenarioId");
+    if (id != null && _scenarios.Exists(id))
+    {
+      _scenarios.SaveResult(id, "matching", result);
+    }
+
+    return new JsonResult(new { success = true, data = result });
   }
 }

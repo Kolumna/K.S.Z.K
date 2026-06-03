@@ -19,11 +19,18 @@ const MapApiService = {
     return await res.json();
   },
 
-  // Otoczka wypukła
   async calculateConvexHull(pointsArray) {
     if (!pointsArray || pointsArray.length < 3) {
       throw new Error("Required at least 3 points to calculate convex hull.");
     }
     return await this._sendRequest("CalculateGraham", pointsArray);
   },
+
+  async calculateMatching(matchingPayload) {
+    if (!matchingPayload || !matchingPayload.dwarves || !matchingPayload.mines) {
+      throw new Error("Invalid payload for matching algorithm.");
+    }
+    console.log("Sending matching payload to API:", matchingPayload);
+    return await this._sendRequest("CalculateMatching", matchingPayload);
+  }
 };

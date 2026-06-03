@@ -25,9 +25,9 @@ public class SegmentTreeTest
         Dwarf localCommander = tree.GetLoudestDecametrist(0, 3);
 
         Assert.Equal(5, commander.PointId);
-        Assert.Equal(55, commander.getLoudness());
+        Assert.Equal(55, commander.GetLoudness());
 
         Assert.Equal(2, localCommander.PointId);
-        Assert.Equal(47, localCommander.getLoudness());
+        Assert.Equal(47, localCommander.GetLoudness());
     }
 }

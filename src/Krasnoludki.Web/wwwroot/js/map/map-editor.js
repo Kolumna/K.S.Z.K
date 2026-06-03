@@ -336,7 +336,7 @@ async function updateMapBtn() {
       },
       body: JSON.stringify({
         scenarioId,
-        nodes: JSON.stringify(nodes),
+        nodes: JSON.stringify(nodesWithCorrectIds),
       }),
     });
 
