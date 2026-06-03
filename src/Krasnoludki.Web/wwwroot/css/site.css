@@ -1,3 +1,75 @@
+:root {
+  --color-bg: #0f0e0c;
+  --color-surface: #13120e;
+  --color-card: #1a1814;
+  --color-card-hover: #202018;
+  --color-overlay: #2a2520;
+
+  --border-subtle: #1a1814;
+  --border-default: #2a2520;
+  --border-strong: #3a3528;
+  --border-active: #c8a030;
+
+  --text-primary: #e8e4d8;
+  --text-secondary: #c0b898;
+  --text-tertiary: #8a8070;
+  --text-muted: #646156;
+  --text-disabled: #2a2820;
+
+  --gold: #e8c060;
+  --gold-border: #c8a030;
+  --gold-bg: #3a3020;
+  --gold-subtle: #2a2010;
+
+  --dwarf: #4a90c0;
+  --dwarf-bg: #1a3a5a;
+  --mine: #c07030;
+  --mine-bg: #3a2010;
+
+  --success: #6aaa6a;
+  --success-bg: #1a3020;
+  --warning: #c0a030;
+  --warning-bg: #2a2010;
+  --danger: #c05050;
+  --danger-bg: #3a1818;
+
+  --mineral-gold: #e8c060;
+  --mineral-silver: #c0c8d0;
+  --mineral-coal: #808878;
+  --mineral-quartz: #a0c0e0;
+
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+
+  --font-sans: "Georgia", serif;
+  --font-mono: "Courier New", monospace;
+
+  --text-xs: 10px;
+  --text-sm: 11px;
+  --text-base: 13px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+
+  --tracking-tight: 0.02em;
+  --tracking-normal: 0.05em;
+  --tracking-wide: 0.1em;
+  --tracking-wider: 0.15em;
+  --tracking-widest: 0.25em;
+
+  --transition-fast: all 0.12s ease;
+  --transition-normal: all 0.2s ease;
+}
+
 @font-face {
   font-family: "Almendra-Local";
   src: url("../fonts/Almendra-Regular.ttf") format("truetype");
@@ -17,6 +89,25 @@ span {
   font-family: "Almendra-Local", serif;
   margin: 0;
   padding: 0;
+  color: var(--text-primary);
+}
+
+.field-y {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-x {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+html {
+  background-color: var(--color-bg);
 }
 
 a {
@@ -30,57 +121,55 @@ body {
 }
 
 .btn {
-  padding: 24px;
-  background-color: #000;
+  padding: 8px 16px;
+  background-color: var(--gold-bg);
   color: white;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 16px;
   transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
 }
 
 .btn:hover {
-  background-color: #333;
+  background-color: var(--color-overlay);
 }
 
 .btn-icon {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  flex: 1;
   width: 256px;
   height: 256px;
-  font-size: 1.25rem;
 }
 
 .container {
-  max-width: 1500px;
+  max-width: 1600px;
   margin: 0 auto;
   width: 100%;
-  height: 100%;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
 }
 
-header {
+.main-page-header {
   text-align: center;
   padding: 24px;
 }
 
-footer {
+.main-page-footer {
   text-align: center;
   padding: 24px;
 }
 
 .canvas-area {
   background-color: #333;
-  width: 100%;
   height: 100%;
   flex: 1;
   display: flex;
-  border-radius: 8px;
+  flex-direction: column;
 }
 
 #mapCanvas {
@@ -92,6 +181,27 @@ footer {
   background-color: var(--color-surface);
   cursor: crosshair;
   box-sizing: border-box;
+  background-color: #e8dcc4;
+  background-image:
+    radial-gradient(
+      circle at center,
+      transparent 40%,
+      rgba(101, 67, 33, 0.6) 120%
+    ),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>');
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+  cursor: crosshair;
+}
+
+#algoCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-bottom: 1px solid var(--border-strong);
+  border-left: 1px solid var(--border-strong);
+  background-color: var(--color-surface);
+  cursor: crosshair;
+  box-sizing: border-box;
 }
 
 main {
@@ -100,7 +210,8 @@ main {
 
 .buttons-group {
   display: flex;
-  gap: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
   justify-content: center;
   align-items: center;
   margin-top: 24px;
@@ -399,6 +510,15 @@ aside.algo-aside {
 .aside-item.scenarios-aside {
   overflow-y: auto;
   flex: 1;
+  overflow-x: hidden;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   justify-content: center;
@@ -442,6 +562,10 @@ aside.algo-aside {
   gap: 8px;
   justify-content: center;
   width: 100%;
+}
+
+.modal-content button:hover {
+  background-color: var(--color-overlay);
 }
 
 .modal-content input[type="checkbox"] {
@@ -524,8 +648,37 @@ input {
   border-radius: 8px;
 }
 
-.scenarios-list {
-  margin-top: 24px;
+.book-aside-header {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+#book-search-input {
+  width: 100%;
+}
+
+.book-search-form {
+  display: flex;
+  gap: 8px;
+}
+
+.book-search-form button {
+  padding: 8px 16px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  border: 1px solid var(--gold-border);
+}
+
+.book-search-form button:hover {
+  background-color: var(--color-overlay);
 }
 
 #algo-run-button {
