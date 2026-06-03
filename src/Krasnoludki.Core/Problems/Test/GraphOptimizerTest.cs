@@ -1,1 +1,0 @@
-namespace Krasnoludki.Core.Algorithms.Test;
