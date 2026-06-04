@@ -2,20 +2,45 @@ namespace Krasnoludki.Core.Graph;
 
 public class EdgeFlow
 {
-    public int From{ get; }
-    public int To{ get; }
-    public int Capacity{ get; }
-    public int CurrFlow{ get; private set;}
-    public long Cost { get; }
-    public EdgeFlow BackwardEdge{ get; }
+    public int From;
+    public int To;
+    public int Capacity;
+    public int CurrFlow;
+    public double Cost;
+    public EdgeFlow BackwardEdge;
 
-    
-    public EdgeFlow(int from, int to, int capacity, long cost = 0)
+    public EdgeFlow(Models.Source source, Models.Dwarf dwarf)      //konstruktor od source do krasnoludków
     {
-        From = from;
-        To = to;
-        Capacity = capacity;
-        Cost = cost;
+        From = source.PointId;
+        To = dwarf.PointId;
+        Capacity = 1;
+        Cost = 0;
+        CurrFlow = 0;
+        BackwardEdge = new EdgeFlow(this);
+    }
+    public EdgeFlow(Models.Dwarf dwarf, Models.Mine mine)        //konstruktor od krasnoludka do kopalni
+    {
+        From = dwarf.PointId;
+        To = mine.PointId;
+        Capacity = 1;
+        if(dwarf.PreferredMinerals.Contains(mine.Resource))     //sprawdza czy w koaplni jest preferowany zasób krasnoludka
+            {
+                Cost = Math.Sqrt(Math.Pow(dwarf.x - mine.x, 2) + Math.Pow(dwarf.y - mine.y, 2));
+            }   //jeśli tak, liczy koszt
+        else
+            {
+                Cost = 1000000;
+            }   //jeśli nie, ustawia sztucznie wysoki koszt
+        CurrFlow = 0;
+        BackwardEdge = new EdgeFlow(this);
+    }
+
+        public EdgeFlow(Models.Mine mine, Models.Sink sink)     //konstruktor od mine do sink
+    {
+        From = mine.PointId;
+        To = sink.PointId;
+        Capacity = mine.Capacity;
+        Cost = 0;
         CurrFlow = 0;
         BackwardEdge = new EdgeFlow(this);
     }

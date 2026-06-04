@@ -1,4 +1,5 @@
 using Krasnoludki.Core.McmfAlgorithm.Models;
+using  Krasnoludki.Core.McmfAlgorithm.Graph;
 
 namespace Krasnoludki.Core.Graph;
 
@@ -12,7 +13,7 @@ public class ResidualNetwork
     // lack of free place in mine with preferred minerals
 
     private readonly List<IGraphNode> _nodes;
-    public List<EdgeFlow> Edges{get;}
+    public List<GraphEdgeFlow> Edges{get;}
     public int SourceID { get; } = 0;
     public int SinkID { get; }
 
@@ -38,7 +39,7 @@ public class ResidualNetwork
 
         int CurrDwarfId = 1,CurrMineId;
 
-        Edges = new List<EdgeFlow>();
+        Edges = new List<GraphEdgeFlow>();
 
         //Edges from artificial source to every Dwarf
         foreach(GraphDwarf dwarf in dwarves)
@@ -46,7 +47,7 @@ public class ResidualNetwork
             GraphNode<GraphDwarf> new_node = new GraphNode<GraphDwarf>(CurrDwarfId,dwarf); //adding new node with dwarf in list of nodes
             _nodes.Add(new_node);
 
-            EdgeFlow edge = new EdgeFlow(SourceID, CurrDwarfId, 1); // source -> dwarf edge + dwarf -> source ege
+            GraphEdgeFlow edge = new GraphEdgeFlow(SourceID, CurrDwarfId, 1); // source -> dwarf edge + dwarf -> source ege
 
             Edges.Add(edge);
 
@@ -64,7 +65,7 @@ public class ResidualNetwork
                 {
                     cost += NON_PREFERRED_PENALTY;
                 }
-                EdgeFlow DwarfMineEdge = new EdgeFlow(CurrDwarfId, CurrMineId, 1, cost);
+                GraphEdgeFlow DwarfMineEdge = new GraphEdgeFlow(CurrDwarfId, CurrMineId, 1, cost);
 
                 Edges.Add(DwarfMineEdge);
 
@@ -82,7 +83,7 @@ public class ResidualNetwork
             GraphNode<GraphMine> new_node = new GraphNode<GraphMine>(CurrMineId, mine); // adding new node with mine in list of nodes
             _nodes.Add(new_node);
 
-            EdgeFlow MineSinkEdge = new EdgeFlow(CurrMineId, SinkID, mine.Capacity);
+            GraphEdgeFlow MineSinkEdge = new GraphEdgeFlow(CurrMineId, SinkID, mine.Capacity);
 
             Edges.Add(MineSinkEdge);
 
@@ -94,7 +95,7 @@ public class ResidualNetwork
     // Artificial constructor designed exclusively for unit testing.
     // Allows direct injection of predefined nodes and edges to simulate specific graph topologies
     // and edge cases without breaking encapsulation.
-    public ResidualNetwork(List<IGraphNode> nodes, List<EdgeFlow> edges, int sourceId, int sinkId)
+    public ResidualNetwork(List<IGraphNode> nodes, List<GraphEdgeFlow> edges, int sourceId, int sinkId)
     {
         _nodes = nodes;
         Edges = edges;

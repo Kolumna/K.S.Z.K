@@ -1,6 +1,7 @@
 using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Graph;
 using Krasnoludki.Core.McmfAlgorithm.Models;
+using Krasnoludki.Core.McmfAlgorithm.Graph;
 using Krasnoludki.Core.Routing;
 
 namespace Krasnoludki.Core.Problems;
@@ -26,7 +27,7 @@ public class MinCostMaxFlowProblem
         BellmanFordAlgorithm algorithm = new BellmanFordAlgorithm();
         long MinCost = 0;
         int MaxFlow = 0;
-        List<EdgeFlow> path = new List<EdgeFlow>();
+        List<GraphEdgeFlow> path = new List<GraphEdgeFlow>();
 
         while (true)
         {
@@ -37,14 +38,14 @@ public class MinCostMaxFlowProblem
                 break;
             
             int residualCapacity = int.MaxValue;
-            foreach (EdgeFlow edge in path) // Searching for the residual capacity of a path: \(c_f(p)\)
+            foreach (GraphEdgeFlow edge in path) // Searching for the residual capacity of a path: \(c_f(p)\)
             {
                 residualCapacity = (edge.Capacity - edge.CurrFlow) < residualCapacity?
                     (edge.Capacity - edge.CurrFlow): residualCapacity;
             }
 
             MaxFlow += residualCapacity;
-            foreach(EdgeFlow edge in path) // For every edge in graph increase flow by new residual capacity of a path
+            foreach(GraphEdgeFlow edge in path) // For every edge in graph increase flow by new residual capacity of a path
             {   
                 edge.AddFlow(residualCapacity); 
 

@@ -1,16 +1,17 @@
 using Krasnoludki.Core.Graph;
+using Krasnoludki.Core.McmfAlgorithm.Graph;
 
 namespace Krasnoludki.Core.Algorithms;
 
 public class BellmanFordAlgorithm
 {
-    public List<EdgeFlow> bellmanFordAlgorithm(ResidualNetwork network,int src)
+    public List<GraphEdgeFlow> bellmanFordAlgorithm(ResidualNetwork network,int src)
     {
 
         int nodes_count = network.SinkID + 1;
 
         long[] distances = new long[nodes_count];
-        EdgeFlow[] parentEdge = new EdgeFlow[nodes_count]; // array for tracking route
+        GraphEdgeFlow[] parentEdge = new GraphEdgeFlow[nodes_count]; // array for tracking route
 
         // Initialize all distances to infinity and the source node to 0.
         Array.Fill(distances, long.MaxValue);
@@ -22,7 +23,7 @@ public class BellmanFordAlgorithm
         for(int iteration_count = 0; iteration_count < nodes_count; iteration_count++)
         {
             modified = false;
-            foreach(EdgeFlow edge in network.Edges)
+            foreach(GraphEdgeFlow edge in network.Edges)
             {
                 // Verify residual capacity. We only consider edges that can take more flow (Capacity - CurrFlow > 0)
                 if (distances[edge.From] != long.MaxValue &&
@@ -37,7 +38,7 @@ public class BellmanFordAlgorithm
                     distances[edge.To] = distances[edge.From] + edge.Cost;
                 }
 
-                EdgeFlow backEdge = edge.BackwardEdge;
+                GraphEdgeFlow backEdge = edge.BackwardEdge;
                 if (distances[backEdge.From] != long.MaxValue &&
                         backEdge.Capacity - backEdge.CurrFlow > 0 &&
                             distances[backEdge.From] + backEdge.Cost < distances[backEdge.To])
@@ -52,33 +53,11 @@ public class BellmanFordAlgorithm
         }
 
 
-        // List<int> AffectedNodes = new List<int>();
-        // List<int> NegativeCycle = new List<int>();
-
-        //Finding nodes from negative cycles
-
-        // foreach(EdgeFlow edge in network.Edges)
-        // {
-            
-        //     if (distances[edge.From] != double.MaxValue &&
-        //                 edge.Capacity - edge.CurrFlow > 0 &&
-        //                     distances[edge.From] + edge.Cost
-        //                         < distances[edge.To])
-        //     {
-        //         distances[edge.To] = distances[edge.From] + edge.Cost;
-
-        //         if(!AffectedNodes.Contains(edge.To))
-        //             AffectedNodes.Add(edge.To);
-        //     }
-        // }
-
-        //
-
 
         //Finding the shortest path
         int currNode = network.SinkID;
-        EdgeFlow currEdge;
-        List<EdgeFlow> path = new List<EdgeFlow>();
+        GraphEdgeFlow currEdge;
+        List<GraphEdgeFlow> path = new List<GraphEdgeFlow>();
 
         if(distances[currNode] == long.MaxValue) // there is no path
         {

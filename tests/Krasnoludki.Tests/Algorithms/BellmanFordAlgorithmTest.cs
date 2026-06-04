@@ -1,6 +1,8 @@
 using Krasnoludki.Core.Graph;
 using Krasnoludki.Core.Models;
 using Krasnoludki.Core.Algorithms;
+using Krasnoludki.Core.McmfAlgorithm.Models;
+using Krasnoludki.Core.McmfAlgorithm.Graph;
 using Xunit;
 
 namespace Krasnoludki.Test;
@@ -19,20 +21,20 @@ public class BellmanFordTest
             new GraphNode<object?>(3, null)
         };
 
-        List<EdgeFlow> edges = new List<EdgeFlow>();
-        EdgeFlow edge1 = new EdgeFlow(0,1,1,10);
+        List<GraphEdgeFlow> edges = new List<GraphEdgeFlow>();
+        GraphEdgeFlow edge1 = new GraphEdgeFlow(0,1,1,10);
         edges.Add(edge1);
 
-        EdgeFlow edge2 = new EdgeFlow(0,2,1,5);
+        GraphEdgeFlow edge2 = new GraphEdgeFlow(0,2,1,5);
         edges.Add(edge2);
 
-        EdgeFlow edge3 = new EdgeFlow(2,1,1,-2);
+        GraphEdgeFlow edge3 = new GraphEdgeFlow(2,1,1,-2);
         edges.Add(edge3);
 
-        EdgeFlow edge4 = new EdgeFlow(1,3,1,10);
+        GraphEdgeFlow edge4 = new GraphEdgeFlow(1,3,1,10);
         edges.Add(edge4);
 
-        EdgeFlow edge5 = new EdgeFlow(2,3,1,20);
+        GraphEdgeFlow edge5 = new GraphEdgeFlow(2,3,1,20);
         edges.Add(edge5);
 
 
@@ -42,7 +44,7 @@ public class BellmanFordTest
 
         int source = 0;
         
-        Assert.Equal(new List<EdgeFlow>{edge2,edge3,edge4},
+        Assert.Equal(new List<GraphEdgeFlow>{edge2,edge3,edge4},
                 algorithm.bellmanFordAlgorithm(network,source));
 
     }
