@@ -223,9 +223,7 @@ main {
 h1 {
   font-size: 4rem;
   color: var(--gold);
-  text-shadow:
-    2px 2px 0 var(--gold-border),
-    4px 4px 0 var(--gold-bg);
+  text-shadow: 4px 4px 0 var(--gold-bg);
 }
 
 .subtitle {
@@ -250,14 +248,13 @@ small {
 header {
   display: flex;
   border-bottom: 1px solid var(--border-strong);
+  padding: 0 16px;
 }
 
 .logo {
   font-size: 1.8rem;
   color: var(--gold);
-  text-shadow:
-    1px 1px 0 var(--gold-border),
-    2px 2px 0 var(--gold-bg);
+  text-shadow: 1px 1px 0 var(--gold-bg);
   padding: 16px 0;
 }
 
@@ -271,6 +268,11 @@ header {
   padding: 24px;
   color: var(--text-muted);
   margin-top: auto;
+  font-family: var(--font-sans);
+}
+
+.main-page-footer p {
+  font-family: var(--font-sans);
 }
 
 nav {
