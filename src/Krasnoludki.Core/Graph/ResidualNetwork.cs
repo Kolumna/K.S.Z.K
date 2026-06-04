@@ -1,4 +1,4 @@
-using Krasnoludki.Core.Models;
+using Krasnoludki.Core.McmfAlgorithm.Models;
 
 namespace Krasnoludki.Core.Graph;
 

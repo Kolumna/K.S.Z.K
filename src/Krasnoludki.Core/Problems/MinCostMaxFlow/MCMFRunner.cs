@@ -1,6 +1,6 @@
 using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Graph;
-using Krasnoludki.Core.Models;
+using Krasnoludki.Core.McmfAlgorithm.Models;
 using Krasnoludki.Core.Problems;
 using System.Diagnostics;
 

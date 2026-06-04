@@ -1,4 +1,4 @@
-namespace Krasnoludki.Core.Models;
+namespace Krasnoludki.Core.McmfAlgorithm.Models;
 
 public class GraphDwarf
 {
