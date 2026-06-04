@@ -1,6 +1,8 @@
 using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Graph;
+using Krasnoludki.Core.McmfAlgorithm.Adapter;
 using Krasnoludki.Core.McmfAlgorithm.Models;
+using Krasnoludki.Core.Models;
 using Krasnoludki.Core.Problems;
 using System.Diagnostics;
 
@@ -35,13 +37,19 @@ public class RoutingResultDto
 
 public class MCMFRunner
 {   
-    public RoutingResultDto MCMFRun(List<GraphDwarf> dwarves, List<GraphMine> mines)
+    public RoutingResultDto MCMFRun(List<Dwarf> frontedDwarves, List<Mine> frontendMines)
     {
-        if (dwarves is null || mines is null || dwarves.Count == 0 || mines.Count == 0) 
+        if (frontedDwarves is null || frontendMines is null || frontedDwarves.Count == 0 || frontendMines.Count == 0) 
         {
             return new RoutingResultDto(new List<AssignmentDto>(), 0, 0, 0, 0, 0);
         }
 
+        McmfMapper mapper = new McmfMapper();
+
+        List<GraphDwarf> dwarves = mapper.MapDwarves(frontedDwarves);
+        List<GraphMine> mines = mapper.MapMines(frontendMines);
+
+        
         Stopwatch timer = new Stopwatch();
         timer.Start();
         ResidualNetwork network = new ResidualNetwork(dwarves,mines);

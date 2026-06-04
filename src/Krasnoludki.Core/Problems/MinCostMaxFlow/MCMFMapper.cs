@@ -10,7 +10,8 @@ public class McmfMapper
         List<GraphDwarf> graphDwarves = new List<GraphDwarf>();
         foreach(var dwarf in frontendDwarves)
         {
-            
+            GraphDwarf newDwarf = new GraphDwarf(dwarf.PointId,dwarf.x,dwarf.y, dwarf.PreferredMinerals, dwarf.VoiceLoudness);
+            graphDwarves.Add(newDwarf);
         }
         return graphDwarves;
     }
@@ -20,7 +21,8 @@ public class McmfMapper
         List<GraphMine> graphMines = new List<GraphMine>();
         foreach(var mine in frontendMines)
         {
-            
+            GraphMine newMine = new GraphMine(mine.PointId,mine.x,mine.y, mine.Resource, mine.Capacity);
+            graphMines.Add(newMine);
         }
         return graphMines;
     }

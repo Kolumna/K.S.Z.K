@@ -5,10 +5,6 @@ public enum PointType
     Source,Dwarf,Mine,Sink
 }
 
-public enum MineralType
-{
-    Gold,Quartz,Silver,Coal,None
-}
 public class GraphPoint
 {
     public int PointId;
