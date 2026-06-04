@@ -6,6 +6,12 @@ using Krasnoludki.Core.McmfAlgorithm.Graph;
 
 namespace Krasnoludki.Test;
 
+/// <summary>
+/// Validates the structural integrity of the residual network topology.
+/// Ensures that nodes, forward capacities, and specifically backward edges 
+/// (which are vital for the MCMF algorithm's ability to revert bad flow decisions) 
+/// are initialized with the correct inverse costs and capacities.
+/// </summary>
 public class ResidualNetworkTest
 {
     private List<GraphDwarf> GetTestGraphDwarves()
@@ -61,7 +67,7 @@ public class ResidualNetworkTest
         Assert.Equal(0, network.SourceID);
         Assert.Equal(dwarves.Count + mines.Count + 1, network.SinkID);
 
-
+        //check whether the edges are appropriately generated
         foreach(GraphEdgeFlow networkEdge in network.Edges)
         {
             // Source -> Dwarf Edge
@@ -113,9 +119,13 @@ public class ResidualNetworkTest
                 GraphMine mineData =  ((GraphNode<GraphMine>)network.GetNode(networkEdge.To)).Data;
 
                 double distance = Math.Round(dwarfData.HomeLocation.CalculateDistance(mineData.Location), 5);
-                
+                // because we assume precision to 5 digets after comma 
+                // and to prevent  problems with computer precision (bellman - ford can enter an infinite loop)
+                // we operate on long and in the end of MCMF divide total cost by 100000
                 long expectedCost = (long)(distance * 100000);
 
+                // we add some big penalty to cost of edge to prevent unemployment in case if there's no place in
+                // mine with preferred resource, and this edge (nearest) is chosen in case if dwarf is unemployed
                 if (!dwarfData.PreferredMinerals.Contains(mineData.Resource))
                 {
                     expectedCost += ResidualNetwork.NON_PREFERRED_PENALTY;
