@@ -33,3 +33,9 @@ public class DwarfAssignmentDto
     [JsonPropertyName("mineId")]
     public string MineId { get; set; }
 }
+
+public class SegmentTreeResultDto
+{
+    [JsonPropertyName("loudestDwarfId")]
+    public string LoudestDwarfId { get; set; }
+}

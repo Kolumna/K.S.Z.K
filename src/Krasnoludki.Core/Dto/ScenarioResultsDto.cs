@@ -11,5 +11,6 @@ public class ScenarioResultsDto
   public ConvexHullResultDto ConvexHull { get; set; }
   // public MinCostResultDto MinCost { get; set; }
 
-  // public RmqResultDto Rmq { get; set; }
+  [JsonPropertyName("segmentTree")]
+  public SegmentTreeResultDto Rmq { get; set; }
 }
