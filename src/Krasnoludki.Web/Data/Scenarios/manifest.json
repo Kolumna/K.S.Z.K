@@ -1,0 +1,15 @@
+[
+  {
+    "Id": "dae08915",
+    "Name": "Scenariusz 03.06.2026 14:14",
+    "CreatedAt": "2026-05-31T15:50:44.7979537+02:00",
+    "UpdatedAt": "2026-06-03T14:14:54.9087424+02:00",
+    "File": "dae08915.hoff",
+    "Dwarves": 2,
+    "Mines": 1,
+    "Minerals": [
+      "coal"
+    ],
+    "HasConvexHull": false
+  }
+]

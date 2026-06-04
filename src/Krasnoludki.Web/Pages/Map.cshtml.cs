@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Krasnoludki.Core.Problems.Huffman;
 using System.Text.Json.Serialization;
 using Krasnoludki.Web.Services;
+using System.Text.Json;
 
 namespace Krasnoludki.Web.Pages
 {
@@ -23,6 +24,7 @@ namespace Krasnoludki.Web.Pages
     public string ActiveScenarioName { get; set; } = "Nowa mapa";
 
     public string NodesJson { get; set; } = "[]";
+    public string ResultsJson { get; set; } = "{}";
 
     public void OnGet()
     {
@@ -40,13 +42,13 @@ namespace Krasnoludki.Web.Pages
 
         var manifest = _scenarios.GetManifest();
         var scenario = manifest.FirstOrDefault(m => m.Id == id);
-        if (scenario != null)
+        if (_scenarios.Exists(id))
         {
-          ActiveScenarioName = scenario.Name;
-          SelectedScenarioId = scenario.Id;
-          var json = _scenarios.Load(id);
-          NodesJson = json;
-
+          var loaded = _scenarios.Load(id);
+          ActiveScenarioName = loaded.Name;
+          SelectedScenarioId = loaded.Id;
+          NodesJson = JsonSerializer.Serialize(loaded.Nodes);
+          ResultsJson = JsonSerializer.Serialize(loaded.Results);
           return;
         }
         else
@@ -92,13 +94,13 @@ namespace Krasnoludki.Web.Pages
 
       var name = $"Scenariusz {DateTime.Now:dd.MM.yyyy HH:mm}";
 
-      var id = request.ScenarioId;
-      _scenarios.Update(id, request.NodesJson, name);
+      var scenario = _scenarios.Load(request.ScenarioId);
+      _scenarios.Update(scenario, request.NodesJson, name);
 
-      HttpContext.Session.SetString("activeScenarioId", id);
+      HttpContext.Session.SetString("activeScenarioId", scenario.Id);
 
-      var bytes = _scenarios.GetRawBytes(id);
-      return File(bytes, "application/octet-stream", $"{id}.hoff");
+      var bytes = _scenarios.GetRawBytes(scenario.Id);
+      return File(bytes, "application/octet-stream", $"{scenario.Id}.hoff");
     }
   }
   public class SaveRequest
