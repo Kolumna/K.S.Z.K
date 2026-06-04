@@ -27,7 +27,7 @@ public class ResidualNetwork
         throw new ArgumentOutOfRangeException(nameof(id), $"\aArgumentOutOfRangeException: Node with id: {id} doesn't exists in residual network!\n");
     }
     
-    public ResidualNetwork(List<Dwarf> dwarves, List<Mine> mines)
+    public ResidualNetwork(List<GraphDwarf> dwarves, List<GraphMine> mines)
     {
         DwarvesCount = dwarves.Count;
         MinesCount = mines.Count;
@@ -41,9 +41,9 @@ public class ResidualNetwork
         Edges = new List<EdgeFlow>();
 
         //Edges from artificial source to every Dwarf
-        foreach(Dwarf dwarf in dwarves)
+        foreach(GraphDwarf dwarf in dwarves)
         {
-            GraphNode<Dwarf> new_node = new GraphNode<Dwarf>(CurrDwarfId,dwarf); //adding new node with dwarf in list of nodes
+            GraphNode<GraphDwarf> new_node = new GraphNode<GraphDwarf>(CurrDwarfId,dwarf); //adding new node with dwarf in list of nodes
             _nodes.Add(new_node);
 
             EdgeFlow edge = new EdgeFlow(SourceID, CurrDwarfId, 1); // source -> dwarf edge + dwarf -> source ege
@@ -51,7 +51,7 @@ public class ResidualNetwork
             Edges.Add(edge);
 
             CurrMineId = DwarvesCount + 1;
-            foreach(Mine mine in mines) //Edges from every Dwarf to every Mine
+            foreach(GraphMine mine in mines) //Edges from every Dwarf to every Mine
             {
                 // cost = physical distance between dwarf's home and mine location
                 // (in this case rounded to 3 digits after comma to prevent problems with computer precision)
@@ -77,9 +77,9 @@ public class ResidualNetwork
         
         CurrMineId = DwarvesCount + 1;
         //Edges from every mine to artificial sink
-        foreach(Mine mine in mines)
+        foreach(GraphMine mine in mines)
         {
-            GraphNode<Mine> new_node = new GraphNode<Mine>(CurrMineId, mine); // adding new node with mine in list of nodes
+            GraphNode<GraphMine> new_node = new GraphNode<GraphMine>(CurrMineId, mine); // adding new node with mine in list of nodes
             _nodes.Add(new_node);
 
             EdgeFlow MineSinkEdge = new EdgeFlow(CurrMineId, SinkID, mine.Capacity);

@@ -9,17 +9,17 @@ public class ResidualNetworkTest
     [Fact]
     public void ResidualNetwork_Structure()
     {
-        List<Dwarf> dwarves = new List<Dwarf>();
+        List<GraphDwarf> dwarves = new List<GraphDwarf>();
 
-        Dwarf dwarf1 = new Dwarf(1,2,new List<MineralType>{MineralType.Coal,MineralType.Gold},12);
-        Dwarf dwarf2 = new Dwarf(3,4,new List<MineralType>{MineralType.Quartz,MineralType.Gold},10);
+        GraphDwarf dwarf1 = new Dwarf(1,2,new List<MineralType>{MineralType.Coal,MineralType.Gold},12);
+        GraphDwarf dwarf2 = new Dwarf(3,4,new List<MineralType>{MineralType.Quartz,MineralType.Gold},10);
         dwarves.Add(dwarf1);
         dwarves.Add(dwarf2);
 
-        List<Mine> mines = new List<Mine>();
+        List<GraphMine> mines = new List<GraphMine>();
 
-        Mine mine1 = new Mine(6,5,MineralType.Coal,40);
-        Mine mine2 = new Mine(7,5,MineralType.Coal,10);
+        GraphMine mine1 = new Mine(6,5,MineralType.Coal,40);
+        GraphMine mine2 = new Mine(7,5,MineralType.Coal,10);
         mines.Add(mine1);
         mines.Add(mine2);
 

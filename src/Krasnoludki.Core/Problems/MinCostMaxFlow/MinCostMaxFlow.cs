@@ -76,8 +76,8 @@ public class MinCostMaxFlowProblem
                 edge.To > networkAfterMCMF.DwarvesCount && edge.To < networkAfterMCMF.SinkID)
             {
                 
-                int dwarf_id = ((GraphNode<Dwarf>)networkAfterMCMF.GetNode(edge.From)).Data.Id;
-                int mine_id = ((GraphNode<Mine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
+                int dwarf_id = ((GraphNode<GraphDwarf>)networkAfterMCMF.GetNode(edge.From)).Data.Id;
+                int mine_id = ((GraphNode<GraphMine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
 
 
                 // if the mine wasn't with dwarf preferred material we added artificial massive cost

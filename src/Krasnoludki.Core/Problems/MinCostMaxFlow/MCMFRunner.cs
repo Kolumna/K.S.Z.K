@@ -35,7 +35,7 @@ public class RoutingResultDto
 
 public class MCMFRunner
 {   
-    public RoutingResultDto MCMFRun(List<Dwarf> dwarves, List<Mine> mines)
+    public RoutingResultDto MCMFRun(List<GraphDwarf> dwarves, List<GraphMine> mines)
     {
         if (dwarves is null || mines is null || dwarves.Count == 0 || mines.Count == 0) 
         {
