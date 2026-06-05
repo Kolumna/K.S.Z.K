@@ -61,6 +61,6 @@ public class SegmentTree {
 
     private int Louder(int idxA, int idxB)
     {
-        return Decametrists[idxA].getLoudness() >= Decametrists[idxB].getLoudness() ? idxA : idxB;
+        return Decametrists[idxA].GetLoudness() >= Decametrists[idxB].GetLoudness() ? idxA : idxB;
     }
 }

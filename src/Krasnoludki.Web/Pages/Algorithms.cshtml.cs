@@ -1,7 +1,10 @@
 
 using System.Text.Json;
+using Krasnoludki.Core;
+using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Dto;
 using Krasnoludki.Core.DTOs;
+using Krasnoludki.Core.Models;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -24,10 +27,11 @@ public class AlgorithmsModel : PageModel
 
   public ScenarioResultsDto ParsedResults { get; set; } = new ScenarioResultsDto();
 
+  public bool HasMatchingResult => ParsedResults.Matching != null;
   public bool HasConvexHullResult => ParsedResults?.ConvexHull != null;
   // public bool HasMinCostResult => ResultsJson.Contains("minCost");
-  // public bool HasMatchingResult => ResultsJson.Contains("matching");
-  // public bool HasRmqResult => ResultsJson.Contains("rmq");
+
+  public bool HasRmqResult => ParsedResults?.Rmq != null;
 
   private readonly ScenarioFileService _scenarios;
 
@@ -96,7 +100,7 @@ public class AlgorithmsModel : PageModel
               (long)Math.Round(p.Y)))
           .ToList();
 
-      var hull = Core.ConvexHullSolver.GrahamScan(corePoints);
+      var hull = ConvexHullSolver.GrahamScan(corePoints);
 
       var hullPoints = hull
           .Select(p => new PointDto { X = p.X, Y = p.Y })
@@ -142,5 +146,82 @@ public class AlgorithmsModel : PageModel
         message = "Error: " + ex.Message
       });
     }
+  }
+
+  public IActionResult OnPostCalculateMatching(
+    [FromBody] MatchingInputDto input
+  )
+  {
+    Console.WriteLine("Received matching request with input: " + JsonSerializer.Serialize(input));
+    List<Dwarf> dwarves = input.Dwarves;
+    List<Mine> mines = input.Mines;
+
+    Console.WriteLine($"Received {dwarves.Count} dwarves and {mines.Count} mines for matching.");
+
+    foreach (var dwarf in dwarves)
+    {
+      Console.WriteLine($"Dwarf {dwarf.PointId}: Prefers {string.Join(", ", dwarf.PreferredMinerals)}");
+    }
+
+    foreach (var mine in mines)
+    {
+      Console.WriteLine($"Mine {mine.PointId}: Contains {mine.Resource} with capacity {mine.Capacity}");
+    }
+
+    List<int[]> assigned = DwarfAssigning.Assign(dwarves, mines);
+
+    var result = new MatchingResultDto
+    {
+      Assignments = [.. assigned.Select(pair => new DwarfAssignmentDto
+      {
+        DwarfId = pair[0].ToString(),
+        MineId = pair[1].ToString()
+      })]
+    };
+
+    Console.WriteLine("Matching result: " + JsonSerializer.Serialize(result));
+
+    var id = HttpContext.Session.GetString("activeScenarioId");
+    if (id != null && _scenarios.Exists(id))
+    {
+      _scenarios.SaveResult(id, "matching", result);
+    }
+
+    return new JsonResult(new { success = true, data = result });
+  }
+
+  public IActionResult OnPostCalculateSegmentTree(
+   [FromBody] List<Dwarf> dwarfesForRmq
+ )
+  {
+    Console.WriteLine("Received segment tree request with input: " + JsonSerializer.Serialize(dwarfesForRmq));
+    List<Dwarf> decametrists = dwarfesForRmq;
+
+    Console.WriteLine($"Received {decametrists.Count} decametrists for segment tree.");
+
+    foreach (var dwarf in decametrists)
+    {
+      Console.WriteLine($"Dwarf {dwarf.PointId}: Prefers {string.Join(", ", dwarf.PreferredMinerals)}");
+    }
+    var tree = new SegmentTree(decametrists);
+
+    Dwarf loudestDwarf = tree.GetLoudestDecametrist();
+
+    Console.WriteLine("Segment tree result: " + JsonSerializer.Serialize(loudestDwarf));
+
+    var result = new SegmentTreeResultDto
+    {
+      LoudestDwarfId = loudestDwarf.PointId.ToString()
+    };
+
+    Console.WriteLine("Segment tree result: " + JsonSerializer.Serialize(result));
+
+    var id = HttpContext.Session.GetString("activeScenarioId");
+    if (id != null && _scenarios.Exists(id))
+    {
+      _scenarios.SaveResult(id, "segmentTree", result);
+    }
+
+    return new JsonResult(new { success = true, data = result });
   }
 }

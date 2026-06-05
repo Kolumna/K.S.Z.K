@@ -1,8 +1,13 @@
+using System.Text.Json.Serialization;
 using Krasnoludki.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

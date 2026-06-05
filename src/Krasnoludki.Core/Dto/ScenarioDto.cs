@@ -29,4 +29,8 @@ public class ScenarioResults
 {
     [JsonPropertyName("convexHull")]
     public ConvexHullResultDto? ConvexHull { get; set; }
+    [JsonPropertyName("matching")]
+    public MatchingResultDto? Matching { get; set; }
+    [JsonPropertyName("segmentTree")]
+    public SegmentTreeResultDto? SegmentTree { get; set; }
 }
