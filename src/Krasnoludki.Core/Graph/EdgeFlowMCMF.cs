@@ -1,0 +1,42 @@
+namespace Krasnoludki.Core.McmfAlgorithm.Graph;
+
+public class GraphEdgeFlow
+{
+    public int From{ get; }
+    public int To{ get; }
+    public int Capacity{ get; }
+    public int CurrFlow{ get; private set;}
+    public long Cost { get; }
+    public GraphEdgeFlow BackwardEdge{ get; }
+
+    
+    public GraphEdgeFlow(int from, int to, int capacity, long cost = 0)
+    {
+        From = from;
+        To = to;
+        Capacity = capacity;
+        Cost = cost;
+        CurrFlow = 0;
+        BackwardEdge = new GraphEdgeFlow(this);
+    }
+
+    private GraphEdgeFlow(GraphEdgeFlow mainEdge) //konstruktor prywatny do tworzenia krawędzi powrotnej
+    {
+        From = mainEdge.To;
+        To = mainEdge.From;
+        Capacity = mainEdge.Capacity;   //ustawia takie samo capacity jak w krawedzi głównej
+        Cost = 0 - mainEdge.Cost;       //
+        CurrFlow = Capacity;            //zapycha od razu pływ
+        BackwardEdge = mainEdge;        //zmiany te pozwalają obsługiwać pływ za pomocą jednej metody
+    }
+
+    public int ReturnCapacity()
+    {
+        return Capacity - CurrFlow;
+    }
+    public void AddFlow(int flow)
+    {
+        CurrFlow += flow;
+        BackwardEdge.CurrFlow -= flow;
+    }
+}
