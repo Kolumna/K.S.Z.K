@@ -721,3 +721,44 @@ button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+main {
+  position: relative;
+}
+
+.zoom-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoom-controls button {
+  height: 40px;
+  width: 40px;
+  background-color: var(--gold-bg);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 200ms background-color ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1000;
+}
+
+.zoom-controls button span {
+  position: absolute;
+  right: 6px;
+  bottom: -2px;
+  font-size: 16px;
+}
+
+.zoom-controls button:hover {
+  background-color: var(--color-overlay);
+}

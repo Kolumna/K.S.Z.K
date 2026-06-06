@@ -4,6 +4,44 @@ const algorithmResults =
 const canvas = document.getElementById("algoCanvas");
 const ctx = canvas.getContext("2d");
 
+let selectedDwarfs = [];
+
+const camera = {
+  x: 0,
+  y: 0,
+  zoom: 1,
+  minZoom: 0.2,
+  maxZoom: 5,
+};
+
+let isPanning = false;
+let panStart = { x: 0, y: 0 };
+
+function screenToWorld(sx, sy) {
+  return {
+    x: (sx - camera.x) / camera.zoom,
+    y: (sy - camera.y) / camera.zoom,
+  };
+}
+
+function applyCamera() {
+  ctx.setTransform(camera.zoom, 0, 0, camera.zoom, camera.x, camera.y);
+}
+
+function resetTransform() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+function drawScene(drawFn) {
+  resetTransform();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  applyCamera();
+  drawFn();
+
+  resetTransform();
+}
+
 let rmqSelectionBox = { minX: -1, maxX: -1, minY: -1, maxY: -1 };
 let isDragging = false;
 let dragStart = { x: 0, y: 0 };
@@ -147,14 +185,12 @@ async function runAlgorithm(algorithmType) {
         break;
       }
       case "rmq": {
-        const payload = INITIAL_NODES.filter((n) => n.type === "dwarf").map(
-          (n) => ({
-            pointId: n.id,
-            x: n.x,
-            y: n.y,
-            voiceLoudness: n.loudness ?? 50,
-          }),
-        );
+        console.log("Zaznaczeni krasnoludki do RMQ:", selectedDwarfs);
+        const payload = selectedDwarfs.map((s) => ({
+          ...s,
+          pointId: Number(s.id),
+          voiceLoudness: s.loudness ?? 0,
+        }));
         res = await MapApiService.calculateSegmentTree(payload);
         if (res.success) {
           drawRMQ();
@@ -196,182 +232,185 @@ function buildMatchingPayload() {
 }
 
 function drawConvexHull(hullPoints) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawAllNodes();
+  drawScene(() => {
+    drawAllNodes();
 
-  if (!hullPoints || hullPoints.length < 3) return;
+    if (!hullPoints || hullPoints.length < 3) return;
 
-  ctx.beginPath();
-  hullPoints.forEach((p, i) => {
-    i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
-  });
-  ctx.closePath();
-
-  ctx.fillStyle = "rgba(192,112,48,0.07)";
-  ctx.strokeStyle = "#c07030";
-  ctx.lineWidth = 2.5;
-  ctx.setLineDash([8, 4]);
-  ctx.fill();
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  hullPoints.forEach((p) => {
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = "#c07030";
+    hullPoints.forEach((p, i) => {
+      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+
+    ctx.fillStyle = "rgba(192,112,48,0.07)";
+    ctx.strokeStyle = "#c07030";
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([8, 4]);
     ctx.fill();
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    hullPoints.forEach((p) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "#c07030";
+      ctx.fill();
+    });
   });
 }
 
 function drawMatching(data) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawScene(() => {
+    const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
+    const mines = INITIAL_NODES.filter((n) => n.type === "mine");
 
-  const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
-  const mines = INITIAL_NODES.filter((n) => n.type === "mine");
-
-  dwarves.forEach((d) => {
-    mines.forEach((m) => {
-      if (!d.minerals.some((min) => m.minerals.includes(min))) return;
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(60,55,40,0.15)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.moveTo(d.x, d.y);
-      ctx.lineTo(m.x, m.y);
-      ctx.stroke();
-      ctx.setLineDash([]);
+    dwarves.forEach((d) => {
+      mines.forEach((m) => {
+        if (!d.minerals.some((min) => m.minerals.includes(min))) return;
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(60,55,40,0.15)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(m.x, m.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
     });
+
+    data.assignments.forEach((a) => {
+      const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
+      const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
+      if (!dwarf || !mine) return;
+
+      ctx.beginPath();
+      ctx.strokeStyle = "#6aaa6a";
+      ctx.lineWidth = 2.5;
+      ctx.moveTo(dwarf.x, dwarf.y);
+      ctx.lineTo(mine.x, mine.y);
+      ctx.stroke();
+    });
+
+    drawAllNodes();
   });
-
-  data.assignments.forEach((a) => {
-    const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
-    const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
-    if (!dwarf || !mine) return;
-
-    ctx.beginPath();
-    ctx.strokeStyle = "#6aaa6a";
-    ctx.lineWidth = 2.5;
-    ctx.moveTo(dwarf.x, dwarf.y);
-    ctx.lineTo(mine.x, mine.y);
-    ctx.stroke();
-  });
-
-  drawAllNodes();
 }
 
 function drawMinCost(data) {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawScene(() => {
+    const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
+    const mines = INITIAL_NODES.filter((n) => n.type === "mine");
 
-  const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
-  const mines = INITIAL_NODES.filter((n) => n.type === "mine");
+    dwarves.forEach((d) => {
+      mines.forEach((m) => {
+        if (!d.minerals.some((min) => m.minerals.includes(min))) return;
+        ctx.beginPath();
+        ctx.strokeStyle = "rgba(60,55,40,0.15)";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(m.x, m.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
+    });
 
-  dwarves.forEach((d) => {
-    mines.forEach((m) => {
-      if (!d.minerals.some((min) => m.minerals.includes(min))) return;
+    data.assignments.forEach((a) => {
+      const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
+      const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
+      if (!dwarf || !mine) return;
+
+      const dist = Math.sqrt(
+        Math.pow(dwarf.x - mine.x, 2) + Math.pow(dwarf.y - mine.y, 2),
+      );
+      const ratio = Math.min(dist / 500, 1);
+      const r = Math.round(ratio * 200);
+      const g = Math.round((1 - ratio) * 170 + 80);
+      const color = a.isPenalized ? "#a060c0" : `rgb(${r},${g},50)`;
+
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(60,55,40,0.15)";
-      ctx.lineWidth = 1;
-      ctx.setLineDash([4, 4]);
-      ctx.moveTo(d.x, d.y);
-      ctx.lineTo(m.x, m.y);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = a.isPenalized ? 1.5 : 2.5;
+      ctx.setLineDash(a.isPenalized ? [4, 4] : []);
+      ctx.moveTo(dwarf.x, dwarf.y);
+      ctx.lineTo(mine.x, mine.y);
       ctx.stroke();
       ctx.setLineDash([]);
+
+      const mx = (dwarf.x + mine.x) / 2;
+      const my = (dwarf.y + mine.y) / 2;
+      ctx.fillStyle = "#fff";
+      ctx.font = "18px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(dist.toFixed(0), mx, my - 6);
     });
+
+    drawAllNodes();
   });
-
-  data.assignments.forEach((a) => {
-    const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
-    const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
-    if (!dwarf || !mine) return;
-
-    const dist = Math.sqrt(
-      Math.pow(dwarf.x - mine.x, 2) + Math.pow(dwarf.y - mine.y, 2),
-    );
-    const ratio = Math.min(dist / 500, 1);
-    const r = Math.round(ratio * 200);
-    const g = Math.round((1 - ratio) * 170 + 80);
-    const color = a.isPenalized ? "#a060c0" : `rgb(${r},${g},50)`;
-
-    ctx.beginPath();
-    ctx.strokeStyle = color;
-    ctx.lineWidth = a.isPenalized ? 1.5 : 2.5;
-    ctx.setLineDash(a.isPenalized ? [4, 4] : []);
-    ctx.moveTo(dwarf.x, dwarf.y);
-    ctx.lineTo(mine.x, mine.y);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    const mx = (dwarf.x + mine.x) / 2;
-    const my = (dwarf.y + mine.y) / 2;
-    ctx.fillStyle = "#fff";
-    ctx.font = "18px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(dist.toFixed(0), mx, my - 6);
-  });
-
-  drawAllNodes();
 }
 
 function drawRMQ() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawScene(() => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  const rmqDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").sort(
-    (a, b) => a.x - b.x,
-  );
+    const rmqDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").sort(
+      (a, b) => a.x - b.x,
+    );
 
-  INITIAL_NODES.filter((n) => n.type === "mine").forEach((m) => drawMine(m));
+    INITIAL_NODES.filter((n) => n.type === "mine").forEach((m) => drawMine(m));
 
-  rmqDwarves.forEach((dwarf, index) => {
-    const inBox =
-      rmqSelectionBox.minX !== -1 &&
-      dwarf.x >= rmqSelectionBox.minX &&
-      dwarf.x <= rmqSelectionBox.maxX &&
-      dwarf.y >= rmqSelectionBox.minY &&
-      dwarf.y <= rmqSelectionBox.maxY;
+    rmqDwarves.forEach((dwarf, index) => {
+      const inBox =
+        rmqSelectionBox.minX !== -1 &&
+        dwarf.x >= rmqSelectionBox.minX &&
+        dwarf.x <= rmqSelectionBox.maxX &&
+        dwarf.y >= rmqSelectionBox.minY &&
+        dwarf.y <= rmqSelectionBox.maxY;
 
-    const inDrag =
-      isDragging &&
-      dwarf.x >= Math.min(dragStart.x, dragEnd.x) &&
-      dwarf.x <= Math.max(dragStart.x, dragEnd.x) &&
-      dwarf.y >= Math.min(dragStart.y, dragEnd.y) &&
-      dwarf.y <= Math.max(dragStart.y, dragEnd.y);
+      const inDrag =
+        isDragging &&
+        dwarf.x >= Math.min(dragStart.x, dragEnd.x) &&
+        dwarf.x <= Math.max(dragStart.x, dragEnd.x) &&
+        dwarf.y >= Math.min(dragStart.y, dragEnd.y) &&
+        dwarf.y <= Math.max(dragStart.y, dragEnd.y);
 
-    const isSelected = inBox || inDrag;
+      const isSelected = inBox || inDrag;
 
-    drawDwarf(dwarf, {
-      highlight: isSelected,
-      highlightColor: "#c8a030",
-      showIndex: true,
-      index,
-      showLoudness: true,
+      drawDwarf(dwarf, {
+        highlight: isSelected,
+        highlightColor: "#c8a030",
+        showIndex: true,
+        index,
+        showLoudness: true,
+      });
     });
+
+    if (isDragging) {
+      ctx.save();
+      ctx.fillStyle = "rgba(241,196,15,0.1)";
+      ctx.strokeStyle = "#f1c40f";
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.fillRect(
+        dragStart.x,
+        dragStart.y,
+        dragEnd.x - dragStart.x,
+        dragEnd.y - dragStart.y,
+      );
+      ctx.strokeRect(
+        dragStart.x,
+        dragStart.y,
+        dragEnd.x - dragStart.x,
+        dragEnd.y - dragStart.y,
+      );
+      ctx.restore();
+    }
+
+    if (algorithmResults.segmentTree?.loudestDwarfId) {
+      drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
+    }
   });
-
-  if (isDragging) {
-    ctx.save();
-    ctx.fillStyle = "rgba(241,196,15,0.1)";
-    ctx.strokeStyle = "#f1c40f";
-    ctx.lineWidth = 1.5;
-    ctx.setLineDash([4, 4]);
-    ctx.fillRect(
-      dragStart.x,
-      dragStart.y,
-      dragEnd.x - dragStart.x,
-      dragEnd.y - dragStart.y,
-    );
-    ctx.strokeRect(
-      dragStart.x,
-      dragStart.y,
-      dragEnd.x - dragStart.x,
-      dragEnd.y - dragStart.y,
-    );
-    ctx.restore();
-  }
-
-  if (algorithmResults.segmentTree?.loudestDwarfId) {
-    drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
-  }
 }
 
 function drawLoudestDwarf(dwarfId) {
@@ -413,18 +452,6 @@ function loadAlgorithmResults() {
   }
 }
 
-canvas.addEventListener("mousedown", (e) => {
-  const algo = new URLSearchParams(window.location.search).get("algorithm");
-  if (algo !== "rmq") return;
-
-  rmqSelectionBox = { minX: -1, maxX: -1, minY: -1, maxY: -1 };
-  isDragging = true;
-  const coords = getCanvasCoords(e);
-  dragStart = { ...coords };
-  dragEnd = { ...coords };
-  drawRMQ();
-});
-
 canvas.addEventListener("mousemove", (e) => {
   if (!isDragging) return;
   const coords = getCanvasCoords(e);
@@ -432,7 +459,84 @@ canvas.addEventListener("mousemove", (e) => {
   drawRMQ();
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  setupCanvas();
+  loadAlgorithmResults();
+});
+
+window.addEventListener("resize", () => {
+  setupCanvas();
+  loadAlgorithmResults();
+});
+
+canvas.addEventListener(
+  "wheel",
+  (e) => {
+    e.preventDefault();
+
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
+    const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
+    const newZoom = Math.min(
+      camera.maxZoom,
+      Math.max(camera.minZoom, camera.zoom * zoomFactor),
+    );
+
+    camera.x = mouseX - (mouseX - camera.x) * (newZoom / camera.zoom);
+    camera.y = mouseY - (mouseY - camera.y) * (newZoom / camera.zoom);
+    camera.zoom = newZoom;
+
+    loadAlgorithmResults();
+  },
+  { passive: false },
+);
+
+canvas.addEventListener("mousedown", (e) => {
+  const algo = new URLSearchParams(window.location.search).get("algorithm");
+
+  if (e.button === 1 || (e.button === 0 && e.altKey)) {
+    e.preventDefault();
+    isPanning = true;
+    panStart = { x: e.clientX - camera.x, y: e.clientY - camera.y };
+    canvas.style.cursor = "grab";
+    return;
+  }
+
+  if (algo === "rmq" && e.button === 0 && !e.altKey) {
+    rmqSelectionBox = { minX: -1, maxX: -1, minY: -1, maxY: -1 };
+    isDragging = true;
+    const coords = getCanvasCoords(e);
+    const world = screenToWorld(coords.x, coords.y);
+    dragStart = { ...world };
+    dragEnd = { ...world };
+    drawRMQ();
+  }
+});
+
+canvas.addEventListener("mousemove", (e) => {
+  if (isPanning) {
+    camera.x = e.clientX - panStart.x;
+    camera.y = e.clientY - panStart.y;
+    loadAlgorithmResults();
+    return;
+  }
+
+  if (!isDragging) return;
+  const coords = getCanvasCoords(e);
+  const world = screenToWorld(coords.x, coords.y);
+  dragEnd = { ...world };
+  drawRMQ();
+});
+
 canvas.addEventListener("mouseup", (e) => {
+  if (isPanning) {
+    isPanning = false;
+    canvas.style.cursor = "default";
+    return;
+  }
+
   if (!isDragging) return;
   isDragging = false;
 
@@ -452,6 +556,13 @@ canvas.addEventListener("mouseup", (e) => {
       ({ d }) => d.x >= minX && d.x <= maxX && d.y >= minY && d.y <= maxY,
     );
 
+  console.log(
+    "Zaznaczeni krasnoludki:",
+    selected.map(({ d }) => d),
+  );
+
+  selectedDwarfs = selected.map(({ d }) => d);
+
   if (selected.length > 0) {
     const indices = selected.map((s) => s.i);
     const L = Math.min(...indices);
@@ -467,12 +578,36 @@ canvas.addEventListener("mouseup", (e) => {
   drawRMQ();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
-  setupCanvas();
-  loadAlgorithmResults();
-});
+canvas.addEventListener("wheel", (e) => e.preventDefault(), { passive: false });
 
-window.addEventListener("resize", () => {
-  setupCanvas();
+function zoomToCenter(factor) {
+  const W = getCW();
+  const H = getCH();
+
+  const centerX = W / 2;
+  const centerY = H / 2;
+
+  const newZoom = Math.min(
+    camera.maxZoom,
+    Math.max(camera.minZoom, camera.zoom * factor),
+  );
+
+  camera.x = centerX - (centerX - camera.x) * (newZoom / camera.zoom);
+  camera.y = centerY - (centerY - camera.y) * (newZoom / camera.zoom);
+  camera.zoom = newZoom;
+
   loadAlgorithmResults();
-});
+}
+
+function zoomIn() {
+  zoomToCenter(1.2);
+}
+function zoomOut() {
+  zoomToCenter(1 / 1.2);
+}
+function resetZoom() {
+  camera.x = 0;
+  camera.y = 0;
+  camera.zoom = 1;
+  loadAlgorithmResults();
+}
