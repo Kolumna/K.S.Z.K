@@ -9,3 +9,12 @@ public class MatchingInputDto
   [JsonPropertyName("mines")]
   public List<Mine> Mines { get; set; }
 }
+
+public class MinCostRequest
+{
+  [JsonPropertyName("dwarves")]
+  public List<Dwarf> Dwarves { get; set; } = new();
+
+  [JsonPropertyName("mines")]
+  public List<Mine> Mines { get; set; } = new();
+}

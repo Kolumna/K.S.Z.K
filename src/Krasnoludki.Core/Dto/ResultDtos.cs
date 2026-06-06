@@ -39,3 +39,35 @@ public class SegmentTreeResultDto
     [JsonPropertyName("loudestDwarfId")]
     public string LoudestDwarfId { get; set; }
 }
+public class MinCostResultDto
+{
+    [JsonPropertyName("assignments")]
+    public List<AssignmentDto> Assignments { get; set; } = new();
+
+    [JsonPropertyName("realCost")]
+    public double RealCost { get; set; }
+
+    [JsonPropertyName("employedCount")]
+    public int EmployedCount { get; set; }
+
+    [JsonPropertyName("penalizedCount")]
+    public int PenalizedCount { get; set; }
+
+    [JsonPropertyName("maxFlow")]
+    public int MaxFlow { get; set; }
+}
+
+public class AssignmentDto
+{
+    [JsonPropertyName("dwarfId")]
+    public int DwarfId { get; set; }
+
+    [JsonPropertyName("mineId")]
+    public int MineId { get; set; }
+
+    [JsonPropertyName("actualDistance")]
+    public double ActualDistance { get; set; }
+
+    [JsonPropertyName("isPenalized")]
+    public bool IsPenalized { get; set; }
+}

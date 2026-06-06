@@ -160,6 +160,10 @@ public class ScenarioFileService
                 scenario.Results.SegmentTree =
                     JsonSerializer.Deserialize<SegmentTreeResultDto>(JsonSerializer.Serialize(result));
                 break;
+            case "minCost":
+                scenario.Results.MinCost =
+                    JsonSerializer.Deserialize<MinCostResultDto>(JsonSerializer.Serialize(result));
+                break;
         }
 
         scenario.UpdatedAt = DateTime.Now;
@@ -195,7 +199,8 @@ public class ManifestEntry
     public int Mines { get; set; }
     public List<string> Minerals { get; set; } = new();
 
-    public bool HasConvexHull { get; set; }
     public bool HasMatching { get; set; }
+    public bool HasMinCost { get; set; }
+    public bool HasConvexHull { get; set; }
     public bool HasSegmentTree { get; set; }
 }

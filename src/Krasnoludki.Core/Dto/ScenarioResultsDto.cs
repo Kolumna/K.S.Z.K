@@ -13,4 +13,7 @@ public class ScenarioResultsDto
 
   [JsonPropertyName("segmentTree")]
   public SegmentTreeResultDto Rmq { get; set; }
+
+  [JsonPropertyName("minCost")]
+  public MinCostResultDto MinCost { get; set; }
 }
