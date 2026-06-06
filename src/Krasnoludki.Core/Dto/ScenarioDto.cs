@@ -33,4 +33,6 @@ public class ScenarioResults
     public MatchingResultDto? Matching { get; set; }
     [JsonPropertyName("segmentTree")]
     public SegmentTreeResultDto? SegmentTree { get; set; }
+    [JsonPropertyName("minCost")]
+    public MinCostResultDto? MinCost { get; set; }
 }

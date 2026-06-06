@@ -484,3 +484,4 @@ $RECYCLE.BIN/
 *.swp
 
 src/Krasnoludki.Web/Data/Scenarios
+src/Krasnoludki.Web/Data/Scenarios/manifest.json

@@ -98,6 +98,34 @@ async function runAlgorithm(algorithmType) {
           drawLoudestDwarf(res.data.loudestDwarfId);
         }
         break;
+      case "minCost":
+        const mcmfDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").map(
+          (n, i) => ({
+            pointId: n.id,
+            x: n.x,
+            y: n.y,
+            preferredMinerals: n.minerals,
+            voiceLoudness: n.loudness ?? 0,
+          }),
+        );
+
+        const mcmfMines = INITIAL_NODES.filter((n) => n.type === "mine").map(
+          (n, i) => ({
+            pointId: n.id,
+            x: n.x,
+            y: n.y,
+            resource: n.minerals[0],
+            capacity: n.capacity ?? 1,
+          }),
+        );
+
+        res = await MapApiService.calculateMinCost({
+          dwarves: mcmfDwarves,
+          mines: mcmfMines,
+        });
+
+        if (res.success) drawMinCostResult(res.data);
+        break;
       default:
         throw new Error("Nieznany typ algorytmu: " + algorithmType);
     }
@@ -187,17 +215,14 @@ function loadAlgorithmResults() {
     "algorithm",
   );
 
-  console.log("Selected algorithm from URL:", selectedAlgorithm);
   if (algorithmResults.convexHull && selectedAlgorithm === "convexHull") {
     drawConvexHullOverlay(algorithmResults.convexHull.hullPoints);
   } else if (algorithmResults.matching && selectedAlgorithm === "matching") {
     drawDwarfAssignments(algorithmResults.matching);
   } else if (algorithmResults.segmentTree && selectedAlgorithm === "rmq") {
-    console.log(
-      "Drawing loudest dwarf with ID:",
-      algorithmResults.segmentTree.loudestDwarfId,
-    );
     drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
+  } else if (algorithmResults.minCost && selectedAlgorithm === "minCost") {
+    drawMinCostResult(algorithmResults.minCost);
   }
 }
 
@@ -234,9 +259,7 @@ function drawDwarvesForRmq() {
         dwarf.x <= maxX &&
         dwarf.y >= minY &&
         dwarf.y <= maxY;
-    }
-
-    else if (rmqSelectionBox.minX !== -1) {
+    } else if (rmqSelectionBox.minX !== -1) {
       isSelected =
         dwarf.x >= rmqSelectionBox.minX &&
         dwarf.x <= rmqSelectionBox.maxX &&
@@ -263,7 +286,7 @@ function drawDwarvesForRmq() {
     ctx.fillStyle = isSelected ? "#f1c40f" : "#bdc3c7";
     ctx.font = isSelected ? "bold 15px Georgia" : "13px Georgia";
     ctx.textAlign = "center";
-    ctx.fillText(`[${index}]`, dwarf.x, dwarf.y + 32);
+    ctx.fillText(`[${dwarf.id}]`, dwarf.x, dwarf.y + 32);
   });
 
   if (isDragging) {
@@ -282,7 +305,10 @@ function drawDwarvesForRmq() {
     ctx.restore();
   }
 
-  if(algorithmResults.segmentTree && algorithmResults.segmentTree.loudestDwarfId) {
+  if (
+    algorithmResults.segmentTree &&
+    algorithmResults.segmentTree.loudestDwarfId
+  ) {
     drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
   }
 }
@@ -291,8 +317,6 @@ function drawLoudestDwarf(dwarfId) {
   const dwarf = INITIAL_NODES.find(
     (n) => n.type === "dwarf" && Number(n.id) === Number(dwarfId),
   );
-
-  console.log("Drawing loudest dwarf with ID:", dwarfId, "Found dwarf:", dwarf);
 
   if (dwarf) {
     ctx.beginPath();
@@ -370,9 +394,6 @@ canvas.addEventListener("mouseup", function (e) {
   if (selectedIndices.length > 0) {
     rmqSelectedL = Math.min(...selectedIndices);
     rmqSelectedR = Math.max(...selectedIndices);
-    console.log(
-      `Obszar 2D zatwierdzony. Indeksy dla Drzewa: [${rmqSelectedL}, ${rmqSelectedR}]`,
-    );
   }
 
   drawDwarvesForRmq();
@@ -385,5 +406,93 @@ document.addEventListener("DOMContentLoaded", () => {
   if (getSelectedAlgorithm() === "rmq") {
     drawDwarvesForRmq();
   }
+  if(getSelectedAlgorithm() === "minCost"){
+    drawMinCostResult(algorithmResults.minCost);
+  }
 });
 
+function drawAllNodes() {
+  INITIAL_NODES.forEach((node) => {
+    const x = node.x;
+    const y = node.y;
+
+    if (node.type === "dwarf") {
+      ctx.beginPath();
+      ctx.arc(x, y, 14, 0, Math.PI * 2);
+      ctx.fillStyle = "#1a3a5a";
+      ctx.strokeStyle = "#4a90c0";
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#80c0f0";
+    } else {
+      const s = 12;
+      ctx.beginPath();
+      ctx.rect(x - s, y - s, s * 2, s * 2);
+      ctx.fillStyle = "#2a1a08";
+      ctx.strokeStyle = "#c07030";
+      ctx.lineWidth = 2;
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = "#e8c060";
+    }
+  });
+}
+
+function drawMinCostResult(data) {
+  console.log("Min cost result:", data);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
+  const mines = INITIAL_NODES.filter((n) => n.type === "mine");
+
+  dwarves.forEach((d) => {
+    mines.forEach((m) => {
+      if (!d.minerals.some((min) => m.minerals.includes(min))) return;
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(60,55,40,0.2)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(m.x, m.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  });
+
+  data.assignments.forEach((a) => {
+    const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
+    const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
+
+    if (!dwarf || !mine) {
+      console.warn(`Nie znaleziono: dwarf=${a.dwarfId} mine=${a.mineId}`);
+      return;
+    }
+
+    const dist = Math.sqrt(
+      Math.pow(dwarf.x - mine.x, 2) + Math.pow(dwarf.y - mine.y, 2),
+    );
+    const ratio = Math.min(dist / 500, 1);
+    const r = Math.round(ratio * 200);
+    const g = Math.round((1 - ratio) * 170 + 80);
+    const color = a.isPenalized ? "#a060c0" : `rgb(${r},${g},50)`;
+
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = a.isPenalized ? 1.5 : 2.5;
+    ctx.setLineDash(a.isPenalized ? [4, 4] : []);
+    ctx.moveTo(dwarf.x, dwarf.y);
+    ctx.lineTo(mine.x, mine.y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const mx = (dwarf.x + mine.x) / 2;
+    const my = (dwarf.y + mine.y) / 2;
+    ctx.fillStyle = color;
+    ctx.font = "9px Georgia";
+    ctx.textAlign = "center";
+    ctx.fillText(dist.toFixed(0), mx, my - 4);
+  });
+
+  drawAllNodes();
+}

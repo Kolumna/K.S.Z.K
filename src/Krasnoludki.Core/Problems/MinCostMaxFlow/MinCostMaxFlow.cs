@@ -2,7 +2,6 @@ using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Graph;
 using Krasnoludki.Core.McmfAlgorithm.Models;
 using Krasnoludki.Core.McmfAlgorithm.Graph;
-using Krasnoludki.Core.Routing;
 
 namespace Krasnoludki.Core.Problems;
 
@@ -20,7 +19,7 @@ namespace Krasnoludki.Core.Problems;
 /// </remarks>
 public class MinCostMaxFlowProblem
 {
-    public (double,int) MinCostMaxFlow(ResidualNetwork network)
+    public (double, int) MinCostMaxFlow(ResidualNetwork network)
     {
         int source = network.SourceID;
 
@@ -32,37 +31,37 @@ public class MinCostMaxFlowProblem
         while (true)
         {
             // Searching for the new augmenting path with Bellman-Ford algorithm
-            path = algorithm.bellmanFordAlgorithm(network,source);
+            path = algorithm.bellmanFordAlgorithm(network, source);
             //If there's no more augmenting path Min Cost Max Flow Algorithm can stop
-            if(path.Count == 0)
+            if (path.Count == 0)
                 break;
-            
+
             int residualCapacity = int.MaxValue;
             foreach (GraphEdgeFlow edge in path) // Searching for the residual capacity of a path: \(c_f(p)\)
             {
-                residualCapacity = (edge.Capacity - edge.CurrFlow) < residualCapacity?
-                    (edge.Capacity - edge.CurrFlow): residualCapacity;
+                residualCapacity = (edge.Capacity - edge.CurrFlow) < residualCapacity ?
+                    (edge.Capacity - edge.CurrFlow) : residualCapacity;
             }
 
             MaxFlow += residualCapacity;
-            foreach(GraphEdgeFlow edge in path) // For every edge in graph increase flow by new residual capacity of a path
-            {   
-                edge.AddFlow(residualCapacity); 
+            foreach (GraphEdgeFlow edge in path) // For every edge in graph increase flow by new residual capacity of a path
+            {
+                edge.AddFlow(residualCapacity);
 
                 MinCost += (residualCapacity * edge.Cost);
             }
         }
 
-       return (MinCost / 100000.0, MaxFlow);
-       
+        return (MinCost / 100000.0, MaxFlow);
+
     }
 
-/// <summary>
-/// Extracts the final dwarf-to-mine assignments from the residual network after the algorithm's execution.
-/// </summary>
-/// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
-/// <returns>A list of AssignmentDto containing DwarfId, MineId, and Distance, real cost, total employed 
-/// dwarves count, count of dwarves employed due to the distance.</returns>
+    /// <summary>
+    /// Extracts the final dwarf-to-mine assignments from the residual network after the algorithm's execution.
+    /// </summary>
+    /// <param name="networkAfterMCMF">The residual network with populated flows (CurrFlow).</param>
+    /// <returns>A list of AssignmentDto containing DwarfId, MineId, and Distance, real cost, total employed 
+    /// dwarves count, count of dwarves employed due to the distance.</returns>
     public (List<AssignmentDto>, double, int, int) ExtractAssignments(ResidualNetwork networkAfterMCMF)
     {
         var ReadyEdges = new List<AssignmentDto>();
@@ -76,14 +75,14 @@ public class MinCostMaxFlowProblem
                 edge.From > 0 && edge.From <= networkAfterMCMF.DwarvesCount && // the edge is : dwarf -> mine edge
                 edge.To > networkAfterMCMF.DwarvesCount && edge.To < networkAfterMCMF.SinkID)
             {
-                
+
                 int dwarf_id = ((GraphNode<GraphDwarf>)networkAfterMCMF.GetNode(edge.From)).Data.Id;
                 int mine_id = ((GraphNode<GraphMine>)networkAfterMCMF.GetNode(edge.To)).Data.Id;
 
 
                 // if the mine wasn't with dwarf preferred material we added artificial massive cost
                 double actualDistance;
-                if(edge.Cost >= ResidualNetwork.NON_PREFERRED_PENALTY)
+                if (edge.Cost >= ResidualNetwork.NON_PREFERRED_PENALTY)
                 {
                     actualDistance = (double)(edge.Cost % ResidualNetwork.NON_PREFERRED_PENALTY) / 100000;
                     distanceEmployedDwarfs++;
@@ -94,7 +93,12 @@ public class MinCostMaxFlowProblem
                 }
 
                 realCost += actualDistance;
-                ReadyEdges.Add(new AssignmentDto(dwarf_id, mine_id, actualDistance)); 
+                ReadyEdges.Add(new AssignmentDto
+                {
+                    DwarfId = dwarf_id,
+                    MineId = mine_id,
+                    ActualDistance = actualDistance
+                });
                 // to get right distance we need to be sure not to count extra artificial massive cost
 
                 employedDwarfsCount++;

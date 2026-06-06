@@ -74,14 +74,14 @@ else
         <a asp-page="/Algorithms" asp-route-algorithm="minCost"
            class="algo-button@(Model.Algorithm == "minCost" ? " active" : "")" data-tool="algo2"><span>Optymalizacja z
           Owsianką</span>
-          @* @if (Model.HasMinCostResult)
+          @if (Model.HasMinCostResult)
           {
             <p class="status active">Uruchomiono</p>
           }
           else
           {
             <p class="status">Nie uruchomiono</p>
-          } *@
+          }
         </a>
         <a asp-page="/Algorithms" asp-route-algorithm="convexHull"
            class="algo-button@(Model.Algorithm == "convexHull" ? " active" : "")" data-tool="algo3"><span>Wyznaczenie
