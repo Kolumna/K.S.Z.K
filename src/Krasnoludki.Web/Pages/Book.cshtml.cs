@@ -35,7 +35,32 @@ public class BookModel : PageModel
 
   public void OnGet()
   {
-    SavedScenarios = _scenarios.GetManifest();
+    var allScenarios = _scenarios.GetManifest();
+
+    if (!string.IsNullOrEmpty(Q))
+    {
+      var filteredList = new List<dynamic>();
+
+      foreach (var scenario in allScenarios)
+      {
+        string name = scenario.Name?.ToString() ?? "";
+        string idStr = scenario.Id?.ToString() ?? "";
+
+        var matchesInName = Core.Algorithms.RabinKarp.ContainsSubstring(name.ToLower(), Q.ToLower());
+        var matchesInId = Core.Algorithms.RabinKarp.ContainsSubstring(idStr.ToLower(), Q.ToLower());
+
+        if (matchesInName.Count > 0 || matchesInId.Count > 0)
+        {
+          filteredList.Add(scenario);
+        }
+      }
+
+      SavedScenarios = filteredList;
+    }
+    else
+    {
+      SavedScenarios = allScenarios;
+    }
 
     var id = HttpContext.Session.GetString("activeScenarioId");
     if (id == null)
