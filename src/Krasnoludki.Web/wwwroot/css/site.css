@@ -650,6 +650,18 @@ input {
   border-radius: 8px;
 }
 
+.scenario-item span {
+  font-size: 16px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
+
+.scenario-item > div {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+}
+
 .book-aside-header {
   display: flex;
   flex-direction: column;
@@ -761,4 +773,10 @@ main {
 
 .zoom-controls button:hover {
   background-color: var(--color-overlay);
+}
+
+.book-main {
+  border: 1px solid var(--border-strong);
+  border-left: none;
+  border-top: none;
 }
