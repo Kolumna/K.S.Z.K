@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using Krasnoludki.Core.DTOs;
 using Krasnoludki.Core.Problems.Huffman;
@@ -186,6 +187,47 @@ public class ScenarioFileService
             SaveManifest(manifest);
         }
     }
+
+    public ScenarioStats CalculateStats(string id)
+    {
+        var scenario = Load(id);
+        var hoffPath = Path.Combine(_baseDir, $"{id}.hoff");
+
+        long hoffBytes = new FileInfo(hoffPath).Length;
+        long jsonBytes = Encoding.UTF8.GetByteCount(
+            JsonSerializer.Serialize(scenario));
+
+        double saved = (1.0 - ((double)hoffBytes / jsonBytes)) * 100.0;
+
+        return new ScenarioStats
+        {
+            HoffSize = $"{hoffBytes / 1024.0:F1} KB",
+            VirtualJsonSize = $"{jsonBytes / 1024.0:F1} KB",
+            CompressionRatio = $"{Math.Max(0, saved):F0}%",
+        };
+    }
+
+    // public ScenarioStats CalculateCompressionEfficiency(string id, object decompressedScenario)
+    // {
+    //     string hoffPath = Path.Combine(_baseDir, $"{id}.hoff");
+
+    //     if (!File.Exists(hoffPath))
+    //         return new ScenarioStats();
+
+    //     long hoffBytes = new FileInfo(hoffPath).Length;
+
+    //     string simulatedJson = JsonSerializer.Serialize(decompressedScenario);
+    //     long jsonBytes = Encoding.UTF8.GetByteCount(simulatedJson);
+
+    //     double savedPercent = (1.0 - ((double)hoffBytes / jsonBytes)) * 100.0;
+
+    //     return new ScenarioStats
+    //     {
+    //         HoffSize = $"{hoffBytes / 1024.0:F1} KB",
+    //         VirtualJsonSize = $"{jsonBytes / 1024.0:F1} KB",
+    //         CompressionRatio = $"{Math.Max(0, savedPercent):F0}%",
+    //     };
+    // }
 }
 
 public class ManifestEntry
@@ -203,4 +245,11 @@ public class ManifestEntry
     public bool HasMinCost { get; set; }
     public bool HasConvexHull { get; set; }
     public bool HasSegmentTree { get; set; }
+}
+
+public class ScenarioStats
+{
+    public string HoffSize { get; set; } = "0 KB";
+    public string VirtualJsonSize { get; set; } = "0 KB";
+    public string CompressionRatio { get; set; } = "0%";
 }

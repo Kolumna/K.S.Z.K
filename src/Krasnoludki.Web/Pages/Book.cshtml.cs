@@ -1,4 +1,5 @@
 
+using System.Text;
 using System.Text.Json;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,9 @@ public class BookModel : PageModel
 
   public string NodesJson { get; set; } = "[]";
   public string ResultsJson { get; set; } = "{}";
+
+
+  public ScenarioStats CompressionStats { get; set; } = new ScenarioStats();
 
   private readonly ScenarioFileService _scenarios;
 
@@ -46,6 +50,8 @@ public class BookModel : PageModel
       Reset();
       return;
     }
+
+    CompressionStats = _scenarios.CalculateStats(id);
 
     var entry = SavedScenarios.FirstOrDefault(m => m.Id == id);
     if (entry == null)
