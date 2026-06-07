@@ -100,9 +100,11 @@ function drawDwarf(node, options = {}) {
   ctx.fill();
   ctx.stroke();
 
-  // ctx.fillStyle = "#fff";
-  // ctx.font = "16px Arial";
-  // ctx.fillText(`id: ${index}`, x, y + 24);
+  ctx.fillStyle = "#fff";
+  ctx.font = "16px Arial";
+  node.minerals.forEach((mineral, i) => {
+    ctx.fillText(mineral, x - 48, y + 24 + i * 18);
+  });
 
   if (showIndex) {
     ctx.fillStyle = "#fff";
@@ -142,8 +144,8 @@ function drawMine(node, options = {}) {
   ctx.stroke();
 
   if (node.minerals && node.minerals[0]) {
-    ctx.fillStyle = "#3a3528";
-    ctx.font = "8px Arial";
+    ctx.fillStyle = "#fff";
+    ctx.font = "16px Arial";
     ctx.fillText(node.minerals[0], x, y + s + 14);
   }
 }
