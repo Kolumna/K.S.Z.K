@@ -780,3 +780,24 @@ main {
   border-left: none;
   border-top: none;
 }
+
+.algo-stats {
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--border-strong);
+  background-color: var(--color-card);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 20px;
+  font-family: var(--font-mono);
+}
+
+.algo-stats strong {
+  font-family: var(--font-mono);
+}
+
+.algo-stats.disabled {
+  display: none;
+}
