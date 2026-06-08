@@ -72,10 +72,28 @@ function getCH() {
   return canvas.getBoundingClientRect().height;
 }
 
+function drawNodeGraphics(x, y, type) {
+  ctx.beginPath();
+  ctx.arc(x, y, 20, 0, Math.PI * 2);
+  ctx.fillStyle =
+    type === "dwarf" ? "#8B4513" : window.MINERAL_COLORS?.[type] || "#888";
+  ctx.fill();
+  ctx.strokeStyle = "#000";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  const label = type.charAt(0).toUpperCase();
+  ctx.fillStyle = "white";
+  ctx.font = "bold 14px Arial";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(label, x, y);
+}
+
 function drawDwarf(node, options = {}) {
   const {
     highlight = false,
-    highlightColor = "#6aaa6a",
+    highlightColor = "#62e662",
     isLoudest = false,
     showIndex = false,
     index = 0,
@@ -88,17 +106,11 @@ function drawDwarf(node, options = {}) {
   if (highlight) {
     ctx.beginPath();
     ctx.arc(x, y, 26, 0, Math.PI * 2);
-    ctx.fillStyle = `${highlightColor}33`;
+    ctx.fillStyle = `${highlightColor}`;
     ctx.fill();
   }
 
-  ctx.beginPath();
-  ctx.arc(x, y, 10, 0, Math.PI * 2);
-  ctx.fillStyle = isLoudest ? "#1a4a2a" : "#1a3a5a";
-  ctx.strokeStyle = isLoudest ? "#6aaa6a" : "#4a90c0";
-  ctx.lineWidth = highlight ? 2.5 : 2;
-  ctx.fill();
-  ctx.stroke();
+  drawNodeGraphics(x, y, node.type);
 
   ctx.fillStyle = "#fff";
   ctx.font = "16px Arial";
@@ -119,7 +131,7 @@ function drawDwarf(node, options = {}) {
     ctx.fillText(`${node.loudness}dB`, x, y - 17);
 
     if (isLoudest) {
-      ctx.fillStyle = "#6aaa6a";
+      ctx.fillStyle = "#5fff5f";
     }
   }
 }
@@ -135,13 +147,7 @@ function drawMine(node, options = {}) {
     ctx.fillRect(x - s - 6, y - s - 6, (s + 6) * 2, (s + 6) * 2);
   }
 
-  ctx.beginPath();
-  ctx.rect(x - s, y - s, s * 2, s * 2);
-  ctx.fillStyle = "#2a1a08";
-  ctx.strokeStyle = "#c07030";
-  ctx.lineWidth = 2;
-  ctx.fill();
-  ctx.stroke();
+  drawNodeGraphics(x, y, node.type);
 
   if (node.minerals && node.minerals[0]) {
     ctx.fillStyle = "#fff";
@@ -177,7 +183,9 @@ async function runAlgorithm(algorithmType) {
       case "matching": {
         const payload = buildMatchingPayload();
         res = await MapApiService.calculateMatching(payload);
-        if (res.success) drawMatching(res.data);
+        if (res.success) {
+          drawMatching(res.data);
+        }
         break;
       }
       case "minCost": {
@@ -259,7 +267,29 @@ function drawConvexHull(hullPoints) {
       ctx.fillStyle = "#c07030";
       ctx.fill();
     });
+    showConvexHullStats(hullPoints);
   });
+}
+
+function showConvexHullStats(data) {
+  console.log("Dane do statystyk ConvexHull:", data);
+  const statsDiv = document.querySelector(".algo-stats");
+  if (!statsDiv) return;
+
+  statsDiv.classList.remove("disabled");
+
+  const nodesCount = data.length;
+  const perimeter = data.reduce((sum, p, i) => {
+    const next = data[(i + 1) % data.length];
+    return (
+      sum + Math.sqrt(Math.pow(p.x - next.x, 2) + Math.pow(p.y - next.y, 2))
+    );
+  }, 0);
+
+  statsDiv.innerHTML = `
+    <p>Ilość wierzchołków: <strong>${nodesCount}</strong></p>
+    <p>Obwód: <strong>${perimeter.toFixed(2)}</strong></p>
+  `;
 }
 
 function drawMatching(data) {
@@ -295,7 +325,27 @@ function drawMatching(data) {
     });
 
     drawAllNodes();
+    showMatchingStats(data);
   });
+}
+
+function showMatchingStats(data) {
+  console.log("Dane do statystyk przydziału:", data);
+  const statsDiv = document.querySelector(".algo-stats");
+
+  if (!statsDiv) return;
+  statsDiv.classList.remove("disabled");
+
+  const assignedDwarves = data.assignments.length;
+  const unassignedDwarves =
+    INITIAL_NODES.filter((n) => n.type === "dwarf").length - assignedDwarves;
+  const edgesCount = data.assignments.length;
+
+  statsDiv.innerHTML = `
+    <p>Przydzielono: <strong>${assignedDwarves}</strong></p>
+    <p>Nieprzydzielono: <strong>${unassignedDwarves}</strong></p>
+    <p>Ilość krawędzi grafu: <strong>${edgesCount}</strong></p>
+  `;
 }
 
 function drawMinCost(data) {
@@ -349,7 +399,28 @@ function drawMinCost(data) {
     });
 
     drawAllNodes();
+    showMinCostStats(data);
   });
+}
+
+function showMinCostStats(data) {
+  console.log("Dane do statystyk minCost:", data);
+  const statsDiv = document.querySelector(".algo-stats");
+
+  if (!statsDiv) return;
+  statsDiv.classList.remove("disabled");
+
+  const sumOfDistances = data.realCost;
+  const dwarfsWithPenalties = data.penalizedCount;
+  const maxFlow = data.maxFlow;
+  const dwarfsCount = data.employedCount;
+
+  statsDiv.innerHTML = `
+    <p>Suma odległości: <strong>${sumOfDistances.toFixed(2)}</strong></p>
+    <p>Krasnoludki z karą: <strong>${dwarfsWithPenalties}</strong></p>
+    <p>Max flow: <strong>${maxFlow}</strong></p>
+    <p>Przydzielone krasnoludki: <strong>${dwarfsCount}</strong></p>
+  `;
 }
 
 function drawRMQ() {
@@ -411,8 +482,26 @@ function drawRMQ() {
 
     if (algorithmResults.segmentTree?.loudestDwarfId) {
       drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
+      showRMQStats(algorithmResults.segmentTree);
     }
   });
+}
+
+function showRMQStats(data) {
+  console.log("Dane do statystyk RMQ:", data);
+  const statsDiv = document.querySelector(".algo-stats");
+
+  if (!statsDiv) return;
+  statsDiv.classList.remove("disabled");
+
+  const loudestDwarf = INITIAL_NODES.find(
+    (n) => n.type === "dwarf" && Number(n.id) === Number(data.loudestDwarfId),
+  );
+
+  statsDiv.innerHTML = `
+    <p>Najgłośniejszy krasnolud: <strong>${loudestDwarf ? loudestDwarf.id : "Nie znaleziono"}</strong></p>
+    <p>Głośność: <strong>${loudestDwarf ? loudestDwarf.loudness : "Nie znaleziono"}</strong></p>
+  `;
 }
 
 function drawLoudestDwarf(dwarfId) {
