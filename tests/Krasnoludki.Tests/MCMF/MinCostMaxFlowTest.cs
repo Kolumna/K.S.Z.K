@@ -68,16 +68,15 @@ public class MinCostMaxFlowProblemTest
         Assert.Contains(network.Edges, e => e.To == network.SinkID && e.Capacity > 0);
 
         MinCostMaxFlowProblem mcmf = new MinCostMaxFlowProblem();
-        var (rawMinCost, maxFlow) = mcmf.MinCostMaxFlow(network);
-        var (assignments, realCost, employedCount, penalizedCount) = mcmf.ExtractAssignments(network);
+        var (minCost, maxFlow) = mcmf.MinCostMaxFlow(network);
+        var (assignments, employedCount) = mcmf.ExtractAssignments(network);
 
         // 1. Verify flow completion: Ensure all dwarves successfully found employment
-        Assert.Equal(6, maxFlow);
-        Assert.Equal(6, employedCount);
+        Assert.Equal(5, maxFlow);
+        Assert.Equal(5, employedCount);
 
         // 2. Verify business logic & penalties
-        Assert.Equal(88.19804, realCost, 5); 
-        Assert.Equal(1, penalizedCount); // Outcast (Id: 6) must receive the non-preference penalty
+        Assert.Equal(78.19804, minCost, 5); 
 
         // 3. Verify MCMF optimization (Conflict Resolution)
         // Mine 101 has a capacity of 2. Dwarves 1 and 2 are closer, so Dwarf 3 

@@ -211,46 +211,16 @@ public class AlgorithmsModel : PageModel
       var network = new ResidualNetwork(dwarves, mines);
       var mcmf = new MinCostMaxFlowProblem();
 
-      var (rawMinCost, maxFlow) = mcmf.MinCostMaxFlow(network);
-      var (assignments, realCost, employedCount, penalizedCount) = mcmf.ExtractAssignments(network);
+      var (minCost, maxFlow) = mcmf.MinCostMaxFlow(network);
+      var (assignments, employedCount) = mcmf.ExtractAssignments(network);
 
-      var penalizedIds = assignments
-      .Where(a =>
-      {
-        var dwarf = request.Dwarves.FirstOrDefault(d => d.PointId == a.DwarfId);
-        var mine = request.Mines.FirstOrDefault(m => m.PointId == a.MineId);
-        if (dwarf == null || mine == null) return false;
-
-        return !dwarf.PreferredMinerals.Contains(mine.Resource);
-      })
-      .Select(a => a.DwarfId)
-      .ToHashSet();
 
       var result = new MinCostResultDto
       {
-        RealCost = Math.Round(realCost, 2),
-        MaxFlow = maxFlow,
-        EmployedCount = employedCount,
-        PenalizedCount = penalizedCount,
-        Assignments = assignments.Select(a =>
-        {
-          var dwarf = request.Dwarves.FirstOrDefault(d => d.PointId == a.DwarfId);
-          var mine = request.Mines.FirstOrDefault(m => m.PointId == a.MineId);
-
-          var distance = (dwarf != null && mine != null)
-      ? Math.Round(Math.Sqrt(
-          Math.Pow(dwarf.x - mine.x, 2) +
-          Math.Pow(dwarf.y - mine.y, 2)), 4)
-      : 0.0;
-
-          return new AssignmentDto
-          {
-            DwarfId = a.DwarfId,
-            MineId = a.MineId,
-            ActualDistance = distance,
-            IsPenalized = penalizedIds.Contains(a.DwarfId),
-          };
-        }).ToList(),
+          RealCost = Math.Round(minCost, 2),
+          MaxFlow = maxFlow,
+          EmployedCount = employedCount,
+          Assignments = assignments
       };
 
 

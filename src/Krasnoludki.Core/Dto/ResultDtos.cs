@@ -50,9 +50,6 @@ public class MinCostResultDto
     [JsonPropertyName("employedCount")]
     public int EmployedCount { get; set; }
 
-    [JsonPropertyName("penalizedCount")]
-    public int PenalizedCount { get; set; }
-
     [JsonPropertyName("maxFlow")]
     public int MaxFlow { get; set; }
 }
@@ -67,7 +64,4 @@ public class AssignmentDto
 
     [JsonPropertyName("actualDistance")]
     public double ActualDistance { get; set; }
-
-    [JsonPropertyName("isPenalized")]
-    public bool IsPenalized { get; set; }
 }
