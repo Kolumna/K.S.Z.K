@@ -42,4 +42,15 @@ const MapApiService = {
     }
     return await this._sendRequest("CalculateSegmentTree", dwarfesForRmq);
   },
+
+  async calculateMinCost(minCostPayload) {
+    if (
+      !minCostPayload ||
+      !minCostPayload.dwarves ||
+      !minCostPayload.mines
+    ) {
+      throw new Error("Invalid payload for min cost algorithm.");
+    }
+    return await this._sendRequest("CalculateMinCost", minCostPayload);
+  }
 };

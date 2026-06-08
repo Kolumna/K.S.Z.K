@@ -4,7 +4,10 @@ using Krasnoludki.Core;
 using Krasnoludki.Core.Algorithms;
 using Krasnoludki.Core.Dto;
 using Krasnoludki.Core.DTOs;
+using Krasnoludki.Core.Graph;
+using Krasnoludki.Core.McmfAlgorithm.Adapter;
 using Krasnoludki.Core.Models;
+using Krasnoludki.Core.Problems;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -29,7 +32,7 @@ public class AlgorithmsModel : PageModel
 
   public bool HasMatchingResult => ParsedResults.Matching != null;
   public bool HasConvexHullResult => ParsedResults?.ConvexHull != null;
-  // public bool HasMinCostResult => ResultsJson.Contains("minCost");
+  public bool HasMinCostResult => ParsedResults?.MinCost != null;
 
   public bool HasRmqResult => ParsedResults?.Rmq != null;
 
@@ -69,8 +72,6 @@ public class AlgorithmsModel : PageModel
           ParsedResults = JsonSerializer.Deserialize<ScenarioResultsDto>(ResultsJson) ?? new ScenarioResultsDto();
         }
 
-        Console.WriteLine($"Loaded scenario: {loaded.Name}, Nodes: {loaded.Nodes.Count}, Results: {ResultsJson}");
-        Console.WriteLine($"Parsed Convex Hull: {ParsedResults.ConvexHull?.HullPoints.Count ?? 0} points");
         return;
       }
       else
@@ -152,21 +153,8 @@ public class AlgorithmsModel : PageModel
     [FromBody] MatchingInputDto input
   )
   {
-    Console.WriteLine("Received matching request with input: " + JsonSerializer.Serialize(input));
     List<Dwarf> dwarves = input.Dwarves;
     List<Mine> mines = input.Mines;
-
-    Console.WriteLine($"Received {dwarves.Count} dwarves and {mines.Count} mines for matching.");
-
-    foreach (var dwarf in dwarves)
-    {
-      Console.WriteLine($"Dwarf {dwarf.PointId}: Prefers {string.Join(", ", dwarf.PreferredMinerals)}");
-    }
-
-    foreach (var mine in mines)
-    {
-      Console.WriteLine($"Mine {mine.PointId}: Contains {mine.Resource} with capacity {mine.Capacity}");
-    }
 
     List<int[]> assigned = DwarfAssigning.Assign(dwarves, mines);
 
@@ -178,8 +166,6 @@ public class AlgorithmsModel : PageModel
         MineId = pair[1].ToString()
       })]
     };
-
-    Console.WriteLine("Matching result: " + JsonSerializer.Serialize(result));
 
     var id = HttpContext.Session.GetString("activeScenarioId");
     if (id != null && _scenarios.Exists(id))
@@ -194,27 +180,16 @@ public class AlgorithmsModel : PageModel
    [FromBody] List<Dwarf> dwarfesForRmq
  )
   {
-    Console.WriteLine("Received segment tree request with input: " + JsonSerializer.Serialize(dwarfesForRmq));
     List<Dwarf> decametrists = dwarfesForRmq;
 
-    Console.WriteLine($"Received {decametrists.Count} decametrists for segment tree.");
-
-    foreach (var dwarf in decametrists)
-    {
-      Console.WriteLine($"Dwarf {dwarf.PointId}: Prefers {string.Join(", ", dwarf.PreferredMinerals)}");
-    }
     var tree = new SegmentTree(decametrists);
 
     Dwarf loudestDwarf = tree.GetLoudestDecametrist();
-
-    Console.WriteLine("Segment tree result: " + JsonSerializer.Serialize(loudestDwarf));
 
     var result = new SegmentTreeResultDto
     {
       LoudestDwarfId = loudestDwarf.PointId.ToString()
     };
-
-    Console.WriteLine("Segment tree result: " + JsonSerializer.Serialize(result));
 
     var id = HttpContext.Session.GetString("activeScenarioId");
     if (id != null && _scenarios.Exists(id))
@@ -223,5 +198,71 @@ public class AlgorithmsModel : PageModel
     }
 
     return new JsonResult(new { success = true, data = result });
+  }
+
+  public IActionResult OnPostCalculateMinCost([FromBody] MinCostRequest request)
+  {
+    try
+    {
+      var mapper = new McmfMapper();
+      var dwarves = mapper.MapDwarves(request.Dwarves);
+      var mines = mapper.MapMines(request.Mines);
+
+      var network = new ResidualNetwork(dwarves, mines);
+      var mcmf = new MinCostMaxFlowProblem();
+
+      var (rawMinCost, maxFlow) = mcmf.MinCostMaxFlow(network);
+      var (assignments, realCost, employedCount, penalizedCount) = mcmf.ExtractAssignments(network);
+
+      var penalizedIds = assignments
+      .Where(a =>
+      {
+        var dwarf = request.Dwarves.FirstOrDefault(d => d.PointId == a.DwarfId);
+        var mine = request.Mines.FirstOrDefault(m => m.PointId == a.MineId);
+        if (dwarf == null || mine == null) return false;
+
+        return !dwarf.PreferredMinerals.Contains(mine.Resource);
+      })
+      .Select(a => a.DwarfId)
+      .ToHashSet();
+
+      var result = new MinCostResultDto
+      {
+        RealCost = Math.Round(realCost, 2),
+        MaxFlow = maxFlow,
+        EmployedCount = employedCount,
+        PenalizedCount = penalizedCount,
+        Assignments = assignments.Select(a =>
+        {
+          var dwarf = request.Dwarves.FirstOrDefault(d => d.PointId == a.DwarfId);
+          var mine = request.Mines.FirstOrDefault(m => m.PointId == a.MineId);
+
+          var distance = (dwarf != null && mine != null)
+      ? Math.Round(Math.Sqrt(
+          Math.Pow(dwarf.x - mine.x, 2) +
+          Math.Pow(dwarf.y - mine.y, 2)), 4)
+      : 0.0;
+
+          return new AssignmentDto
+          {
+            DwarfId = a.DwarfId,
+            MineId = a.MineId,
+            ActualDistance = distance,
+            IsPenalized = penalizedIds.Contains(a.DwarfId),
+          };
+        }).ToList(),
+      };
+
+
+      var id = HttpContext.Session.GetString("activeScenarioId");
+      if (id != null && _scenarios.Exists(id))
+        _scenarios.SaveResult(id, "minCost", result);
+
+      return new JsonResult(new { success = true, data = result });
+    }
+    catch (Exception ex)
+    {
+      return StatusCode(500, new { success = false, message = ex.Message });
+    }
   }
 }

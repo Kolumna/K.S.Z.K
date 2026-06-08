@@ -203,11 +203,6 @@ function confirmNode() {
       "#mineralsCheckboxGroup input:checked",
     );
     selectedTypes = Array.from(checkboxes).map((cb) => cb.value);
-
-    if (selectedTypes.length === 0) {
-      alert("Wybierz przynajmniej jeden surowiec!");
-      return;
-    }
   }
 
   nodes.push({

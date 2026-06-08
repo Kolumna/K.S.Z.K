@@ -1,4 +1,5 @@
 
+using System.Text;
 using System.Text.Json;
 using Krasnoludki.Web.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +21,9 @@ public class BookModel : PageModel
   public string NodesJson { get; set; } = "[]";
   public string ResultsJson { get; set; } = "{}";
 
+
+  public ScenarioStats CompressionStats { get; set; } = new ScenarioStats();
+
   private readonly ScenarioFileService _scenarios;
 
   public BookModel(ScenarioFileService scenarios)
@@ -31,7 +35,32 @@ public class BookModel : PageModel
 
   public void OnGet()
   {
-    SavedScenarios = _scenarios.GetManifest();
+    var allScenarios = _scenarios.GetManifest();
+
+    if (!string.IsNullOrEmpty(Q))
+    {
+      var filteredList = new List<dynamic>();
+
+      foreach (var scenario in allScenarios)
+      {
+        string name = scenario.Name?.ToString() ?? "";
+        string idStr = scenario.Id?.ToString() ?? "";
+
+        var matchesInName = Core.Algorithms.RabinKarp.ContainsSubstring(name.ToLower(), Q.ToLower());
+        var matchesInId = Core.Algorithms.RabinKarp.ContainsSubstring(idStr.ToLower(), Q.ToLower());
+
+        if (matchesInName.Count > 0 || matchesInId.Count > 0)
+        {
+          filteredList.Add(scenario);
+        }
+      }
+
+      SavedScenarios = filteredList;
+    }
+    else
+    {
+      SavedScenarios = allScenarios;
+    }
 
     var id = HttpContext.Session.GetString("activeScenarioId");
     if (id == null)
@@ -46,6 +75,8 @@ public class BookModel : PageModel
       Reset();
       return;
     }
+
+    CompressionStats = _scenarios.CalculateStats(id);
 
     var entry = SavedScenarios.FirstOrDefault(m => m.Id == id);
     if (entry == null)
