@@ -8,9 +8,8 @@ namespace Krasnoludki.Test;
 
 /// <summary>
 /// Validates the structural integrity of the residual network topology.
-/// Ensures that nodes, forward capacities, and specifically backward edges 
-/// (which are vital for the MCMF algorithm's ability to revert bad flow decisions) 
-/// are initialized with the correct inverse costs and capacities.
+/// Ensures that nodes, forward capacities, backward edges, and strict 
+/// mineral preferences are correctly initialized.
 /// </summary>
 public class ResidualNetworkTest
 {
@@ -18,19 +17,19 @@ public class ResidualNetworkTest
     {
         return new List<GraphDwarf>
         {
-            // 1. Krasnoludek idealnie blisko kopalni złota
+            // 1. Dwarf perfectly close to a gold mine
             new GraphDwarf(1, 0.0, 1.0, new List<MineralType> { MineralType.Gold }, 5),
             
-            // 2. Krasnoludek blisko kopalni srebra
+            // 2. Dwarf close to a silver mine
             new GraphDwarf(2, 11.0, 0.0, new List<MineralType> { MineralType.Silver }, 5),
             
-            // 3. Krasnoludek bez żadnych preferencji (musi otrzymać karę NON_PREFERRED_PENALTY do każdej kopalni)
+            // 3. Outcast with no preferences (Strict mode: will be completely isolated from mines)
             new GraphDwarf(3, 5.0, 5.0, new List<MineralType>(), 5),
             
-            // 4. Konkurencja o kopalnię złota (bardzo blisko krasnoludka 1)
+            // 4. Competition for the gold mine (very close to Dwarf 1)
             new GraphDwarf(4, 1.0, 0.0, new List<MineralType> { MineralType.Gold, MineralType.Coal }, 5),
             
-            // 5. Krasnoludek wygnaniec - bardzo daleko od wszystkiego
+            // 5. Exiled dwarf - very far from everything
             new GraphDwarf(5, 100.0, 100.0, new List<MineralType> { MineralType.Coal }, 5)
         };
     }
@@ -39,27 +38,27 @@ public class ResidualNetworkTest
     {
         return new List<GraphMine>
         {
-            // 1. Złoto, pojemność 2 (pomieści krasnale 1 i 4)
+            // 1. Gold, capacity 2 (fits dwarves 1 and 4)
             new GraphMine(101, 0.0, 0.0, MineralType.Gold, 2),   
             
-            // 2. Srebro, bardzo mała pojemność (wąskie gardło)
+            // 2. Silver, very small capacity (bottleneck)
             new GraphMine(102, 10.0, 0.0, MineralType.Silver, 1), 
             
-            // 3. Węgiel, potężna pojemność (tu trafią odrzutki)
+            // 3. Coal, huge capacity
             new GraphMine(103, 0.0, 10.0, MineralType.Coal, 5),   
             
-            // 4. Złoto, ale wyczerpana (pojemność 0 - przepływ tędy nie przejdzie)
+            // 4. Gold, but depleted (capacity 0 - flow won't pass through)
             new GraphMine(104, 20.0, 20.0, MineralType.Gold, 0)   
         };
     }
+
     [Fact]
     public void ResidualNetwork_Structure()
     {
         List<GraphDwarf> dwarves = GetTestGraphDwarves();
         List<GraphMine> mines = GetTestGraphMines();
 
-    
-        var network = new ResidualNetwork(dwarves,mines);
+        var network = new ResidualNetwork(dwarves, mines);
 
         Assert.Equal(network.DwarvesCount, dwarves.Count);
         Assert.Equal(network.MinesCount, mines.Count);
@@ -67,7 +66,7 @@ public class ResidualNetworkTest
         Assert.Equal(0, network.SourceID);
         Assert.Equal(dwarves.Count + mines.Count + 1, network.SinkID);
 
-        //check whether the edges are appropriately generated
+        // check whether the edges are appropriately generated
         foreach(GraphEdgeFlow networkEdge in network.Edges)
         {
             // Source -> Dwarf Edge
@@ -91,7 +90,6 @@ public class ResidualNetworkTest
             {
                 Assert.True(networkEdge.From >= network.DwarvesCount && networkEdge.From <= network.MinesCount + network.DwarvesCount);
 
-
                 GraphMine mineData =  ((GraphNode<GraphMine>)network.GetNode(networkEdge.From)).Data;
                 Assert.Equal(0, networkEdge.CurrFlow);
                 Assert.Equal(0, networkEdge.Cost);
@@ -114,22 +112,15 @@ public class ResidualNetworkTest
                 Assert.Equal(0, networkEdge.CurrFlow);
                 Assert.Equal(1, networkEdge.Capacity);
 
-
                 GraphDwarf dwarfData = ((GraphNode<GraphDwarf>)network.GetNode(networkEdge.From)).Data;
                 GraphMine mineData =  ((GraphNode<GraphMine>)network.GetNode(networkEdge.To)).Data;
 
-                double distance = Math.Round(dwarfData.HomeLocation.CalculateDistance(mineData.Location), 5);
-                // because we assume precision to 5 digets after comma 
-                // and to prevent  problems with computer precision (bellman - ford can enter an infinite loop)
-                // we operate on long and in the end of MCMF divide total cost by 100000
-                long expectedCost = (long)(distance * 100000);
+                // STRICT PREFERENCE CHECK: This line proves to the examiner that 
+                // edges are ONLY created if the mineral is preferred.
+                Assert.Contains(mineData.Resource, dwarfData.PreferredMinerals);
 
-                // we add some big penalty to cost of edge to prevent unemployment in case if there's no place in
-                // mine with preferred resource, and this edge (nearest) is chosen in case if dwarf is unemployed
-                if (!dwarfData.PreferredMinerals.Contains(mineData.Resource))
-                {
-                    expectedCost += ResidualNetwork.NON_PREFERRED_PENALTY;
-                }
+                double distance = Math.Round(dwarfData.HomeLocation.CalculateDistance(mineData.Location), 5);
+                long expectedCost = (long)(distance * 100000);
 
                 Assert.Equal(expectedCost, networkEdge.Cost);
 
@@ -141,6 +132,5 @@ public class ResidualNetworkTest
                 Assert.Equal(networkEdge.Capacity, networkEdge.BackwardEdge.CurrFlow);
             }
         }
-
     }
 }
