@@ -178,12 +178,20 @@ function drawNodeGraphics(x, y, type, minerals = []) {
     ctx.stroke();
   }
 
-  console.log('Drawing node at', x, y, 'of type', type, 'with minerals', minerals);
+  console.log(
+    "Drawing node at",
+    x,
+    y,
+    "of type",
+    type,
+    "with minerals",
+    minerals,
+  );
 
   if (minerals.length > 0) {
     for (let i = 0; i < minerals.length; i++) {
       ctx.beginPath();
-      ctx.arc((x - 15) + i * 20, y + 35, 6, 0, Math.PI * 2);
+      ctx.arc(x - 15 + i * 20, y + 35, 6, 0, Math.PI * 2);
       ctx.fillStyle = mineralsColors[minerals[i]] || "#000";
       ctx.fill();
       ctx.stroke();
@@ -534,3 +542,33 @@ canvas.addEventListener("click", function (e) {
     document.getElementById("mineModal").style.display = "flex";
   }
 });
+
+function loadJSON() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target.result;
+        const json = JSON.parse(content);
+        if (Array.isArray(json)) {
+          nodes = json;
+          markAsChanged();
+          redrawAll();
+        } else {
+          alert("Nieprawidłowy format pliku JSON");
+        }
+      } catch (err) {
+        alert("Błąd podczas wczytywania pliku JSON: " + err.message);
+      }
+    };
+
+    reader.readAsText(file);
+  };
+  input.click();
+}
