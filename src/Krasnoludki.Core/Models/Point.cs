@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Krasnoludki.Core.Models;
 
 public enum PointType { Source, Dwarf, Mine, Sink }
-public enum MineralType { Gold, Quartz, Silver, Coal, None }
+public enum MineralType { Gold, Quartz, Silver, Coal, Uranium, None }
 
 public abstract class Point
 {
