@@ -103,7 +103,7 @@ function redrawCanvas() {
     // });
 
     nodes.forEach((node) => {
-      drawNodeGraphics(node.x, node.y, node.type, node.minerals);
+      drawNodeGraphics(node.x, node.y, node.type, node.preferredMinerals);
     });
   });
 }
@@ -121,9 +121,9 @@ function redrawList() {
     item.className = "point-item";
     item.innerHTML = `
             <div>
-                <span>${node.type === "dwarf" ? "Krasnoludek" : "Kopalnia"} ${node.type === "dwarf" ? dwarfIndex++ : mineIndex++} <small style="font-size: 12px; font-family: var(--font-mono)">(pointId: ${node.id})</small></span>
+                <span>${node.type === "dwarf" ? "Krasnoludek" : "Kopalnia"} ${node.type === "dwarf" ? dwarfIndex++ : mineIndex++} <small style="font-size: 12px; font-family: var(--font-mono)">(pointId: ${node.pointId})</small></span>
             </div>
-            <button onclick="deleteNode(${node.id})" title="Usuń">
+            <button onclick="deleteNode(${node.pointId})" title="Usuń">
                 <svg viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                     <path d="M199 103v50h-78v30h270v-30h-78v-50H199zm18 18h78v32h-78v-32zm-79.002 80 30.106 286h175.794l30.104-286H137.998zm62.338 13.38.64 8.98 16 224 .643 8.976-17.956 1.283-.64-8.98-16-224-.643-8.976 17.956-1.283zm111.328 0 17.955 1.284-.643 8.977-16 224-.64 8.98-17.956-1.284.643-8.977 16-224 .64-8.98zM247 215h18v242h-18V215z" fill="#fff"></path>
                 </svg>
@@ -188,6 +188,8 @@ function drawNodeGraphics(x, y, type, minerals = []) {
     minerals,
   );
 
+  console.log(nodes)
+
   if (minerals.length > 0) {
     for (let i = 0; i < minerals.length; i++) {
       ctx.beginPath();
@@ -239,6 +241,7 @@ function confirmNode() {
   }
 
   nodes.push({
+    pointId: nodes.length + 1,
     x: pendingCoords.x,
     y: pendingCoords.y,
     type: MapState.mode,
@@ -246,8 +249,8 @@ function confirmNode() {
       MapState.mode === "mine"
         ? parseInt(document.getElementById("capacityInput").value) || 0
         : undefined,
-    minerals: selectedTypes,
-    loudness:
+    preferredMinerals: selectedTypes,
+    voiceLoudness:
       MapState.mode === "dwarf"
         ? parseInt(document.getElementById("loudnessInput").value) || 0
         : undefined,
@@ -301,14 +304,9 @@ async function saveMapBtn() {
 
   try {
     showLoading("Zapisywanie mapy...");
-    const nodesWithCorrectIds = nodes.map((node, index) => ({
-      ...node,
-      id: index + 1,
-    }));
-
     console.log("Wysyłanie danych do serwera:", {
       scenarioId,
-      nodes: nodesWithCorrectIds,
+      nodes,
     });
 
     const res = await fetch("?handler=SaveHoffApi", {
@@ -318,7 +316,7 @@ async function saveMapBtn() {
       },
       body: JSON.stringify({
         scenarioId,
-        nodes: JSON.stringify(nodesWithCorrectIds),
+        nodes: JSON.stringify(nodes),
       }),
     });
 
@@ -347,14 +345,9 @@ async function updateMapBtn() {
   try {
     showLoading("Zapisywanie mapy...");
 
-    const nodesWithCorrectIds = nodes.map((node, index) => ({
-      ...node,
-      id: index + 1,
-    }));
-
     console.log("Wysyłanie danych do serwera:", {
       scenarioId,
-      nodes: nodesWithCorrectIds,
+      nodes,
     });
 
     const res = await fetch("?handler=UpdateHoffApi", {
@@ -364,7 +357,7 @@ async function updateMapBtn() {
       },
       body: JSON.stringify({
         scenarioId,
-        nodes: JSON.stringify(nodesWithCorrectIds),
+        nodes: JSON.stringify(nodes),
       }),
     });
 
