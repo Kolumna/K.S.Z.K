@@ -894,3 +894,28 @@ main {
   gap: 16px;
   width: 100%;
 }
+
+#miniMap {
+  border: 1px solid var(--border-strong);
+  background-color: #e8dcc4;
+}
+
+.book-main {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compression-panel {
+  border: 1px solid var(--border-strong);
+  background-color: var(--color-card);
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.compression-panel h4 {
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
