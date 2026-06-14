@@ -18,3 +18,9 @@ public class MinCostRequest
   [JsonPropertyName("mines")]
   public List<Mine> Mines { get; set; } = new();
 }
+
+public class SegmentTreeInputDto
+{
+  [JsonPropertyName("dwarves")]
+  public List<Dwarf> Dwarves { get; set; } = new();
+}

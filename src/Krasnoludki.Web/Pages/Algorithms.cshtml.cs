@@ -1,4 +1,5 @@
 
+using System.Diagnostics;
 using System.Text.Json;
 using Krasnoludki.Core;
 using Krasnoludki.Core.Algorithms;
@@ -101,7 +102,7 @@ public class AlgorithmsModel : PageModel
               (long)Math.Round(p.Y)))
           .ToList();
 
-      var hull = ConvexHullSolver.GrahamScan(corePoints);
+      var (hull, ms) = Timed(() => ConvexHullSolver.GrahamScan(corePoints));
 
       var hullPoints = hull
           .Select(p => new PointDto { X = p.X, Y = p.Y })
@@ -137,6 +138,7 @@ public class AlgorithmsModel : PageModel
         success = true,
         data = hullPoints.Select(p => new { x = p.X, y = p.Y }),
         perimeter,
+        executionTimeMs = ms
       });
     }
     catch (Exception ex)
@@ -148,32 +150,29 @@ public class AlgorithmsModel : PageModel
       });
     }
   }
-
   public IActionResult OnPostCalculateMatching(
     [FromBody] MatchingInputDto input
   )
   {
+    if (input == null || input.Dwarves == null || input.Mines == null)
+    {
+      return BadRequest(new { success = false, message = "Błędne dane wejściowe." });
+    }
+
     List<Dwarf> dwarves = input.Dwarves;
+    Console.WriteLine($"Received {dwarves.Count} dwarves for matching calculation.");
+    foreach (var dwarf in dwarves)
+    {
+      Console.WriteLine($"Dwarf ID: {dwarf.PointId}, Preferred Minerals: {string.Join(", ", dwarf.PreferredMinerals)}");
+    }
     List<Mine> mines = input.Mines;
-
-    Console.WriteLine("Otrzymane dane do matching:");
-    Console.WriteLine("Dwarves:");
-    foreach (var d in dwarves)
+    Console.WriteLine($"Received {mines.Count} mines for matching calculation.");
+    foreach (var mine in mines)
     {
-      Console.WriteLine($"- Id: {d.PointId}, Loudness: {d.VoiceLoudness}, x: {d.x}, y: {d.y}");
-    }
-    Console.WriteLine("Mines:");
-    foreach (var m in mines)
-    {
-      Console.WriteLine($"- Id: {m.PointId}, Capacity: {m.Capacity}");
+      Console.WriteLine($"Mine ID: {mine.PointId}, Resource: {mine.Resource}, Capacity: {mine.Capacity}");
     }
 
-    List<int[]> assigned = DwarfAssigning.Assign(dwarves, mines);
-
-    Console.WriteLine("Assigned pairs:");
-    foreach (var pair in assigned)    {
-      Console.WriteLine($"Dwarf {pair[0]} -> Mine {pair[1]}");
-    }
+    var (assigned, ms) = Timed(() => DwarfAssigning.Assign(dwarves, mines));
 
     var result = new MatchingResultDto
     {
@@ -190,16 +189,23 @@ public class AlgorithmsModel : PageModel
       _scenarios.SaveResult(id, "matching", result);
     }
 
-    return new JsonResult(new { success = true, data = result });
+    return new JsonResult(new { success = true, data = result, executionTimeMs = ms });
   }
 
   public IActionResult OnPostCalculateSegmentTree(
-   [FromBody] List<Dwarf> dwarfesForRmq
+   [FromBody] SegmentTreeInputDto input
  )
   {
-    List<Dwarf> decametrists = dwarfesForRmq;
+    List<Dwarf> decametrists = input.Dwarves;
 
-    var tree = new SegmentTree(decametrists);
+    if (input == null)
+    {
+      return BadRequest(new { success = false, message = "Nieprawidłowe dane wejściowe." });
+    }
+
+    Console.WriteLine($"Received {decametrists.Count} dwarves for segment tree calculation.");
+
+    var (tree, ms) = Timed(() => new SegmentTree(decametrists));
 
     Dwarf loudestDwarf = tree.GetLoudestDecametrist();
 
@@ -214,10 +220,10 @@ public class AlgorithmsModel : PageModel
       _scenarios.SaveResult(id, "segmentTree", result);
     }
 
-    return new JsonResult(new { success = true, data = result });
+    return new JsonResult(new { success = true, data = result, executionTimeMs = ms });
   }
 
-  public IActionResult OnPostCalculateMinCost([FromBody] MinCostRequest request)
+  public async Task<IActionResult> OnPostCalculateMinCost([FromBody] MinCostRequest request)
   {
     try
     {
@@ -225,31 +231,42 @@ public class AlgorithmsModel : PageModel
       var dwarves = mapper.MapDwarves(request.Dwarves);
       var mines = mapper.MapMines(request.Mines);
 
-      var network = new ResidualNetwork(dwarves, mines);
+      var (network, networkMs) = Timed(() => new ResidualNetwork(dwarves, mines));
       var mcmf = new MinCostMaxFlowProblem();
 
-      var (minCost, maxFlow) = mcmf.MinCostMaxFlow(network);
-      var (assignments, employedCount) = mcmf.ExtractAssignments(network);
+      var ((minCost, maxFlow), minCostMs) = Timed(() => mcmf.MinCostMaxFlow(network));
+      var ((assignments, employedCount), employedCountMs) = Timed(() => mcmf.ExtractAssignments(network));
 
 
       var result = new MinCostResultDto
       {
-          RealCost = Math.Round(minCost, 2),
-          MaxFlow = maxFlow,
-          EmployedCount = employedCount,
-          Assignments = assignments
+        RealCost = Math.Round(minCost, 2),
+        MaxFlow = maxFlow,
+        EmployedCount = employedCount,
+        Assignments = assignments
       };
 
 
       var id = HttpContext.Session.GetString("activeScenarioId");
       if (id != null && _scenarios.Exists(id))
+      {
         _scenarios.SaveResult(id, "minCost", result);
+      }
 
-      return new JsonResult(new { success = true, data = result });
+      return new JsonResult(new { success = true, data = result, executionTimeMs = networkMs + minCostMs + employedCountMs });
     }
     catch (Exception ex)
     {
       return StatusCode(500, new { success = false, message = ex.Message });
     }
   }
+
+  private (T result, double ms) Timed<T>(Func<T> fn)
+  {
+    var sw = Stopwatch.StartNew();
+    var result = fn();
+    sw.Stop();
+    return (result, sw.Elapsed.TotalMilliseconds);
+  }
 }
+

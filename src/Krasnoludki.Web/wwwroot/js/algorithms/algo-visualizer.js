@@ -3,10 +3,12 @@ const algorithmResults =
 
 const canvas = document.getElementById("algoCanvas");
 const ctx = canvas.getContext("2d");
-const currentAlgo = new URLSearchParams(window.location.search).get("algorithm");
+const currentAlgo = new URLSearchParams(window.location.search).get(
+  "algorithm",
+);
 
-const DWARF_NODES = INITIAL_NODES.filter(n => n.type === "dwarf");
-const MINE_NODES = INITIAL_NODES.filter(n => n.type === "mine");
+const DWARF_NODES = INITIAL_NODES.filter((n) => n.type === "dwarf");
+const MINE_NODES = INITIAL_NODES.filter((n) => n.type === "mine");
 const RMQ_DWARVES = [...DWARF_NODES].sort((a, b) => a.x - b.x);
 
 let selectedDwarfs = [];
@@ -28,6 +30,8 @@ function screenToWorld(sx, sy) {
     y: (sy - camera.y) / camera.zoom,
   };
 }
+
+console.log(INITIAL_NODES)
 
 function applyCamera() {
   ctx.setTransform(camera.zoom, 0, 0, camera.zoom, camera.x, camera.y);
@@ -172,8 +176,8 @@ async function runAlgorithm(algorithmType) {
   if (!algorithmType) return;
 
   const btn = document.getElementById("algo-run-button");
+  const execTimeSpan = document.querySelector(".execution-time");
   btn.disabled = true;
-  btn.innerText = "Trwają obliczenia...";
 
   try {
     let res;
@@ -182,7 +186,12 @@ async function runAlgorithm(algorithmType) {
       case "convexHull": {
         const payload = INITIAL_NODES;
         res = await MapApiService.calculateConvexHull(payload);
-        if (res.success) drawConvexHull(res.data);
+        if (res.success) {
+          execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
+            2,
+          )}s`;
+          drawConvexHull(res.data);
+        }
         break;
       }
       case "matching": {
@@ -190,9 +199,11 @@ async function runAlgorithm(algorithmType) {
           dwarves: DWARF_NODES,
           mines: MINE_NODES,
         };
-        console.log("Wysyłany payload do matching:", payload);
         res = await MapApiService.calculateMatching(payload);
         if (res.success) {
+          execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
+            2,
+          )}s`;
           drawMatching(res.data);
         }
         break;
@@ -202,20 +213,28 @@ async function runAlgorithm(algorithmType) {
           dwarves: DWARF_NODES,
           mines: MINE_NODES,
         };
-        console.log("Wysyłany payload do minCost:", payload);
         res = await MapApiService.calculateMinCost(payload);
-        if (res.success) drawMinCost(res.data);
+        if (res.success) {
+          execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
+            2,
+          )}s`;
+          drawMinCost(res.data);
+        }
         break;
       }
       case "rmq": {
         console.log("Zaznaczeni krasnoludki do RMQ:", selectedDwarfs);
-        const payload = selectedDwarfs.map((s) => ({
-          ...s,
-          pointId: Number(s.id),
-          voiceLoudness: s.loudness ?? 0,
-        }));
+        const payload = {
+          dwarves: selectedDwarfs,
+        }
         res = await MapApiService.calculateSegmentTree(payload);
         if (res.success) {
+          execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
+            2,
+          )}s`;
+
+          console.log("Wynik RMQ:", res.data);
+
           drawRMQ();
           drawLoudestDwarf(res.data.loudestDwarfId);
         }
@@ -231,7 +250,6 @@ async function runAlgorithm(algorithmType) {
     alert("Wystąpił błąd podczas wykonywania algorytmu: " + err.message);
   } finally {
     btn.disabled = false;
-    btn.innerText = "Uruchom";
   }
 }
 
@@ -293,7 +311,9 @@ function drawMatching(data) {
     const mines = MINE_NODES;
 
     data.assignments.forEach((a) => {
-      const dwarf = dwarves.find((d) => Number(d.pointId) === Number(a.dwarfId));
+      const dwarf = dwarves.find(
+        (d) => Number(d.pointId) === Number(a.dwarfId),
+      );
       const mine = mines.find((m) => Number(m.pointId) === Number(a.mineId));
       if (!dwarf || !mine) return;
 
@@ -332,8 +352,12 @@ function showMatchingStats(data) {
 function drawMinCost(data) {
   drawScene(() => {
     data.assignments.forEach((a) => {
-      const dwarf = DWARF_NODES.find((d) => Number(d.pointId) === Number(a.dwarfId));
-      const mine = MINE_NODES.find((m) => Number(m.pointId) === Number(a.mineId));
+      const dwarf = DWARF_NODES.find(
+        (d) => Number(d.pointId) === Number(a.dwarfId),
+      );
+      const mine = MINE_NODES.find(
+        (m) => Number(m.pointId) === Number(a.mineId),
+      );
       if (!dwarf || !mine) return;
 
       const dist = Math.sqrt(
@@ -452,19 +476,19 @@ function showRMQStats(data) {
   if (!statsDiv) return;
   statsDiv.classList.remove("disabled");
 
-  const loudestDwarf = INITIAL_NODES.find(
-    (n) => n.type === "dwarf" && Number(n.id) === Number(data.loudestDwarfId),
+  const loudestDwarf = DWARF_NODES.find(
+    (d) => Number(d.pointId) === Number(data.loudestDwarfId),
   );
 
   statsDiv.innerHTML = `
-    <p>Najgłośniejszy krasnolud: <strong>${loudestDwarf ? loudestDwarf.id : "Nie znaleziono"}</strong></p>
-    <p>Głośność: <strong>${loudestDwarf ? loudestDwarf.loudness : "Nie znaleziono"}</strong></p>
+    <p>Najgłośniejszy krasnolud: <strong>${loudestDwarf ? loudestDwarf.pointId : "Nie znaleziono"}</strong></p>
+    <p>Głośność: <strong>${loudestDwarf ? loudestDwarf.voiceLoudness : "Nie znaleziono"}</strong></p>
   `;
 }
 
 function drawLoudestDwarf(dwarfId) {
   const dwarf = INITIAL_NODES.find(
-    (n) => n.type === "dwarf" && Number(n.id) === Number(dwarfId),
+    (n) => n.type === "dwarf" && Number(n.pointId) === Number(dwarfId),
   );
   if (!dwarf) return;
 
@@ -477,6 +501,7 @@ function drawLoudestDwarf(dwarfId) {
 }
 
 function loadAlgorithmResults() {
+  console.log(algorithmResults);
   switch (currentAlgo) {
     case "convexHull":
       if (algorithmResults.convexHull)
