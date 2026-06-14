@@ -182,13 +182,13 @@ body {
   cursor: crosshair;
   box-sizing: border-box;
   background-color: #e8dcc4;
-  background-image:
+  /* background-image:
     radial-gradient(
       circle at center,
       transparent 40%,
       rgba(101, 67, 33, 0.6) 120%
     ),
-    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>');
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>'); */
   cursor: crosshair;
   box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
@@ -397,15 +397,11 @@ aside.book-aside .aside-item {
   display: flex;
   gap: 16px;
   align-items: center;
-  width: 300px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-}
-
-.algo-button:last-child {
-  border-bottom: none;
+  width: 100%;
 }
 
 .algo-button span {
@@ -789,7 +785,7 @@ main {
 }
 
 .algo-stats {
-  margin-top: 16px;
+  margin: 16px 0;
   padding: 16px;
   border: 1px solid var(--border-strong);
   background-color: var(--color-card);
@@ -835,7 +831,7 @@ main {
 }
 
 .yellow {
-  background-color: #FFD700;
+  background-color: #ffd700;
 }
 
 .black {
@@ -843,13 +839,58 @@ main {
 }
 
 .silver {
-  background-color: #C0C0C0;
+  background-color: #c0c0c0;
 }
 
 .green {
-  background-color: #4E9A06;
+  background-color: #4e9a06;
 }
 
 .white {
-  background-color: #E0E0E0;
+  background-color: #e0e0e0;
+}
+
+.algo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.algo-header h2 {
+  font-size: 24px;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.algo-view-container.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.algo-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.algo-actions .execution-time {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  width: 100%;
+}
+
+.algo-actions button {
+  width: auto !important;
+}
+
+.algo-list {
+  display: flex;
+  justify-content: between;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
 }

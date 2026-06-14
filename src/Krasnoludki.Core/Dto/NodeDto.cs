@@ -7,7 +7,7 @@ public class NodeDto
 {
     [JsonPropertyName("pointId")]
     public int Id { get; set; }
-    
+
     [JsonPropertyName("x")]
     public double X { get; set; }
 
@@ -19,6 +19,9 @@ public class NodeDto
 
     [JsonPropertyName("preferredMinerals")]
     public List<string> Minerals { get; set; } = new();
+
+    [JsonPropertyName("resource")]
+    public string Resource { get; set; }
 
     [JsonPropertyName("capacity")]
     public int? Capacity { get; set; }
