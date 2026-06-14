@@ -3,6 +3,11 @@ const algorithmResults =
 
 const canvas = document.getElementById("algoCanvas");
 const ctx = canvas.getContext("2d");
+const currentAlgo = new URLSearchParams(window.location.search).get("algorithm");
+
+const DWARF_NODES = INITIAL_NODES.filter(n => n.type === "dwarf");
+const MINE_NODES = INITIAL_NODES.filter(n => n.type === "mine");
+const RMQ_DWARVES = [...DWARF_NODES].sort((a, b) => a.x - b.x);
 
 let selectedDwarfs = [];
 
@@ -10,7 +15,7 @@ const camera = {
   x: 0,
   y: 0,
   zoom: 1,
-  minZoom: 0.2,
+  minZoom: 0.05,
   maxZoom: 5,
 };
 
@@ -114,7 +119,7 @@ function drawDwarf(node, options = {}) {
 
   ctx.fillStyle = "#fff";
   ctx.font = "16px Arial";
-  node.minerals.forEach((mineral, i) => {
+  node.preferredMinerals.forEach((mineral, i) => {
     ctx.fillText(mineral, x - 48, y + 24 + i * 18);
   });
 
@@ -124,11 +129,11 @@ function drawDwarf(node, options = {}) {
     ctx.fillText(`id: ${index}`, x, y + 24);
   }
 
-  if (showLoudness && node.loudness) {
+  if (showLoudness && node.voiceLoudness) {
     ctx.fillStyle = "#fff";
     ctx.font = "16px Arial";
     ctx.textBaseline = "bottom";
-    ctx.fillText(`${node.loudness}dB`, x, y - 17);
+    ctx.fillText(`${node.voiceLoudness}dB`, x, y - 17);
 
     if (isLoudest) {
       ctx.fillStyle = "#5fff5f";
@@ -175,13 +180,17 @@ async function runAlgorithm(algorithmType) {
 
     switch (algorithmType) {
       case "convexHull": {
-        const payload = INITIAL_NODES.map((n) => ({ x: n.x, y: n.y }));
+        const payload = INITIAL_NODES;
         res = await MapApiService.calculateConvexHull(payload);
         if (res.success) drawConvexHull(res.data);
         break;
       }
       case "matching": {
-        const payload = buildMatchingPayload();
+        const payload = {
+          dwarves: DWARF_NODES,
+          mines: MINE_NODES,
+        };
+        console.log("Wysyłany payload do matching:", payload);
         res = await MapApiService.calculateMatching(payload);
         if (res.success) {
           drawMatching(res.data);
@@ -189,7 +198,11 @@ async function runAlgorithm(algorithmType) {
         break;
       }
       case "minCost": {
-        const payload = buildMatchingPayload();
+        const payload = {
+          dwarves: DWARF_NODES,
+          mines: MINE_NODES,
+        };
+        console.log("Wysyłany payload do minCost:", payload);
         res = await MapApiService.calculateMinCost(payload);
         if (res.success) drawMinCost(res.data);
         break;
@@ -220,25 +233,6 @@ async function runAlgorithm(algorithmType) {
     btn.disabled = false;
     btn.innerText = "Uruchom";
   }
-}
-
-function buildMatchingPayload() {
-  return {
-    dwarves: INITIAL_NODES.filter((n) => n.type === "dwarf").map((n) => ({
-      pointId: n.id,
-      x: n.x,
-      y: n.y,
-      preferredMinerals: n.minerals,
-      voiceLoudness: n.loudness ?? 0,
-    })),
-    mines: INITIAL_NODES.filter((n) => n.type === "mine").map((n) => ({
-      pointId: n.id,
-      x: n.x,
-      y: n.y,
-      resource: n.minerals[0],
-      capacity: n.capacity ?? 1,
-    })),
-  };
 }
 
 function drawConvexHull(hullPoints) {
@@ -293,27 +287,14 @@ function showConvexHullStats(data) {
 }
 
 function drawMatching(data) {
+  console.log("Dane do rysowania matching:", data);
   drawScene(() => {
-    const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
-    const mines = INITIAL_NODES.filter((n) => n.type === "mine");
-
-    dwarves.forEach((d) => {
-      mines.forEach((m) => {
-        if (!d.minerals.some((min) => m.minerals.includes(min))) return;
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(60,55,40,0.15)";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(m.x, m.y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      });
-    });
+    const dwarves = DWARF_NODES;
+    const mines = MINE_NODES;
 
     data.assignments.forEach((a) => {
-      const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
-      const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
+      const dwarf = dwarves.find((d) => Number(d.pointId) === Number(a.dwarfId));
+      const mine = mines.find((m) => Number(m.pointId) === Number(a.mineId));
       if (!dwarf || !mine) return;
 
       ctx.beginPath();
@@ -350,26 +331,9 @@ function showMatchingStats(data) {
 
 function drawMinCost(data) {
   drawScene(() => {
-    const dwarves = INITIAL_NODES.filter((n) => n.type === "dwarf");
-    const mines = INITIAL_NODES.filter((n) => n.type === "mine");
-
-    dwarves.forEach((d) => {
-      mines.forEach((m) => {
-        if (!d.minerals.some((min) => m.minerals.includes(min))) return;
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(60,55,40,0.15)";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(m.x, m.y);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      });
-    });
-
     data.assignments.forEach((a) => {
-      const dwarf = dwarves.find((d) => Number(d.id) === Number(a.dwarfId));
-      const mine = mines.find((m) => Number(m.id) === Number(a.mineId));
+      const dwarf = DWARF_NODES.find((d) => Number(d.pointId) === Number(a.dwarfId));
+      const mine = MINE_NODES.find((m) => Number(m.pointId) === Number(a.mineId));
       if (!dwarf || !mine) return;
 
       const dist = Math.sqrt(
@@ -378,12 +342,10 @@ function drawMinCost(data) {
       const ratio = Math.min(dist / 500, 1);
       const r = Math.round(ratio * 200);
       const g = Math.round((1 - ratio) * 170 + 80);
-      const color = a.isPenalized ? "#a060c0" : `rgb(${r},${g},50)`;
 
       ctx.beginPath();
-      ctx.strokeStyle = color;
-      ctx.lineWidth = a.isPenalized ? 1.5 : 2.5;
-      ctx.setLineDash(a.isPenalized ? [4, 4] : []);
+      ctx.strokeStyle = `rgba(${r},${g},100,0.7)`;
+      ctx.lineWidth = 2.5;
       ctx.moveTo(dwarf.x, dwarf.y);
       ctx.lineTo(mine.x, mine.y);
       ctx.stroke();
@@ -411,13 +373,11 @@ function showMinCostStats(data) {
   statsDiv.classList.remove("disabled");
 
   const sumOfDistances = data.realCost;
-  const dwarfsWithPenalties = data.penalizedCount;
   const maxFlow = data.maxFlow;
   const dwarfsCount = data.employedCount;
 
   statsDiv.innerHTML = `
     <p>Suma odległości: <strong>${sumOfDistances.toFixed(2)}</strong></p>
-    <p>Krasnoludki z karą: <strong>${dwarfsWithPenalties}</strong></p>
     <p>Max flow: <strong>${maxFlow}</strong></p>
     <p>Przydzielone krasnoludki: <strong>${dwarfsCount}</strong></p>
   `;
@@ -425,8 +385,6 @@ function showMinCostStats(data) {
 
 function drawRMQ() {
   drawScene(() => {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const rmqDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").sort(
       (a, b) => a.x - b.x,
     );
@@ -519,9 +477,7 @@ function drawLoudestDwarf(dwarfId) {
 }
 
 function loadAlgorithmResults() {
-  const algo = new URLSearchParams(window.location.search).get("algorithm");
-
-  switch (algo) {
+  switch (currentAlgo) {
     case "convexHull":
       if (algorithmResults.convexHull)
         drawConvexHull(algorithmResults.convexHull.hullPoints);
@@ -542,13 +498,6 @@ function loadAlgorithmResults() {
       drawAllNodes();
   }
 }
-
-canvas.addEventListener("mousemove", (e) => {
-  if (!isDragging) return;
-  const coords = getCanvasCoords(e);
-  dragEnd = { ...coords };
-  drawRMQ();
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   setupCanvas();
@@ -668,8 +617,6 @@ canvas.addEventListener("mouseup", (e) => {
 
   drawRMQ();
 });
-
-canvas.addEventListener("wheel", (e) => e.preventDefault(), { passive: false });
 
 function zoomToCenter(factor) {
   const W = getCW();

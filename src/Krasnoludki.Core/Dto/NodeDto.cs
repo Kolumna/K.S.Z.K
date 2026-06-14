@@ -5,7 +5,7 @@ namespace Krasnoludki.Core.DTOs;
 
 public class NodeDto
 {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("pointId")]
     public int Id { get; set; }
     
     [JsonPropertyName("x")]
@@ -17,11 +17,11 @@ public class NodeDto
     [JsonPropertyName("type")]
     public string Type { get; set; }
 
-    [JsonPropertyName("minerals")]
+    [JsonPropertyName("preferredMinerals")]
     public List<string> Minerals { get; set; } = new();
 
     [JsonPropertyName("capacity")]
     public int? Capacity { get; set; }
-    [JsonPropertyName("loudness")]
+    [JsonPropertyName("voiceLoudness")]
     public int? Loudness { get; set; }
 }

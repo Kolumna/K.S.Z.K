@@ -156,7 +156,24 @@ public class AlgorithmsModel : PageModel
     List<Dwarf> dwarves = input.Dwarves;
     List<Mine> mines = input.Mines;
 
+    Console.WriteLine("Otrzymane dane do matching:");
+    Console.WriteLine("Dwarves:");
+    foreach (var d in dwarves)
+    {
+      Console.WriteLine($"- Id: {d.PointId}, Loudness: {d.VoiceLoudness}, x: {d.x}, y: {d.y}");
+    }
+    Console.WriteLine("Mines:");
+    foreach (var m in mines)
+    {
+      Console.WriteLine($"- Id: {m.PointId}, Capacity: {m.Capacity}");
+    }
+
     List<int[]> assigned = DwarfAssigning.Assign(dwarves, mines);
+
+    Console.WriteLine("Assigned pairs:");
+    foreach (var pair in assigned)    {
+      Console.WriteLine($"Dwarf {pair[0]} -> Mine {pair[1]}");
+    }
 
     var result = new MatchingResultDto
     {
