@@ -89,6 +89,7 @@ namespace Krasnoludki.Web.Pages
 
     public IActionResult OnPostUpdateHoffApi([FromBody] SaveRequest request)
     {
+      Console.WriteLine("Otrzymano żądanie aktualizacji scenariusza:", request);
       if (request == null || string.IsNullOrEmpty(request.NodesJson))
         return BadRequest("Brak danych");
 

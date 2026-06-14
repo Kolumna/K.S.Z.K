@@ -103,7 +103,7 @@ function redrawCanvas() {
     // });
 
     nodes.forEach((node) => {
-      drawNodeGraphics(node.x, node.y, node.type, node.minerals);
+      drawNodeGraphics(node.x, node.y, node.type, node.preferredMinerals);
     });
   });
 }
@@ -345,14 +345,9 @@ async function updateMapBtn() {
   try {
     showLoading("Zapisywanie mapy...");
 
-    const nodesWithCorrectIds = nodes.map((node, index) => ({
-      ...node,
-      id: index + 1,
-    }));
-
     console.log("Wysyłanie danych do serwera:", {
       scenarioId,
-      nodes: nodesWithCorrectIds,
+      nodes,
     });
 
     const res = await fetch("?handler=UpdateHoffApi", {
@@ -362,7 +357,7 @@ async function updateMapBtn() {
       },
       body: JSON.stringify({
         scenarioId,
-        nodes: JSON.stringify(nodesWithCorrectIds),
+        nodes: JSON.stringify(nodes),
       }),
     });
 
