@@ -189,8 +189,8 @@ body {
       rgba(101, 67, 33, 0.6) 120%
     ),
     url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>');
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
   cursor: crosshair;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
 #algoCanvas {
@@ -199,7 +199,14 @@ body {
   display: block;
   border-bottom: 1px solid var(--border-strong);
   border-left: 1px solid var(--border-strong);
-  background-color: var(--color-surface);
+  background-color: #e8dcc4;
+  background-image:
+    radial-gradient(
+      circle at center,
+      transparent 40%,
+      rgba(101, 67, 33, 0.6) 120%
+    ),
+    url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noise)" opacity="0.12"/></svg>');
   cursor: crosshair;
   box-sizing: border-box;
 }
@@ -800,4 +807,49 @@ main {
 
 .algo-stats.disabled {
   display: none;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+}
+
+.map-legend .legend-item {
+  font-size: 14px;
+  padding: 4px 8px;
+  background-color: var(--color-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: 4px;
+  margin-top: 4px;
+  display: flex;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border: 1px solid black;
+  border-radius: 100%;
+  margin-right: 8px;
+}
+
+.yellow {
+  background-color: #FFD700;
+}
+
+.black {
+  background-color: #0f1212;
+}
+
+.silver {
+  background-color: #C0C0C0;
+}
+
+.green {
+  background-color: #4E9A06;
+}
+
+.white {
+  background-color: #E0E0E0;
 }
