@@ -154,36 +154,35 @@ const oreSvgRaw = `<svg width="36" height="36" viewBox="0 0 36 36" fill="none" x
 </svg>
 `;
 
-const nodeIcons = {
-  dwarf: new Image(),
-  mine: new Image(),
-};
+const imageCache = {};
 
-nodeIcons.dwarf.onload = () => redrawAll();
-nodeIcons.mine.onload = () => redrawAll();
+function getCachedImage(type, color) {
+  const key = `${type}_${color}`;
 
-const getImg = ({ color }) => {
-  nodeIcons.dwarf.src =
-    "data:image/svg+xml;utf8," + encodeURIComponent(dwarfSvgRaw(color));
-  nodeIcons.mine.src =
-    "data:image/svg+xml;utf8," + encodeURIComponent(mineSvgRaw(color));
+  if (imageCache[key]) {
+    return imageCache[key];
+  }
 
-  return nodeIcons[MapState.mode];
-};
+  const img = new Image();
+  const svgRaw = type === "dwarf" ? dwarfSvgRaw(color) : mineSvgRaw(color);
+  img.src = "data:image/svg+xml;utf8," + encodeURIComponent(svgRaw);
+
+  img.onload = () => redrawAll();
+
+  imageCache[key] = img;
+  return img;
+}
 
 function drawNodeGraphics(x, y, type, minerals = []) {
   const size = 44;
   const offset = size / 2;
-  const img = nodeIcons[type];
 
-  if (img && img.complete) {
-    ctx.drawImage(
-      getImg({ color: minerals.includes("Uranium") ? "#35ff43" : "white" }),
-      x - offset,
-      y - offset,
-      size,
-      size,
-    );
+  const color = minerals.includes("Uranium") ? "#35ff43" : "white";
+
+  const img = getCachedImage(type, color);
+
+  if (img && img.complete && img.naturalWidth !== 0) {
+    ctx.drawImage(img, x - offset, y - offset, size, size);
   } else {
     ctx.beginPath();
     ctx.arc(x, y, 20, 0, Math.PI * 2);
