@@ -85,6 +85,7 @@ function renderMap() {
 
 document.addEventListener("DOMContentLoaded", () => {
   setupCanvas();
+  fitCameraToNodes();
   renderMap();
 });
 
@@ -196,4 +197,42 @@ function resetZoom() {
   camera.x = 0;
   camera.y = 0;
   camera.zoom = 1;
+}
+
+function fitCameraToNodes() {
+  if (!nodes || nodes.length === 0) return;
+
+  let minX = Infinity;
+  let minY = Infinity;
+  let maxX = -Infinity;
+  let maxY = -Infinity;
+
+  nodes.forEach((node) => {
+    if (node.x < minX) minX = node.x;
+    if (node.y < minY) minY = node.y;
+    if (node.x > maxX) maxX = node.x;
+    if (node.y > maxY) maxY = node.y;
+  });
+
+  if (minX === maxX) { minX -= 50; maxX += 50; }
+  if (minY === maxY) { minY -= 50; maxY += 50; }
+
+  const mapWidth = maxX - minX;
+  const mapHeight = maxY - minY;
+  const rect = canvas.getBoundingClientRect();
+
+  const padding = 40;
+
+  const zoomX = (rect.width - padding * 2) / mapWidth;
+  const zoomY = (rect.height - padding * 2) / mapHeight;
+
+  let requiredZoom = Math.min(zoomX, zoomY);
+
+  camera.zoom = Math.max(camera.minZoom, Math.min(requiredZoom, camera.maxZoom));
+
+  const centerX = minX + mapWidth / 2;
+  const centerY = minY + mapHeight / 2;
+
+  camera.x = (rect.width / 2) - (centerX * camera.zoom);
+  camera.y = (rect.height / 2) - (centerY * camera.zoom);
 }
