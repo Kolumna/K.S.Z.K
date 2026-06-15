@@ -102,7 +102,11 @@ function downloadResults(algorithmType) {
 
 const setLoadingState = (algorithmType, isLoading) => {
   const btn = document.getElementById(`algo-run-button-${algorithmType}`);
-  btn.disabled = isLoading;
+
+  if (isLoading) {
+    btn.disabled = isLoading;
+    btn.textContent = "Ładowanie...";
+  }
 };
 
 document.addEventListener("DOMContentLoaded", () => {
