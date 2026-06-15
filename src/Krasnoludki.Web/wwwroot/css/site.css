@@ -981,6 +981,7 @@ main {
   font-size: 20px;
   color: var(--text-primary);
   font-family: var(--font-mono);
+}
   
 .algo-action-buttons {
   display: flex;
