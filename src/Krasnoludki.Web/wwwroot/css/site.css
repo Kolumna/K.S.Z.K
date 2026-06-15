@@ -983,3 +983,9 @@ main {
   gap: 16px;
   margin-top: 16px;
 }
+
+.compression-stats p, .compression-stats strong {
+  font-size: 20px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+}
