@@ -8,6 +8,9 @@ const currentAlgo = new URLSearchParams(window.location.search).get(
   "algorithm",
 );
 
+let from;
+let to;
+
 async function setRunningAlgoSession(algorithmType, isRunning) {
   await fetch("?handler=SetRunningAlgo", {
     method: "POST",
@@ -43,14 +46,14 @@ async function runAlgorithm(algorithmType) {
 
         break;
       case "rmq": {
-        const from = parseInt(
-          document.getElementById("rmq-from-input")?.value ?? "0",
+        const fromValue = parseInt(
+          document.getElementById("rmq-from-input")?.value || from,
         );
-        const to = parseInt(
-          document.getElementById("rmq-to-input")?.value ?? "100",
+        const toValue = parseInt(
+          document.getElementById("rmq-to-input")?.value || to,
         );
         const dwarfsCompartment = DWARF_NODES.filter(
-          (d) => d.pointId >= from && d.pointId <= to,
+          (d) => d.pointId >= fromValue && d.pointId <= toValue,
         );
         res = await MapApiService.calculateSegmentTree({
           dwarves: dwarfsCompartment,
@@ -112,5 +115,16 @@ const setLoadingState = (algorithmType, isLoading) => {
 document.addEventListener("DOMContentLoaded", () => {
   if (Array.isArray(RUNNING_ALGOS)) {
     RUNNING_ALGOS.forEach((algo) => setLoadingState(algo, true));
+  }
+});
+
+document.addEventListener("rmqSelectionReady", (event) => {
+  const data = event.detail;
+
+  if (data.leftIndex !== null && data.rightIndex !== null) {
+    from = data.leftIndex;
+    to = data.rightIndex;
+  } else {
+    console.log("Nie wybrano zakresu");
   }
 });

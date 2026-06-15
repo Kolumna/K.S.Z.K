@@ -8,6 +8,16 @@ let isDragging = false;
 let dragStart = { x: 0, y: 0 };
 let dragEnd = { x: 0, y: 0 };
 
+const mineralsNames = {
+  Silver: "Srebro",
+  Gold: "Złoto",
+  Quartz: "Kwarc",
+  Coal: "Węgiel",
+  Uranium: "Uran",
+};
+
+let hoveredNode = null;
+
 const camera = {
   x: 0,
   y: 0,
@@ -43,11 +53,29 @@ function resetTransform() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
 }
 
+function getNodeAt(x, y) {
+  if (typeof INITIAL_NODES === "undefined" || !INITIAL_NODES) return null;
+
+  for (let i = INITIAL_NODES.length - 1; i >= 0; i--) {
+    const node = INITIAL_NODES[i];
+    const dx = x - node.x;
+    const dy = y - node.y;
+
+    if (Math.sqrt(dx * dx + dy * dy) <= 22) {
+      return node;
+    }
+  }
+  return null;
+}
+
 function drawScene(drawFn) {
   resetTransform();
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   applyCamera();
   drawFn();
+  if (hoveredNode) {
+    drawTooltip(hoveredNode);
+  }
   resetTransform();
 }
 
@@ -79,7 +107,12 @@ function getCH() {
 
 function drawNodeGraphics(x, y, type) {
   ctx.beginPath();
-  ctx.arc(x, y, 20, 0, Math.PI * 2);
+  if (type === "dwarf") {
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+  } else if (type === "mine") {
+    ctx.rect(x - 18, y - 18, 36, 36);
+  }
+
   ctx.fillStyle = type === "dwarf" ? "#1A3A5A" : "#3A2010";
   ctx.fill();
   ctx.strokeStyle = "#000";
@@ -114,26 +147,73 @@ function drawDwarf(node, options = {}) {
 
   drawNodeGraphics(x, y, node.type);
 
-  ctx.fillStyle = "#fff";
-  ctx.font = "16px Arial";
-  (node.preferredMinerals ?? []).forEach((mineral, i) => {
-    ctx.fillText(mineral, x - 48, y + 24 + i * 18);
-  });
+  // ctx.fillStyle = "#fff";
+  // ctx.font = "16px Arial";
+  // (node.preferredMinerals ?? []).forEach((mineral, i) => {
+  //   ctx.fillText(mineral, x - 48, y + 24 + i * 18);
+  // });
 
-  if (showIndex) {
-    ctx.fillStyle = "#fff";
-    ctx.font = "16px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(`id: ${index}`, x, y + 24);
-  }
+  // if (showIndex) {
+  //   ctx.fillStyle = "#fff";
+  //   ctx.font = "16px Arial";
+  //   ctx.textAlign = "center";
+  //   ctx.textBaseline = "middle";
+  //   ctx.fillText(`id: ${index}`, x, y + 24);
+  // }
 
   if (showLoudness && node.voiceLoudness) {
-    ctx.fillStyle = isLoudest ? "#5fff5f" : "#fff";
-    ctx.font = "16px Arial";
+    const text = `${node.voiceLoudness} dB`;
+
+    ctx.save();
+
+    ctx.font = "bold 13px 'Segoe UI', Arial, sans-serif";
+
+    const textWidth = ctx.measureText(text).width;
+    const paddingX = 8;
+    const height = 22;
+
+    const badgeY = y - 32;
+
+    ctx.beginPath();
+
+    if (isLoudest) {
+      ctx.fillStyle = "#1A3320";
+      ctx.strokeStyle = "#5FFF5F";
+      ctx.lineWidth = 1.5;
+
+      ctx.shadowColor = "#5FFF5F";
+      ctx.shadowBlur = 8;
+    } else {
+      ctx.fillStyle = "#2B2D31";
+
+      ctx.shadowColor = "rgba(0, 0, 0, 0.6)";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 2;
+    }
+
+    ctx.roundRect(
+      x - textWidth / 2 - paddingX,
+      badgeY - height / 2,
+      textWidth + paddingX * 2,
+      height,
+      height / 2,
+    );
+    ctx.fill();
+
+    if (isLoudest) {
+      ctx.stroke();
+    }
+
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.fillStyle = isLoudest ? "#5FFF5F" : "#FFFFFF";
     ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(`${node.voiceLoudness}dB`, x, y - 17);
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(text, x, badgeY + 1);
+
+    ctx.restore();
   }
 }
 
@@ -181,6 +261,23 @@ function drawLoudestDwarf(dwarfId) {
 
 function drawRMQ() {
   drawScene(() => {
+    let boxMinX, boxMaxX, boxMinY, boxMaxY;
+    let shouldDrawBox = false;
+
+    if (isDragging) {
+      boxMinX = Math.min(dragStart.x, dragEnd.x);
+      boxMaxX = Math.max(dragStart.x, dragEnd.x);
+      boxMinY = Math.min(dragStart.y, dragEnd.y);
+      boxMaxY = Math.max(dragStart.y, dragEnd.y);
+      shouldDrawBox = true;
+    } else if (rmqSelectionBox.minX !== -1) {
+      boxMinX = rmqSelectionBox.minX;
+      boxMaxX = rmqSelectionBox.maxX;
+      boxMinY = rmqSelectionBox.minY;
+      boxMaxY = rmqSelectionBox.maxY;
+      shouldDrawBox = true;
+    }
+
     const rmqDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").sort(
       (a, b) => a.x - b.x,
     );
@@ -188,52 +285,72 @@ function drawRMQ() {
     INITIAL_NODES.filter((n) => n.type === "mine").forEach((m) => drawMine(m));
 
     rmqDwarves.forEach((dwarf, index) => {
-      const inBox =
-        rmqSelectionBox.minX !== -1 &&
-        dwarf.x >= rmqSelectionBox.minX &&
-        dwarf.x <= rmqSelectionBox.maxX &&
-        dwarf.y >= rmqSelectionBox.minY &&
-        dwarf.y <= rmqSelectionBox.maxY;
-
-      const inDrag =
-        isDragging &&
-        dwarf.x >= Math.min(dragStart.x, dragEnd.x) &&
-        dwarf.x <= Math.max(dragStart.x, dragEnd.x) &&
-        dwarf.y >= Math.min(dragStart.y, dragEnd.y) &&
-        dwarf.y <= Math.max(dragStart.y, dragEnd.y);
+      const isSelected =
+        shouldDrawBox &&
+        dwarf.x >= boxMinX &&
+        dwarf.x <= boxMaxX &&
+        dwarf.y >= boxMinY &&
+        dwarf.y <= boxMaxY;
 
       drawDwarf(dwarf, {
-        highlight: inBox || inDrag,
-        highlightColor: "#c8a030",
+        highlight: isSelected,
+        highlightColor: "#735e08",
         showIndex: true,
         index,
         showLoudness: true,
       });
     });
 
-    if (isDragging) {
+    if (shouldDrawBox) {
+      const width = boxMaxX - boxMinX;
+      const height = boxMaxY - boxMinY;
+
       ctx.save();
-      ctx.fillStyle = "rgba(241,196,15,0.1)";
-      ctx.strokeStyle = "#f1c40f";
+
+      const fillGradient = ctx.createLinearGradient(
+        boxMinX,
+        boxMinY,
+        boxMinX,
+        boxMaxY,
+      );
+      fillGradient.addColorStop(0, "rgba(241, 196, 15, 0.05)");
+      fillGradient.addColorStop(1, "rgba(241, 196, 15, 0.2)");
+      ctx.fillStyle = fillGradient;
+      ctx.fillRect(boxMinX, boxMinY, width, height);
+
+      ctx.strokeStyle = "#F1C40F";
       ctx.lineWidth = 1.5;
-      ctx.setLineDash([4, 4]);
-      ctx.fillRect(
-        dragStart.x,
-        dragStart.y,
-        dragEnd.x - dragStart.x,
-        dragEnd.y - dragStart.y,
-      );
-      ctx.strokeRect(
-        dragStart.x,
-        dragStart.y,
-        dragEnd.x - dragStart.x,
-        dragEnd.y - dragStart.y,
-      );
+      ctx.setLineDash([8, 6]);
+      ctx.shadowColor = "#F1C40F";
+      ctx.shadowBlur = 6;
+      ctx.strokeRect(boxMinX, boxMinY, width, height);
+
+      ctx.setLineDash([]);
+      ctx.lineWidth = 3;
+      ctx.shadowBlur = 0;
+      const cornerSize = Math.min(15, width / 4, height / 4);
+
+      ctx.beginPath();
+      ctx.moveTo(boxMinX, boxMinY + cornerSize);
+      ctx.lineTo(boxMinX, boxMinY);
+      ctx.lineTo(boxMinX + cornerSize, boxMinY);
+      ctx.moveTo(boxMaxX - cornerSize, boxMinY);
+      ctx.lineTo(boxMaxX, boxMinY);
+      ctx.lineTo(boxMaxX, boxMinY + cornerSize);
+      ctx.moveTo(boxMaxX, boxMaxY - cornerSize);
+      ctx.lineTo(boxMaxX, boxMaxY);
+      ctx.lineTo(boxMaxX - cornerSize, boxMaxY);
+      ctx.moveTo(boxMinX + cornerSize, boxMaxY);
+      ctx.lineTo(boxMinX, boxMaxY);
+      ctx.lineTo(boxMinX, boxMaxY - cornerSize);
+      ctx.stroke();
+
       ctx.restore();
     }
 
     if (algorithmResults.segmentTree?.loudestDwarfId) {
       drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
+      showRMQStats(algorithmResults.segmentTree);
     }
   });
 }
@@ -323,35 +440,121 @@ function renderLoop() {
   requestAnimationFrame(renderLoop);
 }
 
+function drawTooltip(node) {
+  if (!node) return;
+
+  ctx.save();
+
+  const lines = [
+    `${node.type === "dwarf" ? "Krasnoludek" : "Kopalnia"} (Id: ${node.pointId})`,
+  ];
+
+  if (node.type === "dwarf") {
+    lines.push(
+      `Minerały: ${node.preferredMinerals?.map((m) => mineralsNames[m]).join(", ") || "Brak"}`,
+    );
+    lines.push(`Głośność: ${node.voiceLoudness || 0}`);
+  } else {
+    lines.push(
+      `Zasób: ${node.resource ? mineralsNames[node.resource] : "Brak"}`,
+    );
+    lines.push(`Pojemność: ${node.capacity || 0}`);
+  }
+
+  ctx.font = "14px monospace";
+
+  let maxWidth = 0;
+  lines.forEach((line) => {
+    const width = ctx.measureText(line).width;
+    if (width > maxWidth) maxWidth = width;
+  });
+
+  const padding = 10;
+  const boxWidth = maxWidth + padding * 2;
+  const boxHeight = lines.length * 20 + padding;
+
+  const tooltipX = node.x + 20;
+  const tooltipY = node.y - boxHeight - 10;
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(tooltipX, tooltipY, boxWidth, boxHeight, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  lines.forEach((line, index) => {
+    ctx.fillText(line, tooltipX + padding, tooltipY + padding + index * 18);
+  });
+
+  ctx.restore();
+}
+
 function loadAlgorithmResults() {
   console.log(algorithmResults);
   switch (currentAlgo) {
     case "convexHull":
       if (algorithmResults.convexHull)
         drawConvexHull(algorithmResults.convexHull.hullPoints);
-      else drawScene(() => drawAllNodes());
+      else
+        drawScene(() => {
+          drawAllNodes();
+
+          if (hoveredNode) {
+            drawTooltip(hoveredNode);
+          }
+        });
       break;
     case "matching":
       if (algorithmResults.matching) drawMatching(algorithmResults.matching);
-      else drawScene(() => drawAllNodes());
+      else
+        drawScene(() => {
+          drawAllNodes();
+
+          if (hoveredNode) {
+            drawTooltip(hoveredNode);
+          }
+        });
       break;
     case "minCost":
       if (algorithmResults.minCost) drawMinCost(algorithmResults.minCost);
-      else drawScene(() => drawAllNodes());
+      else
+        drawScene(() => {
+          drawAllNodes();
+
+          if (hoveredNode) {
+            drawTooltip(hoveredNode);
+          }
+        });
       break;
     case "rmq":
       drawRMQ();
       break;
     default:
-      drawScene(() => drawAllNodes());
+      drawScene(() => {
+        drawAllNodes();
+
+        if (hoveredNode) {
+          drawTooltip(hoveredNode);
+        }
+      });
   }
 }
 
 function drawConvexHull(hullPoints) {
   drawScene(() => {
-    drawAllNodes();
+    if (!hullPoints || hullPoints.length < 3) {
+      drawAllNodes();
+      return;
+    }
 
-    if (!hullPoints || hullPoints.length < 3) return;
+    const hullColor = "#C07030";
+
+    ctx.save();
 
     ctx.beginPath();
     hullPoints.forEach((p, i) => {
@@ -359,20 +562,77 @@ function drawConvexHull(hullPoints) {
     });
     ctx.closePath();
 
-    ctx.fillStyle = "rgba(192,112,48,0.07)";
-    ctx.strokeStyle = "#c07030";
-    ctx.lineWidth = 2.5;
-    ctx.setLineDash([8, 4]);
+    const centerX =
+      hullPoints.reduce((sum, p) => sum + p.x, 0) / hullPoints.length;
+    const centerY =
+      hullPoints.reduce((sum, p) => sum + p.y, 0) / hullPoints.length;
+
+    const maxDist = Math.max(
+      ...hullPoints.map((p) => Math.hypot(p.x - centerX, p.y - centerY)),
+    );
+
+    const fillGradient = ctx.createRadialGradient(
+      centerX,
+      centerY,
+      0,
+      centerX,
+      centerY,
+      maxDist,
+    );
+    fillGradient.addColorStop(0, "rgba(192, 112, 48, 0.02)");
+    fillGradient.addColorStop(0.7, "rgba(192, 112, 48, 0.08)");
+    fillGradient.addColorStop(1, "rgba(192, 112, 48, 0.15)");
+
+    ctx.fillStyle = fillGradient;
     ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+
+    ctx.beginPath();
+    hullPoints.forEach((p, i) => {
+      i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+    });
+    ctx.closePath();
+
+    ctx.strokeStyle = hullColor;
+    ctx.lineWidth = 3.5;
+    ctx.setLineDash([12, 6]);
+    ctx.lineJoin = "round";
+
+    ctx.shadowColor = hullColor;
+    ctx.shadowBlur = 12;
+
     ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.restore();
 
     hullPoints.forEach((p) => {
+      ctx.save();
+
       ctx.beginPath();
-      ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = "#c07030";
+      ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = "#1A1A1D";
+      ctx.shadowColor = "rgba(0,0,0,0.5)";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 2;
       ctx.fill();
+
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = hullColor;
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#FFFFFF";
+
+      ctx.shadowColor = "#FFFFFF";
+      ctx.shadowBlur = 5;
+      ctx.fill();
+
+      ctx.restore();
     });
+
+    drawAllNodes();
     showConvexHullStats(hullPoints);
   });
 }
@@ -404,20 +664,41 @@ function drawMatching(data) {
     const dwarves = DWARF_NODES;
     const mines = MINE_NODES;
 
+    ctx.save();
+
     data.assignments.forEach((a) => {
       const dwarf = dwarves.find(
         (d) => Number(d.pointId) === Number(a.dwarfId),
       );
       const mine = mines.find((m) => Number(m.pointId) === Number(a.mineId));
+
       if (!dwarf || !mine) return;
 
+      const gradient = ctx.createLinearGradient(
+        dwarf.x,
+        dwarf.y,
+        mine.x,
+        mine.y,
+      );
+      gradient.addColorStop(0, "#4ADE80");
+      gradient.addColorStop(1, "#059669");
+
       ctx.beginPath();
-      ctx.strokeStyle = "#6aaa6a";
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = gradient;
+
+      ctx.lineWidth = 3.5;
+
+      ctx.shadowColor = "#4ADE80";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
       ctx.moveTo(dwarf.x, dwarf.y);
       ctx.lineTo(mine.x, mine.y);
       ctx.stroke();
     });
+
+    ctx.restore();
 
     drawAllNodes();
     showMatchingStats(data);
@@ -452,30 +733,62 @@ function drawMinCost(data) {
       const mine = MINE_NODES.find(
         (m) => Number(m.pointId) === Number(a.mineId),
       );
+
       if (!dwarf || !mine) return;
 
-      const dist = Math.sqrt(
-        Math.pow(dwarf.x - mine.x, 2) + Math.pow(dwarf.y - mine.y, 2),
-      );
+      const dist = Math.hypot(dwarf.x - mine.x, dwarf.y - mine.y);
+
       const ratio = Math.min(dist / 500, 1);
-      const r = Math.round(ratio * 200);
-      const g = Math.round((1 - ratio) * 170 + 80);
+
+      const hue = 120 - ratio * 120;
+      const lineColor = `hsla(${hue}, 80%, 45%, 0.85)`;
+
+      ctx.save();
 
       ctx.beginPath();
-      ctx.strokeStyle = `rgba(${r},${g},100,0.7)`;
-      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 3;
+
+      ctx.shadowColor = lineColor;
+      ctx.shadowBlur = 6;
+
       ctx.moveTo(dwarf.x, dwarf.y);
       ctx.lineTo(mine.x, mine.y);
       ctx.stroke();
-      ctx.setLineDash([]);
 
       const mx = (dwarf.x + mine.x) / 2;
       const my = (dwarf.y + mine.y) / 2;
-      ctx.fillStyle = "#fff";
-      ctx.font = "18px Arial";
+      const text = dist.toFixed(0);
+
+      ctx.font = "bold 13px 'Segoe UI', Arial, sans-serif";
+
+      const textWidth = ctx.measureText(text).width;
+      const paddingX = 8;
+      const paddingY = 4;
+      const height = 22;
+
+      ctx.fillStyle = "#2B2D31";
+      ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+      ctx.shadowBlur = 4;
+      ctx.shadowOffsetY = 2;
+
+      ctx.beginPath();
+      ctx.roundRect(
+        mx - textWidth / 2 - paddingX,
+        my - height / 2,
+        textWidth + paddingX * 2,
+        height,
+        height / 2,
+      );
+      ctx.fill();
+
+      ctx.shadowColor = "transparent";
+      ctx.fillStyle = "#FFFFFF";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(dist.toFixed(0), mx, my - 6);
+      ctx.fillText(text, mx, my + 1);
+
+      ctx.restore();
     });
 
     drawAllNodes();
@@ -656,17 +969,26 @@ document.addEventListener("DOMContentLoaded", () => {
       scheduleRedraw();
       return;
     }
-    if (!isDragging) return;
+
     const coords = getCanvasCoords(e);
     const world = screenToWorld(coords.x, coords.y);
-    dragEnd = { ...world };
-    scheduleRedraw();
+
+    if (isDragging) {
+      dragEnd = { ...world };
+      scheduleRedraw();
+    }
+
+    const newHoveredNode = getNodeAt(world.x, world.y);
+
+    if (hoveredNode !== newHoveredNode) {
+      hoveredNode = newHoveredNode;
+      scheduleRedraw();
+    }
   });
 
   canvas.addEventListener("mouseup", (e) => {
     if (isPanning) {
       isPanning = false;
-      canvas.style.cursor = "default";
       return;
     }
     if (!isDragging) return;
@@ -676,6 +998,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const maxX = Math.max(dragStart.x, dragEnd.x);
     const minY = Math.min(dragStart.y, dragEnd.y);
     const maxY = Math.max(dragStart.y, dragEnd.y);
+
     rmqSelectionBox = { minX, maxX, minY, maxY };
 
     const rmqDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").sort(
@@ -690,14 +1013,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
     selectedDwarfs = selected.map(({ d }) => d);
 
+    let leftIndex = null;
+    let rightIndex = null;
+
     if (selected.length > 0) {
       const indices = selected.map((s) => s.i);
+      leftIndex = Math.min(...indices);
+      rightIndex = Math.max(...indices);
+
       const lSel = document.getElementById("rmq-l");
       const rSel = document.getElementById("rmq-r");
-      if (lSel) lSel.value = Math.min(...indices);
-      if (rSel) rSel.value = Math.max(...indices);
+      if (lSel) lSel.value = leftIndex;
+      if (rSel) rSel.value = rightIndex;
     }
 
+    document.dispatchEvent(
+      new CustomEvent("rmqSelectionReady", {
+        detail: {
+          minX,
+          maxX,
+          minY,
+          maxY,
+          leftIndex,
+          rightIndex,
+          selectedDwarfs,
+        },
+      }),
+    );
+
+    scheduleRedraw();
+  });
+
+  canvas.addEventListener("mouseleave", function () {
+    hoveredNode = null;
     scheduleRedraw();
   });
 });
