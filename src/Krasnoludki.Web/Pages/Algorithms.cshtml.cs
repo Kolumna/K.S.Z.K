@@ -125,6 +125,7 @@ public class AlgorithmsModel : PageModel
           X = p.X,
           Y = p.Y
         })],
+        ExecutionTimeMs = ms
       };
 
       var id = HttpContext.Session.GetString("activeScenarioId");
@@ -138,7 +139,7 @@ public class AlgorithmsModel : PageModel
         success = true,
         data = hullPoints.Select(p => new { x = p.X, y = p.Y }),
         perimeter,
-        executionTimeMs = ms
+        executionTimeMs = ms.ToString("F2")
       });
     }
     catch (Exception ex)
@@ -160,17 +161,7 @@ public class AlgorithmsModel : PageModel
     }
 
     List<Dwarf> dwarves = input.Dwarves;
-    Console.WriteLine($"Received {dwarves.Count} dwarves for matching calculation.");
-    foreach (var dwarf in dwarves)
-    {
-      Console.WriteLine($"Dwarf ID: {dwarf.PointId}, Preferred Minerals: {string.Join(", ", dwarf.PreferredMinerals)}");
-    }
     List<Mine> mines = input.Mines;
-    Console.WriteLine($"Received {mines.Count} mines for matching calculation.");
-    foreach (var mine in mines)
-    {
-      Console.WriteLine($"Mine ID: {mine.PointId}, Resource: {mine.Resource}, Capacity: {mine.Capacity}");
-    }
 
     var (assigned, ms) = Timed(() => DwarfAssigning.Assign(dwarves, mines));
 
@@ -180,7 +171,8 @@ public class AlgorithmsModel : PageModel
       {
         DwarfId = pair[0].ToString(),
         MineId = pair[1].ToString()
-      })]
+      })],
+      ExecutionTimeMs = ms
     };
 
     var id = HttpContext.Session.GetString("activeScenarioId");
@@ -203,15 +195,14 @@ public class AlgorithmsModel : PageModel
       return BadRequest(new { success = false, message = "Nieprawidłowe dane wejściowe." });
     }
 
-    Console.WriteLine($"Received {decametrists.Count} dwarves for segment tree calculation.");
-
     var (tree, ms) = Timed(() => new SegmentTree(decametrists));
 
     Dwarf loudestDwarf = tree.GetLoudestDecametrist();
 
     var result = new SegmentTreeResultDto
     {
-      LoudestDwarfId = loudestDwarf.PointId.ToString()
+      LoudestDwarfId = loudestDwarf.PointId.ToString(),
+      ExecutionTimeMs = ms
     };
 
     var id = HttpContext.Session.GetString("activeScenarioId");
@@ -243,7 +234,8 @@ public class AlgorithmsModel : PageModel
         RealCost = Math.Round(minCost, 2),
         MaxFlow = maxFlow,
         EmployedCount = employedCount,
-        Assignments = assignments
+        Assignments = assignments,
+        ExecutionTimeMs = networkMs + minCostMs + employedCountMs
       };
 
 

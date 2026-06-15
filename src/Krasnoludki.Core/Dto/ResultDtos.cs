@@ -5,12 +5,17 @@ public class ConvexHullResultDto
 {
     [JsonPropertyName("hullPoints")]
     public List<PointDto> HullPoints { get; set; } = new();
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
 
 public class MatchingResultDto
 {
     [JsonPropertyName("assignments")]
     public List<DwarfAssignmentDto> Assignments { get; set; } = new();
+
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
 
 public class MineAssignmentDto
@@ -23,6 +28,9 @@ public class MineAssignmentDto
 
     [JsonPropertyName("allocatedCapacity")]
     public int AllocatedCapacity { get; set; }
+
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
 
 public class DwarfAssignmentDto
@@ -32,12 +40,18 @@ public class DwarfAssignmentDto
 
     [JsonPropertyName("mineId")]
     public string MineId { get; set; }
+
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
 
 public class SegmentTreeResultDto
 {
     [JsonPropertyName("loudestDwarfId")]
     public string LoudestDwarfId { get; set; }
+
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
 public class MinCostResultDto
 {
@@ -52,6 +66,9 @@ public class MinCostResultDto
 
     [JsonPropertyName("maxFlow")]
     public int MaxFlow { get; set; }
+
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
 
 public class AssignmentDto
@@ -64,4 +81,7 @@ public class AssignmentDto
 
     [JsonPropertyName("actualDistance")]
     public double ActualDistance { get; set; }
+
+    [JsonPropertyName("executionTime")]
+    public double ExecutionTimeMs { get; set; }
 }
