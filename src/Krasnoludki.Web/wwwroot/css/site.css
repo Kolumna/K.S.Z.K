@@ -931,10 +931,6 @@ main {
   flex-direction: column;
 }
 
-.algo-section a {
-  margin-top: auto;
-}
-
 .algo-result-stats {
   margin-top: 16px;
   padding: 16px;
@@ -974,9 +970,6 @@ main {
 .algo-link-button:hover {
   background-color: var(--color-overlay);
 }
-.algo-link-button {
-  margin-top: 8px;
-}
 
 .algo-inputs {
   display: flex;
@@ -988,4 +981,12 @@ main {
   font-size: 20px;
   color: var(--text-primary);
   font-family: var(--font-mono);
+  
+.algo-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  border-top: 1px solid var(--border-strong);
+  padding-top: 16px;
 }

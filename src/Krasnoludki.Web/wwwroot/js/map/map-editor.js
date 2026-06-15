@@ -2,11 +2,19 @@ const canvas = document.getElementById("mapCanvas");
 const ctx = canvas.getContext("2d");
 
 const mineralsColors = {
-  Iron: "#C0C0C0",
+  Silver: "#C0C0C0",
   Gold: "#FFD700",
   Quartz: "#E0E0E0",
   Coal: "#0f1212",
   Uranium: "#4E9A06",
+};
+
+const mineralsNames = {
+  Silver: "Srebro",
+  Gold: "Złoto",
+  Quartz: "Kwarc",
+  Coal: "Węgiel",
+  Uranium: "Uran",
 };
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -33,6 +41,7 @@ const camera = {
 
 let isPanning = false;
 let panStart = { x: 0, y: 0 };
+let hoveredNode = null;
 
 function screenToWorld(sx, sy) {
   return {
@@ -110,8 +119,12 @@ function redrawCanvas() {
             ? [node.resource]
             : [];
 
-      drawNodeGraphics(node.x, node.y, node.type, minerals);
+      drawNodeGraphics(node.x, node.y, node.type, minerals, node.pointId);
     });
+
+    if (hoveredNode && !isDragging) {
+      drawTooltip(hoveredNode);
+    }
   });
 }
 
@@ -119,24 +132,40 @@ function redrawList() {
   const list = document.getElementById("pointsList");
   list.innerHTML = "";
 
-  let dwarfIndex = 1;
-  let mineIndex = 1;
-
   nodes.forEach((node) => {
     const item = document.createElement("div");
 
     item.className = "point-item";
     item.innerHTML = `
             <div>
-                <span>${node.type === "dwarf" ? "Krasnoludek" : "Kopalnia"} ${node.type === "dwarf" ? dwarfIndex++ : mineIndex++} <small style="font-size: 12px; font-family: var(--font-mono)">(pointId: ${node.pointId})</small></span>
+                <span>${node.type === "dwarf" ? "Krasnoludek" : "Kopalnia"} <small style="font-size: 12px; font-family: var(--font-mono)">(Id: ${node.pointId})</small></span>
             </div>
-            <button onclick="deleteNode(${node.pointId})" title="Usuń">
+            <div style="display: flex; gap: 8px; align-items: center;">
+            <button onclick="cameraGoTo(${node.pointId})" title="Przejdź do punktu">
+               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;"><g class="" style="" transform="translate(0,0)"><path d="M249.334 22.717c-18.64 2.424-35.677 23.574-37.043 51.49v.02a74.612 74.612 0 0 0-.097 3.59c0 16.362 5.658 30.827 13.942 40.818l10.127 12.213-15.592 2.933c-10.75 2.025-18.622 7.702-25.373 16.978-2.285 3.14-4.384 6.707-6.31 10.62-57.54-6.44-97.91-21.06-97.91-37.952 0-17.363 42.647-31.983 102.75-37.97a90.295 90.295 0 0 1-.323-7.636v-.002c0-.84.024-1.674.047-2.51-96.43 6.77-167.298 29.15-167.3 55.71-.002 25.33 64.462 46.86 154.074 54.67-.19.742-.394 1.465-.576 2.216-2.36 9.72-4.05 20.22-5.268 31.03-.01 0-.02 0-.03.002-.418 3.653-.78 7.34-1.095 11.046l.05-.005c-1.316 15.777-1.772 31.88-1.893 46.95h35.894l2.115 28.4c-68.24-4.994-118.444-21.004-118.444-39.843 0-13.243 24.83-24.89 63.27-32.33.3-4.056.66-8.115 1.076-12.162-76.42 9.353-129.17 29.168-129.172 52.086-.002 28.17 79.71 51.643 185.098 56.768l5.94 79.77c10.5 2.648 24.84 4.162 39.017 4.068 13.79-.092 27.235-1.71 36.45-4l5.263-79.846c105.308-5.14 184.935-28.605 184.935-56.76 0-23.013-53.196-42.895-130.13-52.2.304 4.02.557 8.047.755 12.07 38.883 7.43 63.965 19.17 63.965 32.536 0 18.84-49.804 34.85-117.908 39.844l1.87-28.402h34.18c-.012-15.113-.127-31.27-1.033-47.094.01 0 .02.002.032.004a406.307 406.307 0 0 0-.782-10.986l-.02-.002c-.94-11.157-2.367-21.984-4.546-31.967-.09-.405-.184-.803-.275-1.206 89.518-7.826 153.893-29.344 153.893-54.656 0-26.787-72.076-49.332-169.77-55.887.025.895.053 1.788.053 2.688 0 2.5-.104 4.97-.304 7.407 61.19 5.836 104.61 20.61 104.61 38.2 0 16.805-39.633 31.355-96.524 37.848-2.01-4.283-4.26-8.15-6.762-11.505-6.83-9.167-15.063-14.81-27.14-16.682l-15.913-2.47 10.037-12.59c6.928-8.69 11.912-20.715 13.057-34.268h.002c.163-1.95.25-3.93.25-5.938 0-.77-.022-1.532-.048-2.29-.015-.48-.033-.958-.057-1.434h-.002c-1.48-29.745-20.507-51.3-41.076-51.3-2.528 0-3.966-.087-4.03-.08h-.003zM194.54 355.822c-97.11 6.655-168.573 29.11-168.573 55.8 0 31.932 102.243 57.815 228.367 57.815S482.7 443.555 482.7 411.623c0-26.608-71.02-49.004-167.67-55.736l-.655 9.93c60.363 6.055 103.074 20.956 103.074 38.394 0 22.81-73.032 41.298-163.12 41.298-90.088 0-163.12-18.49-163.12-41.297 0-17.533 43.18-32.502 104.07-38.493l-.74-9.895z" fill="#fff" fill-opacity="1"/></g></svg>
+            </button><button onclick="deleteNode(${node.pointId})" title="Usuń">
                 <svg viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                     <path d="M199 103v50h-78v30h270v-30h-78v-50H199zm18 18h78v32h-78v-32zm-79.002 80 30.106 286h175.794l30.104-286H137.998zm62.338 13.38.64 8.98 16 224 .643 8.976-17.956 1.283-.64-8.98-16-224-.643-8.976 17.956-1.283zm111.328 0 17.955 1.284-.643 8.977-16 224-.64 8.98-17.956-1.284.643-8.977 16-224 .64-8.98zM247 215h18v242h-18V215z" fill="#fff"></path>
                 </svg>
-            </button>`;
+            </button></div>`;
     list.appendChild(item);
   });
+}
+
+function cameraGoTo(pointId, targetZoom = 2) {
+  const node = nodes.find((n) => n.pointId === pointId);
+  if (node) {
+    camera.zoom = Math.min(camera.maxZoom, Math.max(camera.minZoom, targetZoom));
+
+    const rect = canvas.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    camera.x = centerX - node.x * camera.zoom;
+    camera.y = centerY - node.y * camera.zoom;
+
+    redrawAll();
+  }
 }
 
 const mineSvgRaw = (
@@ -180,7 +209,14 @@ function getCachedImage(type, color) {
   return img;
 }
 
-function drawNodeGraphics(x, y, type, minerals = [], isDraggedNode = false) {
+function drawNodeGraphics(
+  x,
+  y,
+  type,
+  minerals = [],
+  isDraggedNode = false,
+  pointId = null,
+) {
   const size = 44;
   const offset = size / 2;
 
@@ -203,18 +239,6 @@ function drawNodeGraphics(x, y, type, minerals = [], isDraggedNode = false) {
     ctx.stroke();
   }
 
-  console.log(
-    "Drawing node at",
-    x,
-    y,
-    "of type",
-    type,
-    "with minerals",
-    minerals,
-  );
-
-  console.log(nodes);
-
   if (minerals.length > 0) {
     for (let i = 0; i < minerals.length; i++) {
       ctx.beginPath();
@@ -224,6 +248,62 @@ function drawNodeGraphics(x, y, type, minerals = [], isDraggedNode = false) {
       ctx.stroke();
     }
   }
+
+  ctx.restore();
+}
+
+function drawTooltip(node) {
+  if (!node) return;
+
+  ctx.save();
+
+  const lines = [
+    `${node.type === "dwarf" ? "Krasnoludek" : "Kopalnia"} (Id: ${node.pointId})`,
+  ];
+
+  if (node.type === "dwarf") {
+    lines.push(
+      `Minerały: ${node.preferredMinerals?.map((m) => mineralsNames[m]).join(", ") || "Brak"}`,
+    );
+    lines.push(`Głośność: ${node.voiceLoudness || 0}`);
+  } else {
+    lines.push(
+      `Zasób: ${node.resource ? mineralsNames[node.resource] : "Brak"}`,
+    );
+    lines.push(`Pojemność: ${node.capacity || 0}`);
+  }
+
+  ctx.font = "14px monospace";
+
+  let maxWidth = 0;
+  lines.forEach((line) => {
+    const width = ctx.measureText(line).width;
+    if (width > maxWidth) maxWidth = width;
+  });
+
+  const padding = 10;
+  const boxWidth = maxWidth + padding * 2;
+  const boxHeight = lines.length * 20 + padding;
+
+  const tooltipX = node.x + 20;
+  const tooltipY = node.y - boxHeight - 10;
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(tooltipX, tooltipY, boxWidth, boxHeight, 6);
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  lines.forEach((line, index) => {
+    ctx.fillText(line, tooltipX + padding, tooltipY + padding + index * 18);
+  });
+
+  ctx.restore();
 }
 
 function getNodeAt(x, y) {
@@ -501,9 +581,23 @@ canvas.addEventListener("mousemove", function (e) {
     isDragging = true;
     redrawAll();
   } else {
-    const hoveredNode = getNodeAt(worldPos.x, worldPos.y);
+    const newHoveredNode = getNodeAt(worldPos.x, worldPos.y);
+    if (hoveredNode !== newHoveredNode) {
+      hoveredNode = newHoveredNode;
+      redrawAll();
+    }
+
     canvas.style.cursor = hoveredNode ? "grab" : "default";
   }
+});
+
+canvas.addEventListener("mouseleave", function () {
+  isPanning = false;
+  draggedNode = null;
+  isDragging = false;
+  hoveredNode = null;
+  redrawAll();
+  canvas.style.cursor = "default";
 });
 
 canvas.addEventListener("mouseup", function (e) {
