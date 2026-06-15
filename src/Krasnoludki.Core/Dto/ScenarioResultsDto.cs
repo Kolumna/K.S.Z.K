@@ -6,14 +6,14 @@ namespace Krasnoludki.Core.Dto;
 public class ScenarioResultsDto
 {
   [JsonPropertyName("matching")]
-  public MatchingResultDto Matching { get; set; }
+  public MatchingResultDto? Matching { get; set; }
+
   [JsonPropertyName("convexHull")]
-  public ConvexHullResultDto ConvexHull { get; set; }
-  // public MinCostResultDto MinCost { get; set; }
+  public ConvexHullResultDto? ConvexHull { get; set; }
 
   [JsonPropertyName("segmentTree")]
-  public SegmentTreeResultDto Rmq { get; set; }
-
+  public SegmentTreeResultDto? Rmq { get; set; }
+  
   [JsonPropertyName("minCost")]
-  public MinCostResultDto MinCost { get; set; }
+  public MinCostResultDto? MinCost { get; set; }
 }

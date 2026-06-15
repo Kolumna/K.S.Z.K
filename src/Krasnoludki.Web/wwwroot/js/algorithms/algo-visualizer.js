@@ -85,7 +85,7 @@ function drawNodeGraphics(x, y, type) {
   ctx.beginPath();
   ctx.arc(x, y, 20, 0, Math.PI * 2);
   ctx.fillStyle =
-    type === "dwarf" ? "#8B4513" : window.MINERAL_COLORS?.[type] || "#888";
+    type === "dwarf" ? "#1A3A5A" : "#3A2010";
   ctx.fill();
   ctx.strokeStyle = "#000";
   ctx.lineWidth = 2;
@@ -189,7 +189,7 @@ async function runAlgorithm(algorithmType) {
         if (res.success) {
           execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
             2,
-          )}s`;
+          )}ms`;
           drawConvexHull(res.data);
         }
         break;
@@ -203,7 +203,7 @@ async function runAlgorithm(algorithmType) {
         if (res.success) {
           execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
             2,
-          )}s`;
+          )}ms`;
           drawMatching(res.data);
         }
         break;
@@ -217,7 +217,7 @@ async function runAlgorithm(algorithmType) {
         if (res.success) {
           execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
             2,
-          )}s`;
+          )}ms`;
           drawMinCost(res.data);
         }
         break;
@@ -231,7 +231,7 @@ async function runAlgorithm(algorithmType) {
         if (res.success) {
           execTimeSpan.textContent = `Algorytm wykonał się w czasie: ${res.executionTimeMs.toFixed(
             2,
-          )}s`;
+          )}ms`;
 
           console.log("Wynik RMQ:", res.data);
 

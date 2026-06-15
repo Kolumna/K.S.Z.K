@@ -103,7 +103,14 @@ function redrawCanvas() {
     // });
 
     nodes.forEach((node) => {
-      drawNodeGraphics(node.x, node.y, node.type, node.preferredMinerals);
+      const minerals =
+        node.type === "dwarf"
+          ? (node.preferredMinerals ?? [])
+          : node.resource
+            ? [node.resource]
+            : [];
+
+      drawNodeGraphics(node.x, node.y, node.type, minerals);
     });
   });
 }
@@ -173,13 +180,18 @@ function getCachedImage(type, color) {
   return img;
 }
 
-function drawNodeGraphics(x, y, type, minerals = []) {
+function drawNodeGraphics(x, y, type, minerals = [], isDraggedNode = false) {
   const size = 44;
   const offset = size / 2;
 
-  const color = minerals.includes("Uranium") ? "#35ff43" : "white";
+  // const color = minerals.includes("Uranium") ? "#35ff43" : "white";
 
-  const img = getCachedImage(type, color);
+  const img = getCachedImage(type);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 4;
 
   if (img && img.complete && img.naturalWidth !== 0) {
     ctx.drawImage(img, x - offset, y - offset, size, size);
@@ -212,17 +224,6 @@ function drawNodeGraphics(x, y, type, minerals = []) {
       ctx.stroke();
     }
   }
-}
-
-function drawConnection(x1, y1, x2, y2) {
-  ctx.beginPath();
-  ctx.setLineDash([5, 5]);
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.strokeStyle = "#444";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.setLineDash([]);
 }
 
 function getNodeAt(x, y) {
