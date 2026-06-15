@@ -36,3 +36,9 @@ public class ScenarioResults
     [JsonPropertyName("minCost")]
     public MinCostResultDto? MinCost { get; set; }
 }
+
+public class SetRunningAlgoDto
+{
+    public string? AlgorithmType { get; set; }
+    public bool IsRunning { get; set; }
+}

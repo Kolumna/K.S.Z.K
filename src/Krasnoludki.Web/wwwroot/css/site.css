@@ -698,7 +698,7 @@ input {
   background-color: var(--color-overlay);
 }
 
-#algo-run-button {
+#algo-run-button, #algo-run-button-minCost, #algo-run-button-convexHull, #algo-run-button-rmq, #algo-run-button-matching {
   padding: 12px 16px;
   background-color: var(--gold-bg);
   color: white;
@@ -714,7 +714,7 @@ input {
   width: 100%;
 }
 
-#algo-run-button:hover {
+#algo-run-button:hover, #algo-run-button-minCost:hover, #algo-run-button-convexHull:hover, #algo-run-button-rmq:hover, #algo-run-button-matching:hover {
   background-color: var(--color-overlay);
 }
 
@@ -931,10 +931,6 @@ main {
   flex-direction: column;
 }
 
-.algo-section a {
-  margin-top: auto;
-}
-
 .algo-result-stats {
   margin-top: 16px;
   padding: 16px;
@@ -974,12 +970,18 @@ main {
 .algo-link-button:hover {
   background-color: var(--color-overlay);
 }
-.algo-link-button {
-  margin-top: 8px;
-}
 
 .algo-inputs {
   display: flex;
   gap: 16px;
   margin-top: 16px;
+}
+
+.algo-action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
+  border-top: 1px solid var(--border-strong);
+  padding-top: 16px;
 }
