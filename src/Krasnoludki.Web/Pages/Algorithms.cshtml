@@ -116,7 +116,7 @@ else
               <h3>Przydział do Kopalni</h3>
 
               <div class="algo-actions">
-                <button onClick="runAlgorithm('matching')" id="algo-run-button">
+                <button onClick="runAlgorithm('matching')" id="algo-run-button-matching">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                     <g class="" style="" transform="translate(0,0)">
                       <path
@@ -172,7 +172,7 @@ else
                 Owsianką</h3>
 
                 <div class="algo-actions">
-                  <button onClick="runAlgorithm('minCost')" id="algo-run-button">
+                  <button onClick="runAlgorithm('minCost')" id="algo-run-button-minCost">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                       <g class="" style="" transform="translate(0,0)">
                         <path
@@ -237,7 +237,7 @@ else
                   granicy Królestwa</h3>
 
                   <div class="algo-actions">
-                    <button onClick="runAlgorithm('convexHull')" id="algo-run-button">
+                    <button onClick="runAlgorithm('convexHull')" id="algo-run-button-convexHull">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                         <g class="" style="" transform="translate(0,0)">
                           <path
@@ -294,7 +294,7 @@ else
                     <label>Do <input type="number" id="rmq-to-input" min="0" value="100" /></label>
                   </div>
                   <div class="algo-actions">
-                    <button onClick="runAlgorithm('rmq')" id="algo-run-button">
+                    <button onClick="runAlgorithm('rmq')" id="algo-run-button-rmq">
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style="height: 20px; width: 20px;">
                         <g class="" style="" transform="translate(0,0)">
                           <path
@@ -370,6 +370,7 @@ else
         <script>
           const INITIAL_NODES = @Html.Raw(Model.NodesJson);
           const ALGORITHM_RESULTS = @Html.Raw(Model.ResultsJson);
+          const RUNNING_ALGOS = @Html.Raw(Model.RunningAlgosJson);
         </script>
         <script src="~/js/map/state.js" asp-append-version="true"></script>
         <script src="~/js/services/api-service.js" asp-append-version="true"></script>

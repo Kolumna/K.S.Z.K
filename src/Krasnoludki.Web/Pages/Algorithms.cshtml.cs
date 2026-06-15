@@ -37,15 +37,18 @@ public class AlgorithmsModel : PageModel
 
   public bool HasRmqResult => ParsedResults?.Rmq != null;
 
+  public string? RunningAlgos => HttpContext.Session.GetString("runningAlgos");
+
   private readonly ScenarioFileService _scenarios;
 
   public AlgorithmsModel(ScenarioFileService scenarios)
   {
     _scenarios = scenarios;
   }
-
+  
   public void OnGet()
   {
+
     var id = HttpContext.Session.GetString("activeScenarioId");
     if (id != null)
     {
@@ -89,7 +92,7 @@ public class AlgorithmsModel : PageModel
   /// <summary>
   /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=CalculateGraham
   /// </summary>
-  public IActionResult OnPostCalculateGraham([FromBody] List<PointDto> incomingPoints)
+  public async Task<IActionResult> OnPostCalculateGraham([FromBody] List<PointDto> incomingPoints)
   {
     if (incomingPoints == null || incomingPoints.Count < 3)
       return BadRequest(new { success = false, message = "Zbyt mało punktów." });
@@ -150,70 +153,128 @@ public class AlgorithmsModel : PageModel
         message = "Error: " + ex.Message
       });
     }
+    finally
+    {
+      var running = GetRunningAlgos();
+      if (running.Contains("convexHull"))
+      {
+        running.Remove("convexHull");
+        HttpContext.Session.SetString("runningAlgos", JsonSerializer.Serialize(running));
+        await HttpContext.Session.CommitAsync();
+      }
+    }
   }
-  public IActionResult OnPostCalculateMatching(
+
+  /// <summary>
+  /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=CalculateMatching
+  /// </summary>
+  public async Task<IActionResult> OnPostCalculateMatching(
     [FromBody] MatchingInputDto input
   )
   {
-    if (input == null || input.Dwarves == null || input.Mines == null)
+    try
     {
-      return BadRequest(new { success = false, message = "Błędne dane wejściowe." });
-    }
+      if (input == null || input.Dwarves == null || input.Mines == null)
+      {
+        return BadRequest(new { success = false, message = "Błędne dane wejściowe." });
+      }
 
-    List<Dwarf> dwarves = input.Dwarves;
-    List<Mine> mines = input.Mines;
+      List<Dwarf> dwarves = input.Dwarves;
+      List<Mine> mines = input.Mines;
 
-    var (assigned, ms) = Timed(() => DwarfAssigning.Assign(dwarves, mines));
+      var (assigned, ms) = Timed(() => DwarfAssigning.Assign(dwarves, mines));
 
-    var result = new MatchingResultDto
-    {
-      Assignments = [.. assigned.Select(pair => new DwarfAssignmentDto
+      var result = new MatchingResultDto
+      {
+        Assignments = [.. assigned.Select(pair => new DwarfAssignmentDto
       {
         DwarfId = pair[0].ToString(),
         MineId = pair[1].ToString()
       })],
-      ExecutionTimeMs = ms
-    };
+        ExecutionTimeMs = ms
+      };
 
-    var id = HttpContext.Session.GetString("activeScenarioId");
-    if (id != null && _scenarios.Exists(id))
-    {
-      _scenarios.SaveResult(id, "matching", result);
+      var id = HttpContext.Session.GetString("activeScenarioId");
+      if (id != null && _scenarios.Exists(id))
+      {
+        _scenarios.SaveResult(id, "matching", result);
+      }
+
+      return new JsonResult(new { success = true, data = result, executionTimeMs = ms });
     }
-
-    return new JsonResult(new { success = true, data = result, executionTimeMs = ms });
+    catch (Exception ex)
+    {
+      return StatusCode(500, new { success = false, message = ex.Message });
+    }
+    finally
+    {
+      var running = GetRunningAlgos();
+      if (running.Contains("matching"))
+      {
+        running.Remove("matching");
+        HttpContext.Session.SetString("runningAlgos", JsonSerializer.Serialize(running));
+        await HttpContext.Session.CommitAsync();
+      }
+    }
   }
 
-  public IActionResult OnPostCalculateSegmentTree(
+  /// <summary>
+  /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=CalculateSegmentTree
+  /// </summary>
+  public async Task<IActionResult> OnPostCalculateSegmentTree(
    [FromBody] SegmentTreeInputDto input
  )
   {
-    List<Dwarf> decametrists = input.Dwarves;
-
-    if (input == null)
+    try
     {
-      return BadRequest(new { success = false, message = "Nieprawidłowe dane wejściowe." });
+      if (input == null || input.Dwarves == null)
+      {
+        return BadRequest(new { success = false, message = "Błędne dane wejściowe." });
+      }
+      List<Dwarf> decametrists = input.Dwarves;
+
+      if (input == null)
+      {
+        return BadRequest(new { success = false, message = "Nieprawidłowe dane wejściowe." });
+      }
+
+      var (tree, segmentTreeMs) = Timed(() => new SegmentTree(decametrists));
+
+      var (loudestDwarf, getLoudestMs) = Timed(() => tree.GetLoudestDecametrist());
+
+      var result = new SegmentTreeResultDto
+      {
+        LoudestDwarfId = loudestDwarf.PointId.ToString(),
+        ExecutionTimeMs = segmentTreeMs + getLoudestMs
+      };
+
+      var id = HttpContext.Session.GetString("activeScenarioId");
+      if (id != null && _scenarios.Exists(id))
+      {
+        _scenarios.SaveResult(id, "segmentTree", result);
+      }
+
+      return new JsonResult(new { success = true, data = result });
     }
-
-    var (tree, ms) = Timed(() => new SegmentTree(decametrists));
-
-    Dwarf loudestDwarf = tree.GetLoudestDecametrist();
-
-    var result = new SegmentTreeResultDto
+    catch (Exception ex)
     {
-      LoudestDwarfId = loudestDwarf.PointId.ToString(),
-      ExecutionTimeMs = ms
-    };
-
-    var id = HttpContext.Session.GetString("activeScenarioId");
-    if (id != null && _scenarios.Exists(id))
-    {
-      _scenarios.SaveResult(id, "segmentTree", result);
+      return StatusCode(500, new { success = false, message = ex.Message });
     }
-
-    return new JsonResult(new { success = true, data = result, executionTimeMs = ms });
+    finally
+    {
+      var running = GetRunningAlgos();
+      if (running.Contains("segmentTree"))
+      {
+        running.Remove("segmentTree");
+        HttpContext.Session.SetString("runningAlgos", JsonSerializer.Serialize(running));
+        await HttpContext.Session.CommitAsync();
+      }
+    }
   }
 
+  /// <summary>
+  /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=CalculateMinCost
+  /// </summary>
   public async Task<IActionResult> OnPostCalculateMinCost([FromBody] MinCostRequest request)
   {
     try
@@ -252,6 +313,41 @@ public class AlgorithmsModel : PageModel
       return StatusCode(500, new { success = false, message = ex.Message });
     }
   }
+
+  /// <summary>
+  /// Handler obsługujący żądanie typu POST dla /Algorithms?handler=SetRunningAlgo
+  /// </summary>
+  public async Task<IActionResult> OnPostSetRunningAlgo([FromBody] SetRunningAlgoDto dto)
+  {
+    var running = GetRunningAlgos();
+
+    if (string.IsNullOrEmpty(dto.AlgorithmType))
+      return new JsonResult(new { success = false });
+
+    if (dto.IsRunning)
+    {
+      running.Add(dto.AlgorithmType);
+    }
+    else
+    {
+      running.Remove(dto.AlgorithmType);
+    }
+
+    HttpContext.Session.SetString("runningAlgos", JsonSerializer.Serialize(running));
+    await HttpContext.Session.CommitAsync(); // <-- Wymuś zapis
+
+    return new JsonResult(new { success = true });
+  }
+
+  private HashSet<string> GetRunningAlgos()
+  {
+    var json = HttpContext.Session.GetString("runningAlgos");
+    return string.IsNullOrEmpty(json)
+        ? new HashSet<string>()
+        : JsonSerializer.Deserialize<HashSet<string>>(json) ?? new HashSet<string>();
+  }
+
+  public string RunningAlgosJson => JsonSerializer.Serialize(GetRunningAlgos());
 
   private (T result, double ms) Timed<T>(Func<T> fn)
   {
