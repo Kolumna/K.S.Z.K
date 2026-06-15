@@ -23,6 +23,7 @@ namespace Krasnoludki.Core.Problems.Huffman
             if (string.IsNullOrEmpty(text))
                 return Array.Empty<byte>();
 
+            // Liczenie częstotliwości znaków w tekście
             var frequencies = new Dictionary<char, int>();
             foreach (char ch in text)
             {
@@ -32,19 +33,19 @@ namespace Krasnoludki.Core.Problems.Huffman
                     frequencies[ch] = 1;
             }
 
-            var queue = new List<HuffmanNode>();
+            // Tworzenie kolejki priorytetowej węzłów Huffmana
+            var queue = new PriorityQueue<HuffmanNode, int>();
             foreach (var pair in frequencies)
             {
-                queue.Add(new HuffmanNode { Character = pair.Key, Frequency = pair.Value });
+                var node = new HuffmanNode { Character = pair.Key, Frequency = pair.Value };
+                queue.Enqueue(node, node.Frequency);
             }
 
+            // Budowanie drzewa Huffmana
             while (queue.Count > 1)
             {
-                queue = queue.OrderBy(node => node.Frequency).ToList();
-
-                var left = queue[0];
-                var right = queue[1];
-                queue.RemoveRange(0, 2);
+                var left = queue.Dequeue();
+                var right = queue.Dequeue();
 
                 var parent = new HuffmanNode
                 {
@@ -54,14 +55,15 @@ namespace Krasnoludki.Core.Problems.Huffman
                     Right = right
                 };
 
-                queue.Add(parent);
+                queue.Enqueue(parent, parent.Frequency);
             }
 
-            var root = queue.Single();
-
+            // Generowanie kodów Huffmana dla każdego znaku
+            var root = queue.Dequeue();
             var huffmanCodes = new Dictionary<char, string>();
             GenerateCodes(root, "", huffmanCodes);
 
+            // Konwersja tekstu na ciąg bitów zgodnie z kodami Huffmana
             var bitString = new StringBuilder();
             foreach (char ch in text)
             {
@@ -129,37 +131,39 @@ namespace Krasnoludki.Core.Problems.Huffman
 
         private static HuffmanNode BuildTree(Dictionary<char, int> frequencies)
         {
-            var queue = new List<HuffmanNode>();
+            // Tworzenie kolejki priorytetowej węzłów Huffmana
+            var queue = new PriorityQueue<HuffmanNode, int>();
+
             foreach (var pair in frequencies)
             {
-                queue.Add(new HuffmanNode
+                var node = new HuffmanNode
                 {
                     Character = pair.Key,
                     Frequency = pair.Value
-                });
+                };
+                queue.Enqueue(node, node.Frequency);
             }
 
             if (queue.Count == 1)
-                return queue[0];
+                return queue.Peek();
 
             while (queue.Count > 1)
             {
-                queue = queue.OrderBy(node => node.Frequency).ToList();
+                var left = queue.Dequeue();
+                var right = queue.Dequeue();
 
-                var left = queue[0];
-                var right = queue[1];
-                queue.RemoveRange(0, 2);
-
-                queue.Add(new HuffmanNode
+                var parent = new HuffmanNode
                 {
                     Character = '\0',
                     Frequency = left.Frequency + right.Frequency,
                     Left = left,
                     Right = right
-                });
+                };
+
+                queue.Enqueue(parent, parent.Frequency);
             }
 
-            return queue.Single();
+            return queue.Dequeue();
         }
 
         private static void GenerateCodes(HuffmanNode node, string currentCode, Dictionary<char, string> lookupTable)
@@ -178,47 +182,50 @@ namespace Krasnoludki.Core.Problems.Huffman
 
         private static byte[] ConvertBitStringToBytes(string bitString, Dictionary<char, int> frequencies)
         {
-            using (var memoryStream = new MemoryStream())
-            using (var writer = new BinaryWriter(memoryStream))
+            // Zapisanie częstotliwości znaków i długości ciągu bitów na początku danych
+            using var memoryStream = new MemoryStream();
+            using var writer = new BinaryWriter(memoryStream);
+            writer.Write(frequencies.Count);
+
+            // Zapisanie częstotliwości znaków
+            foreach (var pair in frequencies)
             {
-                writer.Write(frequencies.Count);
-                foreach (var pair in frequencies)
-                {
-                    writer.Write(pair.Key);
-                    writer.Write(pair.Value);
-                }
-
-                writer.Write(bitString.Length);
-
-                byte currentByte = 0;
-                int bitCount = 0;
-
-                foreach (char bit in bitString)
-                {
-                    currentByte <<= 1;
-                    if (bit == '1')
-                    {
-                        currentByte |= 1;
-                    }
-
-                    bitCount++;
-
-                    if (bitCount == 8)
-                    {
-                        writer.Write(currentByte);
-                        currentByte = 0;
-                        bitCount = 0;
-                    }
-                }
-
-                if (bitCount > 0)
-                {
-                    currentByte <<= (8 - bitCount);
-                    writer.Write(currentByte);
-                }
-
-                return memoryStream.ToArray();
+                writer.Write(pair.Key);
+                writer.Write(pair.Value);
             }
+            
+            // Zapisanie długości ciągu bitów
+            writer.Write(bitString.Length);
+
+            byte currentByte = 0;
+            int bitCount = 0;
+            
+            // Konwersja ciągu bitów na bajty i zapisanie ich do strumienia
+            foreach (char bit in bitString)
+            {
+                currentByte <<= 1;
+                if (bit == '1')
+                {
+                    currentByte |= 1;
+                }
+
+                bitCount++;
+
+                if (bitCount == 8)
+                {
+                    writer.Write(currentByte);
+                    currentByte = 0;
+                    bitCount = 0;
+                }
+            }
+
+            if (bitCount > 0)
+            {
+                currentByte <<= (8 - bitCount);
+                writer.Write(currentByte);
+            }
+
+            return memoryStream.ToArray();
         }
     }
 }
