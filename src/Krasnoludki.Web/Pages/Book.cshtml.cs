@@ -33,6 +33,13 @@ public class BookModel : PageModel
 
   public IEnumerable<dynamic> SavedScenarios { get; set; } = new List<dynamic>();
 
+  private static int CompareByUpdatedAt(dynamic a, dynamic b)
+  {
+    DateTime aDate = a.UpdatedAt ?? a.CreatedAt;
+    DateTime bDate = b.UpdatedAt ?? b.CreatedAt;
+    return bDate.CompareTo(aDate);
+  }
+
   public void OnGet()
   {
     var allScenarios = _scenarios.GetManifest();
@@ -55,10 +62,12 @@ public class BookModel : PageModel
         }
       }
 
+      filteredList.Sort(CompareByUpdatedAt);
       SavedScenarios = filteredList;
     }
     else
     {
+      allScenarios.Sort(CompareByUpdatedAt);
       SavedScenarios = allScenarios;
     }
 

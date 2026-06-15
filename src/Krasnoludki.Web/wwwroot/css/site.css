@@ -977,6 +977,11 @@ main {
   margin-top: 16px;
 }
 
+.compression-stats p, .compression-stats strong {
+  font-size: 20px;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  
 .algo-action-buttons {
   display: flex;
   flex-direction: column;

@@ -98,16 +98,16 @@
             <h4>
               Wydajność zapisu dekretu
             </h4>
-
-            <div>
-              JSON: @Model.CompressionStats.VirtualJsonSize
-            </div>
-            <div>
-              HOFF: @Model.CompressionStats.HoffSize
-            </div>
-
-            <div>
-              Kompresja: @Model.CompressionStats.CompressionRatio
+            <div class="compression-stats">
+              <p>
+                <strong>JSON:</strong> @Model.CompressionStats.VirtualJsonSize
+              </p>
+              <p>
+                <strong>HOFF:</strong> @Model.CompressionStats.HoffSize
+              </p>
+              <p>
+                <strong>Kompresja:</strong> @Model.CompressionStats.CompressionRatio
+              </p>
             </div>
           </div>
         </div>
