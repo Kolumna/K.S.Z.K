@@ -105,7 +105,7 @@ const setLoadingState = (algorithmType, isLoading) => {
 
   if (isLoading) {
     btn.disabled = isLoading;
-    btn.textContent = "Ładowanie...";
+    btn.textContent = "Obliczanie...";
   }
 };
 

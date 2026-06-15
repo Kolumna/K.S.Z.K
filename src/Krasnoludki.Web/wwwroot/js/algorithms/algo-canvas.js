@@ -317,20 +317,9 @@ window.addEventListener("resize", () => {
 
 function renderLoop() {
   if (_dirty) {
-    const algo = new URLSearchParams(window.location.search).get("algorithm");
-
-    // Zdecyduj, co rysujemy na podstawie URL-a
-    if (algo === "rmq") {
-      drawRMQ();
-    } else {
-      // Domyślne rysowanie, jeśli to nie jest RMQ
-      drawScene(() => drawAllNodes());
-    }
-
+    loadAlgorithmResults();
     _dirty = false;
   }
-
-  // Zapętl wywołanie zsynchronizowane z odświeżaniem ekranu
   requestAnimationFrame(renderLoop);
 }
 
@@ -340,21 +329,21 @@ function loadAlgorithmResults() {
     case "convexHull":
       if (algorithmResults.convexHull)
         drawConvexHull(algorithmResults.convexHull.hullPoints);
-      else drawAllNodes();
+      else drawScene(() => drawAllNodes());
       break;
     case "matching":
       if (algorithmResults.matching) drawMatching(algorithmResults.matching);
-      else drawAllNodes();
+      else drawScene(() => drawAllNodes());
       break;
     case "minCost":
       if (algorithmResults.minCost) drawMinCost(algorithmResults.minCost);
-      else drawAllNodes();
+      else drawScene(() => drawAllNodes());
       break;
     case "rmq":
       drawRMQ();
       break;
     default:
-      drawAllNodes();
+      drawScene(() => drawAllNodes());
   }
 }
 
