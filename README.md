@@ -2,88 +2,196 @@
 
 Projekt zaliczeniowy realizowany w ramach przedmiotu **Algorytmy i Struktury Danych II**. Projekt ma na celu implementację algorytmów optymalizacyjnych w kontekście zarządzania zasobami królestwa, z wykorzystaniem języka C# i platformy .NET.
 
-## Struktura Projektu
+System demonstruje wykorzystanie klasycznych algorytmów i struktur danych w scenerii „królewskiego królestwa krasnoludków” – m.in. przydzielanie krasnoludków do zadań, obliczanie tras, przepływy w sieci czy problemy związane z kosztami transportu.
 
-* `src/Krasnoludki.Core/` - Zawiera czyste struktury danych, modele i implementacje algorytmów. Nie posiada żadnych zależności od technologii webowych.
-* `src/Krasnoludki.Web/` - Interfejs użytkownika zbudowany w technologii ASP.NET Core. Odpowiada za wizualizację wyników.
-* `tests/Krasnoludki.Tests/` - Projekt zawierający zautomatyzowane testy jednostkowe (xUnit) weryfikujące poprawność i optymalność algorytmów.
+---
 
-## Uruchomienie Projektu
-Aby uruchomić projekt należy mieć zainstalowane środowisko .NET. Aby to zrobić należy pobrać i zainstalować .NET SDK ze strony [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download).
+## Spis treści
 
-### 1. Uruchomienie Testów Jednostkowych
+1. [Opis ogólny](#opis-ogólny)
+2. [Funkcjonalności](#funkcjonalności)
+3. [Stos technologiczny](#stos-technologiczny)
+4. [Architektura i struktura projektu](#architektura-i-struktura-projektu)
+5. [Wymagania wstępne](#wymagania-wstępne)
+6. [Uruchomienie aplikacji webowej](#uruchomienie-aplikacji-webowej)
+7. [Uruchomienie testów jednostkowych](#uruchomienie-testów-jednostkowych)
+8. [Dokumentacja szczegółowa algorytmów](#dokumentacja-szczegółowa-algorytmów)
+
+---
+
+## Opis ogólny
+
+K.S.Z.K to aplikacja demonstracyjna prezentująca praktyczne wykorzystanie wybranych algorytmów i struktur danych w języku C# z użyciem platformy .NET.
+
+Aplikacja webowa pozwala:
+
+- wizualizować dane oraz wyniki działania algorytmów,
+- ładować przygotowane scenariusze z plików,
+- interaktywnie analizować działanie algorytmów na przykładowych problemach.
+
+Warstwa logiki biznesowej (biblioteka `Krasnoludki.Core`) jest odseparowana od interfejsu użytkownika (`Krasnoludki.Web`), dzięki czemu algorytmy mogą być łatwo testowane i ponownie wykorzystywane.
+
+---
+
+## Funkcjonalności
+
+- **Implementacje algorytmów i struktur danych**, m.in.:
+  - Bellman–Ford,
+  - drzewo przedziałowe (Segment Tree),
+  - wyszukiwanie wzorców (Rabin–Karp),
+  - algorytmy przypisania/przydziału zadań (`DwarfAssigning`).
+- **Rozwiązania problemów na grafach i przepływach**, w tym:
+  - Min Cost Max Flow (minimalny koszt maksymalnego przepływu),
+  - trasy/przepływy w „królewskim” królestwie krasnoludków,
+  - kodowanie Huffmana (kompresja danych).
+- **Aplikacja webowa ASP.NET Core** umożliwiająca:
+  - wizualizację wyników,
+  - obsługę scenariuszy z plików,
+  - pracę w sesji przeglądarkowej.
+- **Testy jednostkowe (xUnit)** weryfikujące poprawność i złożoność czasową kluczowych algorytmów.
+
+---
+
+## Stos technologiczny
+
+- **Język**: C#
+- **Platforma**: .NET 6 lub nowszy
+- **Aplikacja webowa**: ASP.NET Core (Razor Pages)
+- **Testy jednostkowe**: xUnit
+- **System budowania**: `dotnet` CLI / MSBuild
+
+---
+
+## Architektura i struktura projektu
+
+Projekt jest podzielony na trzy główne części:
+
+- `src/Krasnoludki.Core/`  
+  Biblioteka klas zawierająca:
+  - modele i DTO,
+  - implementacje algorytmów,
+  - struktury danych,
+  - definicje problemów (np. MinCostMaxFlow, Huffman, Trasa).
+
+- `src/Krasnoludki.Web/`  
+  Aplikacja webowa ASP.NET Core (Razor Pages), odpowiedzialna za:
+  - interfejs użytkownika,
+  - ładowanie scenariuszy z plików (przez `ScenarioFileService`),
+  - zarządzanie sesją użytkownika,
+  - prezentację wyników działania algorytmów.
+
+- `tests/Krasnoludki.Tests/`  
+  Zestaw testów jednostkowych (xUnit) pokrywających:
+  - poprawność działania algorytmów,
+  - przypadki brzegowe,
+  - wybrane scenariusze integracyjne.
+
+Przykładowa struktura katalogów:
+
+```text
+K.S.Z.K-main/
+├─ src/
+│  ├─ Krasnoludki.Core/
+│  │  ├─ Algorithms/
+│  │  ├─ Graph/
+│  │  ├─ Models/
+│  │  ├─ Dto/
+│  │  └─ Problems/
+│  └─ Krasnoludki.Web/
+│     ├─ Pages/
+│     ├─ Services/
+│     ├─ wwwroot/
+│     └─ Program.cs
+├─ tests/
+│  └─ Krasnoludki.Tests/
+├─ docs/
+└─ README.md
+```
+
+---
+
+## Wymagania wstępne
+
+Aby uruchomić projekt, wymagane jest zainstalowane środowisko **.NET SDK 6 lub nowsze**.
+
+Pobierz i zainstaluj .NET SDK ze strony:  
+[https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
+
+Sprawdzenie wersji .NET:
 
 ```bash
-dotnet test
+dotnet --version
 ```
 
-### 2. Uruchomienie Aplikacji Webowej
+---
 
-```bash
-dotnet run --project src/Krasnoludki.Web
-```
+## Uruchomienie aplikacji webowej
 
-Po uruchomieniu aplikacji, interfejs będzie dostępny pod adresem `http://localhost:5145`.
+1. Przejdź do katalogu projektu webowego:
 
-## Docker
-Aby uruchomić projekt za pomocą Dockera, należy mieć zainstalowany Docker na swoim systemie. Następnie można użyć poniższych poleceń:
-### 1. Pobranie obrazu Dockera
+   ```bash
+   cd src/Krasnoludki.Web
+   ```
 
-```bash 
-docker pull ghcr.io/kolumna/k.s.z.k:latest
-```
-### 2. Uruchomienie kontenera
+2. Uruchom aplikację:
 
-```bash
-docker run -d -p 5145:8080 --name kszk ghcr.io/kolumna/k.s.z.k:latest
-```
-Po uruchomieniu kontenera, interfejs będzie dostępny pod adresem `http://localhost:5145`.
+   ```bash
+   dotnet run --project src/Krasnoludki.Web
+   ```
 
-## Problemy
-# Moduł Przydziału: Algorytm Min-Cost Max-Flow (MCMF)
+   lub bezpośrednio (jeśli jesteś już w katalogu projektu):
 
-## 1. Opis Problemu
+   ```bash
+   dotnet run
+   ```
 
-* **Problem** : Przydzielenie krasnoludków do kopalni z jak najmniejszym całkowitym kosztem.
-Celem jest znalezienie takiego układu, aby krasnoludek pokonywał jak najmniejszą drogę do pracy.
+3. Po uruchomieniu aplikacji interfejs będzie dostępny pod adresem (domyślnie):
 
-* **Ograniczenia (Strict Constraints):** Przydział musi być w 100% zgodny z preferencjami (zawodem) krasnoludka. Jeśli brakuje miejsc w preferowanych kopalniach lub krasnoludek nie ma żadnych preferencji, nie zostaje on przydzielony do żadnej pracy (zostaje bezrobotny).
+   ```text
+   http://localhost:5145
+   ```
 
-* **Algorytmy** : Koncepcja algorytmu Forda-Fulkersona (dla maksymalizacji przepływu) połączona z algorytmem Bellmana-Forda
-do poszukiwania ścieżki o najmniejszym koszcie w sieci rezydualnej.
+---
 
+## Uruchomienie testów jednostkowych
 
-## 2. Modelowanie Matematyczne (Graf Rezidualny)
+1. Przejdź do katalogu z testami:
 
-* **Źródło (Source) i Ujście (Sink):** Sztucznie dodane wierzchołki, niezbędne do działania algorytmów przepływowych.
-Źródło łączy się ze wszystkimi krasnoludkami, a wszystkie kopalnie łączą się z Ujściem.
+   ```bash
+   cd tests/Krasnoludki.Tests
+   ```
 
-* **Węzły (Nodes):** Reprezentuja rzeczywiste obiekty: Krasnoludek (Dwarf) i Kopalnia (Mine).
+2. Uruchom testy:
 
-* **Krawędzie (Edges) i Pojemności (Capacity):** Krawędzie to połączenia między obiektami w grafie. Krawędź między krasnoludkiem a kopalnią powstaje **tylko i wyłącznie wtedy**, gdy minerał z kopalni znajduje się na liście preferencji krasnoludka. Pojemność (przepustowość) określa, ile jednostek 
-(krasnoludków) może przejść przez daną krawędź (np. krawędź Kopalnia -> Ujście ma pojemność równą liczbie miejsc w kopalni).
+   ```bash
+   dotnet test
+   ```
 
-* **Koszty (Costs):** Koszt to wartość, którą płacimy za przejście przez krawędź (rzeczywista odległość fizyczna).
-W tym modelu odpowiada on rzeczywistej, fizycznej odległości między domem krasnoludka a kopalnią (zwiększonej o rzędy wielkości na czas obliczeń, aby uniknąć problemów z precyzją zmiennoprzecinkową).
+Polecenie zbuduje rozwiązanie i wykona wszystkie testy jednostkowe, zwracając raport z ich przebiegu.
 
-## 3. Przebieg Algorytmu
+---
 
-1. **Inicjalizacja:** Zbudowanie sieci rezydualnej (Residual Network) na podstawie danych wejściowych, z rygorystycznym pominięciem niechcianych połączeń.
+## Dokumentacja szczegółowa algorytmów
 
-2. **Poszukiwanie ścieżki:** Zastosowanie algorytmu Bellmana-Forda do znalezienia najtańszej ścieżki powiększającej 
-od Źródła do Ujścia, omijając w pełni nasycone krawędzie.
+Szczegółowe opisy wybranych algorytmów i problemów znajdują się w osobnych plikach dokumentacji:
 
-3. **Aktualizacja przepływu i Krawędzie Powrotne:** Po znalezieniu optymalnej ścieżki algorytm przepycha przez nią jednostkę przepływu. Jednocześnie na grafie udostępniane są **krawędzie powrotne** (Backward Edges) o odwróconym (ujemnym) koszcie. Dzięki temu algorytm może w kolejnych iteracjach "wycofać" krasnoludka z kopalni, jeśli znajdzie się inny kandydat, dla którego to miejsce w ogólnym rozrachunku będzie tańsze. To fundament rozwiązywania konfliktów o zasoby.
+- [`docs/algorithms/GrahamScan_PL.md`](docs/problems/GrahamScan_PL.md) – opis implementacji **algorytmu Grahama (Graham Scan)** do wyznaczania otoczki wypukłej:
+- [`docs/DocumentationMCMF_PL.md`](docs/DocumentationMCMF_PL.md) – szczegółowy opis problemu **Min Cost Max Flow** i jego implementacji
 
-## 4. Architektura i Komponenty Systemu
+### Dokumentacja modeli i warstwy rdzeniowej (`Krasnoludki.Core`)
 
-* `McmfMapper`: Klasa tłumacząca modele domenowe na obiekty grafowe.
-* `ResidualNetwork`: Struktura przechowująca stan grafu i przepustowość. Jej konstruktor odpowiada za ścisłe filtrowanie preferencji krasnoludków.
-* `MinCostMaxFlowProblem`: Główny silnik orkiestrujący pętlę algorytmu. Zwraca całkowity koszt, maksymalny przepływ (liczbę zatrudnionych) oraz gotową listę optymalnych przypisań (`AssignmentDto`).
+- [`docs/core/Models_PL.md`](docs/core/Models_PL.md) – opis modeli domenowych (krasnoludki, kopalnie, punkty) oraz ich odpowiedników MCMF.
+- [`docs/core/GraphAndFlow_PL.md`](docs/core/GraphAndFlow_PL.md) – opis warstwy grafowej i sieci przepływu (EdgeFlow, ResidualNetwork, EdgeGen).
 
-## 5. Złożoność Obliczeniowa
+### Dokumentacja algorytmów (`src/Krasnoludki.Core/Algorithms`)
 
-* **Złożoność pojedynczej iteracji:** Szukanie najkrótszej ścieżki algorytmem Bellmana-Forda zajmuje czas $O(V \cdot E)$.
-* **Złożoność całkowita:** Uzależniona od całkowitego przepływu $F$ (liczby przypisanych krasnoludków).
-Algorytm wykonuje się w pesymistycznym czasie $O(F \cdot V \cdot E)$.
+- [`docs/algorithms/BellmanFord_PL.md`](docs/algorithms/BellmanFord_PL.md) – algorytm Bellmana–Forda wykorzystywany w Min Cost Max Flow.
+- [`docs/algorithms/DwarfAssigning_PL.md`](docs/algorithms/DwarfAssigning_PL.md) – algorytm przydziału krasnoludków do kopalni (Edmonds–Karp / maksymalny przepływ).
+- [`docs/algorithms/RabinKarp_PL.md`](docs/algorithms/RabinKarp_PL.md) – algorytm Rabina–Karpa do wyszukiwania wzorca w tekście.
+- [`docs/algorithms/SegmentTree_PL.md`](docs/algorithms/SegmentTree_PL.md) – drzewo przedziałowe do wyszukiwania najgłośniejszego dekametrowca.
 
+### Dokumentacja problemów (`src/Krasnoludki.Core/Problems`)
+
+- [`docs/problems/Huffman_PL.md`](docs/problems/Huffman_PL.md) – problem kompresji tekstu z użyciem kodowania Huffmana.
+- [`docs/problems/MinCostMaxFlow_PL.md`](docs/problems/MinCostMaxFlow_PL.md) – problem Min Cost Max Flow krasnoludków i kopalni.
+- [`docs/algorithms/GrahamScan_PL.md`](docs/problems/GrahamScan_PL.md) – problem trasy/otoczki wypukłej rozwiązany algorytmem Grahama.
