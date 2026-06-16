@@ -184,6 +184,8 @@ docker run -d -p 5145:8080 --name kszk ghcr.io/kolumna/k.s.z.k:latest
 ```
 Po uruchomieniu kontenera, interfejs będzie dostępny pod adresem http://localhost:5145.
 
+---
+
 ## Dokumentacja szczegółowa algorytmów
 
 Szczegółowe opisy wybranych algorytmów i problemów znajdują się w osobnych plikach dokumentacji:

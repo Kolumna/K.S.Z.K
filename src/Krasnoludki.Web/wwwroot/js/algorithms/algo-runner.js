@@ -8,8 +8,7 @@ const currentAlgo = new URLSearchParams(window.location.search).get(
   "algorithm",
 );
 
-let from;
-let to;
+let selectedDwarfsFromCanvas = [];
 
 async function setRunningAlgoSession(algorithmType, isRunning) {
   await fetch("?handler=SetRunningAlgo", {
@@ -46,17 +45,29 @@ async function runAlgorithm(algorithmType) {
 
         break;
       case "rmq": {
-        const fromValue = parseInt(
-          document.getElementById("rmq-from-input")?.value || from,
-        );
-        const toValue = parseInt(
-          document.getElementById("rmq-to-input")?.value || to,
-        );
-        const dwarfsCompartment = DWARF_NODES.filter(
-          (d) => d.pointId >= fromValue && d.pointId <= toValue,
-        );
+        let selectedDwarfs = [];
+        const fromValue = document.getElementById("rmq-from-input")?.value
+          ? parseInt(document.getElementById("rmq-from-input")?.value)
+          : null;
+        const toValue = document.getElementById("rmq-to-input")?.value
+          ? parseInt(document.getElementById("rmq-to-input")?.value)
+          : null;
+
+        console.log("Wybór z inputów:", fromValue, toValue);
+
+        if (fromValue === null || toValue === null) {
+          selectedDwarfs = selectedDwarfsFromCanvas;
+        } else {
+          console.log("Wybór z inputów:", fromValue, toValue);
+          selectedDwarfs = DWARF_NODES.filter(
+            (d) => d.pointId >= fromValue && d.pointId <= toValue,
+          );
+        }
+
+        console.log(selectedDwarfs);
+
         res = await MapApiService.calculateSegmentTree({
-          dwarves: dwarfsCompartment,
+          dwarves: selectedDwarfs,
         });
         break;
       }
@@ -121,10 +132,10 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("rmqSelectionReady", (event) => {
   const data = event.detail;
 
-  if (data.leftIndex !== null && data.rightIndex !== null) {
-    from = data.leftIndex;
-    to = data.rightIndex;
+  if (data.selectedDwarfs && data.selectedDwarfs.length > 0) {
+    selectedDwarfsFromCanvas = data.selectedDwarfs;
+    console.log("Wybrano krasnoludków z canvasu:", selectedDwarfsFromCanvas);
   } else {
-    console.log("Nie wybrano zakresu");
+    console.log("Nie wybrano krasnoludków z canvasu.");
   }
 });

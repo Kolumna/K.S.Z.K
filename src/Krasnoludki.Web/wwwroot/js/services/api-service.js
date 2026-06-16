@@ -19,7 +19,7 @@ const MapApiService = {
 
   async calculateConvexHull(pointsArray) {
     if (!pointsArray || pointsArray.length < 3) {
-      throw new Error("Required at least 3 points to calculate convex hull.");
+      throw new Error("Wymagane co najmniej 3 punkty do obliczenia otoczki.");
     }
     return await this._sendRequest("CalculateGraham", pointsArray);
   },
@@ -30,16 +30,13 @@ const MapApiService = {
       !matchingPayload.dwarves ||
       !matchingPayload.mines
     ) {
-      throw new Error("Invalid payload for matching algorithm.");
+      throw new Error("Nieprawidłowa treść żądania dla algorytmu dopasowywania.");
     }
-    console.log("Sending matching payload to API:", matchingPayload);
+    console.log("Wysyłanie treści żądania dopasowywania do API:", matchingPayload);
     return await this._sendRequest("CalculateMatching", matchingPayload);
   },
 
   async calculateSegmentTree(dwarfesForRmq) {
-    if (!dwarfesForRmq || dwarfesForRmq.length < 3) {
-      throw new Error("Required at least 3 points to calculate convex hull.");
-    }
     return await this._sendRequest("CalculateSegmentTree", dwarfesForRmq);
   },
 
@@ -49,7 +46,7 @@ const MapApiService = {
       !minCostPayload.dwarves ||
       !minCostPayload.mines
     ) {
-      throw new Error("Invalid payload for min cost algorithm.");
+      throw new Error("Nieprawidłowa treść żądania dla algorytmu minimalnego kosztu.");
     }
     return await this._sendRequest("CalculateMinCost", minCostPayload);
   }

@@ -62,9 +62,9 @@ function renderMap() {
     nodes.forEach((node) => {
       console.log("Node:", node);
       if (node.type === "dwarf") {
-        ctx.fillStyle = "#4a90c0";
+        ctx.fillStyle = "#1A3A5A";
       } else {
-        ctx.fillStyle = "#c07030";
+        ctx.fillStyle = "#3A2010";
       }
       const x = node.x;
       const y = node.y;

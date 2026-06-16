@@ -814,68 +814,6 @@ function showMinCostStats(data) {
   `;
 }
 
-function drawRMQ() {
-  drawScene(() => {
-    const rmqDwarves = INITIAL_NODES.filter((n) => n.type === "dwarf").sort(
-      (a, b) => a.x - b.x,
-    );
-
-    INITIAL_NODES.filter((n) => n.type === "mine").forEach((m) => drawMine(m));
-
-    rmqDwarves.forEach((dwarf, index) => {
-      const inBox =
-        rmqSelectionBox.minX !== -1 &&
-        dwarf.x >= rmqSelectionBox.minX &&
-        dwarf.x <= rmqSelectionBox.maxX &&
-        dwarf.y >= rmqSelectionBox.minY &&
-        dwarf.y <= rmqSelectionBox.maxY;
-
-      const inDrag =
-        isDragging &&
-        dwarf.x >= Math.min(dragStart.x, dragEnd.x) &&
-        dwarf.x <= Math.max(dragStart.x, dragEnd.x) &&
-        dwarf.y >= Math.min(dragStart.y, dragEnd.y) &&
-        dwarf.y <= Math.max(dragStart.y, dragEnd.y);
-
-      const isSelected = inBox || inDrag;
-
-      drawDwarf(dwarf, {
-        highlight: isSelected,
-        highlightColor: "#c8a030",
-        showIndex: true,
-        index,
-        showLoudness: true,
-      });
-    });
-
-    if (isDragging) {
-      ctx.save();
-      ctx.fillStyle = "rgba(241,196,15,0.1)";
-      ctx.strokeStyle = "#f1c40f";
-      ctx.lineWidth = 1.5;
-      ctx.setLineDash([4, 4]);
-      ctx.fillRect(
-        dragStart.x,
-        dragStart.y,
-        dragEnd.x - dragStart.x,
-        dragEnd.y - dragStart.y,
-      );
-      ctx.strokeRect(
-        dragStart.x,
-        dragStart.y,
-        dragEnd.x - dragStart.x,
-        dragEnd.y - dragStart.y,
-      );
-      ctx.restore();
-    }
-
-    if (algorithmResults.segmentTree?.loudestDwarfId) {
-      drawLoudestDwarf(algorithmResults.segmentTree.loudestDwarfId);
-      showRMQStats(algorithmResults.segmentTree);
-    }
-  });
-}
-
 function showRMQStats(data) {
   console.log("Dane do statystyk RMQ:", data);
   const statsDiv = document.querySelector(".algo-stats");
@@ -1005,27 +943,25 @@ document.addEventListener("DOMContentLoaded", () => {
       (a, b) => a.x - b.x,
     );
 
-    const selected = rmqDwarves
-      .map((d, i) => ({ d, i }))
-      .filter(
-        ({ d }) => d.x >= minX && d.x <= maxX && d.y >= minY && d.y <= maxY,
-      );
+    const selected = rmqDwarves.filter(
+      (d) => d.x >= minX && d.x <= maxX && d.y >= minY && d.y <= maxY,
+    );
 
-    selectedDwarfs = selected.map(({ d }) => d);
-
-    let leftIndex = null;
-    let rightIndex = null;
+    let leftPointId = null;
+    let rightPointId = null;
 
     if (selected.length > 0) {
-      const indices = selected.map((s) => s.i);
-      leftIndex = Math.min(...indices);
-      rightIndex = Math.max(...indices);
+      leftPointId = selected[0].pointId;
+      rightPointId = selected[selected.length - 1].pointId;
 
       const lSel = document.getElementById("rmq-l");
       const rSel = document.getElementById("rmq-r");
-      if (lSel) lSel.value = leftIndex;
-      if (rSel) rSel.value = rightIndex;
+
+      if (lSel) lSel.value = leftPointId;
+      if (rSel) rSel.value = rightPointId;
     }
+
+    console.log("Zaznaczone krasnoludki:", selected);
 
     document.dispatchEvent(
       new CustomEvent("rmqSelectionReady", {
@@ -1034,9 +970,9 @@ document.addEventListener("DOMContentLoaded", () => {
           maxX,
           minY,
           maxY,
-          leftIndex,
-          rightIndex,
-          selectedDwarfs,
+          leftPointId,
+          rightPointId,
+          selectedDwarfs: selected,
         },
       }),
     );

@@ -218,16 +218,13 @@ else
                     @if (@Model.ParsedResults.MinCost != null)
                     {
                       <p>
-                        <strong>MaxFlow:</strong> @Model.ParsedResults.MinCost.MaxFlow
+                        <strong>Maksymalny przepływ:</strong> @Model.ParsedResults.MinCost.MaxFlow
                       </p>
                       <p>
-                        <strong>RealCost:</strong> @Model.ParsedResults.MinCost.RealCost
+                        <strong>Rzeczywisty koszt:</strong> @Model.ParsedResults.MinCost.RealCost
                       </p>
                       <p>
-                        <strong>Assignments:</strong> @Model.ParsedResults.MinCost.Assignments.Count
-                      </p>
-                      <p>
-                        <strong>Employed Count:</strong> @Model.ParsedResults.MinCost.EmployedCount
+                        <strong>Przypisane:</strong> @Model.ParsedResults.MinCost.Assignments.Count
                       </p>
                     }
                   </div>
@@ -346,8 +343,8 @@ else
                 <div class="algo-section">
                   <h3>Wybór dekamentrysty</h3>
                   <div class="algo-inputs">
-                    <label>Od <input type="number" id="rmq-from-input" min="0" placeholder="Od jakiego Id" /></label>
-                    <label>Do <input type="number" id="rmq-to-input" min="0" placeholder="Do jakiego Id" /></label>
+                    <label>Od <input type="number" id="rmq-from-input" min="1" placeholder="Od jakiego Id" /></label>
+                    <label>Do <input type="number" id="rmq-to-input" min="1" placeholder="Do jakiego Id" /></label>
                   </div>
                   <div class="algo-actions">
                     <button onClick="runAlgorithm('rmq')" id="algo-run-button-rmq">
