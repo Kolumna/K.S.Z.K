@@ -234,7 +234,7 @@ function drawNodeGraphics(
   } else {
     ctx.beginPath();
     ctx.arc(x, y, 20, 0, Math.PI * 2);
-    ctx.fillStyle = type === "dwarf" ? "#8B4513" : "#888";
+    ctx.fillStyle = type === "dwarf" ? "#1A3A5A" : "#3A2010";
     ctx.fill();
     ctx.stroke();
   }

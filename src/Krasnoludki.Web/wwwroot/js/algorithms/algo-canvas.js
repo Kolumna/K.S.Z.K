@@ -105,7 +105,51 @@ function getCH() {
   return getCanvasRect().height;
 }
 
+const mineSvgRaw = (
+  iconColor = "white",
+) => `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="64" height="64" rx="8" fill="#3A2010"/>
+<path d="M44.4116 14.0002L14 15.2675V19.0539L46.3168 17.811L44.4116 14V14.0002ZM42.8905 19.4251L40.3881 19.5214L41.1929 34.8119L44.3656 34.1774L42.8905 19.4251ZM31.7685 19.8529L30.2551 19.9113L30.0334 21.1959L27.8462 22.7389L27.8569 22.8102L27.8345 22.8063L27.5824 24.266L28.0916 24.3541L28.4716 26.8553L31.0664 27.3034L32.2632 25.0743L32.7723 25.1623L33.0243 23.7025L33.0019 23.6987L33.0361 23.6351L31.4931 21.4479L31.7685 19.8529ZM25.3954 20.0981L23.5175 20.1704L20.2694 24.678L20.1301 27.405L25.3954 20.0982V20.0981ZM19.0074 20.3438L16.4337 20.4428L14.0703 42.8948L17.8278 43.4489L19.0074 20.3439V20.3438ZM30.6777 21.8166L31.8675 23.5027L28.9916 23.0061L30.6777 21.8166ZM28.9894 24.509L31.3652 24.9192L30.7882 25.9943L29.1728 25.7153L28.9894 24.509ZM47.1521 35.1307L40.8621 36.3888L37.1598 35.1545L34.7975 37.5166H48.7425L47.1521 35.1307ZM25.7519 35.3173L24.9767 37.0228H23.6282V38.5041H24.3034L23.7048 39.8208H21.8178V41.3021H23.0316L22.3582 42.7833H20.1719V44.2646H21.6849L20.5628 46.7334H18.526V48.2146H19.8894L19.1684 49.8008L20.5169 50.4139L21.5165 48.2146H33.3192L32.7637 46.7334H22.1898L23.3121 44.2646H31.838L31.2825 42.7833H23.9854L24.6585 41.3021H30.7268L30.1713 39.8208H25.3319L25.9305 38.5041H29.6776L29.3075 37.5166H32.7027L33.1965 37.0228H26.6038L27.1004 35.9303L25.7519 35.3173ZM31.445 38.9979L34.7664 47.8554C35.2619 47.1772 36.0623 46.7334 36.9596 46.7334C37.9402 46.7334 38.8055 47.2632 39.2831 48.05H43.8528C44.3304 47.2632 45.1958 46.7334 46.1764 46.7334C47.0342 46.7334 47.8032 47.1391 48.3022 47.7673L50.4945 38.9979H31.445ZM36.9596 48.2146C36.2692 48.2146 35.7252 48.7586 35.7252 49.449C35.7252 50.1395 36.2692 50.6834 36.9596 50.6834C37.6501 50.6834 38.194 50.1395 38.194 49.449C38.194 48.7586 37.6501 48.2146 36.9596 48.2146ZM46.1764 48.2146C45.486 48.2146 44.942 48.7586 44.942 49.449C44.942 50.1395 45.486 50.6834 46.1764 50.6834C46.8668 50.6834 47.4108 50.1395 47.4108 49.449C47.4108 48.7586 46.8668 48.2146 46.1764 48.2146Z" fill="${iconColor}"/>
+</svg>
+`;
+
+const dwarfSvgRaw = (
+  iconColor = "white",
+) => `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="64" height="64" rx="8" fill="#1A3A5A"/>
+<path d="M41.1438 14C46.7145 21.8296 41.5412 23.337 38.3314 25.1069C37.7764 23.8995 37.139 22.8045 36.284 21.7771C40.1838 20.1197 40.8888 16.5124 41.1438 14ZM21.8548 14C22.1098 16.5124 22.8147 20.1197 26.7145 21.7771C25.8596 22.8045 25.2221 23.8995 24.6671 25.1069C21.4498 23.337 16.2901 21.8296 21.8548 14ZM31.4993 19.6322C34.8966 21.7021 36.1715 23.712 37.379 26.7418C33.7867 27.6193 29.2194 27.6193 25.6196 26.7418C26.827 23.712 28.102 21.7021 31.4993 19.6322ZM39.5389 27.6268C39.9363 28.3992 41.3838 33.229 41.3988 34.5114C41.0463 34.1439 40.6863 33.7689 40.3338 33.394L39.8388 33.8289C39.7563 31.909 38.8939 29.8692 37.9564 28.0168C38.4439 27.8968 39.0439 27.7693 39.5389 27.6268ZM23.4597 27.6268C23.9247 27.7543 24.6071 27.9193 25.0421 28.0168C24.1122 29.8692 23.2422 31.909 23.1672 33.8289L22.6648 33.394L21.5998 34.5114C20.8124 33.5815 23.0622 28.3992 23.4597 27.6268ZM36.479 28.2867L37.0715 30.0716C35.3616 30.5591 33.8017 31.0166 31.8968 31.5716L32.3842 32.8465C32.8042 32.7265 33.2392 32.6065 33.6667 32.479C33.8842 32.914 34.3791 33.199 34.9191 33.199C35.6841 33.199 36.2915 32.659 36.2915 31.999C36.2915 31.9015 36.284 31.8116 36.2615 31.7216L37.5065 31.3691L38.5489 34.4964L35.8415 37.0688L34.7466 35.0439H28.2595L27.157 37.0688L24.4497 34.4964L25.4921 31.3691C25.8971 31.4816 26.3021 31.5941 26.6995 31.7141C26.6695 31.8041 26.662 31.9015 26.662 31.999C26.662 32.659 27.2695 33.199 28.042 33.199C28.5894 33.199 29.0844 32.9065 29.3019 32.4715C29.7444 32.599 30.1794 32.719 30.6143 32.8465L31.1093 31.5716C29.3694 31.0616 27.7795 30.6041 25.9271 30.0716L26.527 28.2867C30.1044 29.1192 32.8942 29.1192 36.479 28.2867ZM39.7188 35.3964L45.0001 40.9236H41.4438L42.8237 44.5234H38.5114L39.6138 46.4433L36.8015 45.6258L31.4993 50.2381L26.1971 45.6258L23.3922 46.4433L24.4947 44.5234H20.1824L21.5548 40.9236H18L23.2872 35.3964L27.592 39.1387L29.2344 36.2738H33.7867L35.4291 39.1387L39.7188 35.3964ZM32.8792 37.3238H30.1194V38.6737H32.8792V37.3238Z" fill="${iconColor}"/>
+</svg>
+`;
+
+const imageCache = {};
+
+function getCachedImage(type, color) {
+  const key = `${type}_${color}`;
+
+  if (imageCache[key]) {
+    return imageCache[key];
+  }
+
+  const img = new Image();
+  const svgRaw = type === "dwarf" ? dwarfSvgRaw(color) : mineSvgRaw(color);
+  img.src = "data:image/svg+xml;utf8," + encodeURIComponent(svgRaw);
+
+  img.onload = () => redrawAll();
+
+  imageCache[key] = img;
+  return img;
+}
+
 function drawNodeGraphics(x, y, type) {
+  const size = 44;
+  const offset = size / 2;
+  const img = getCachedImage(type);
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+  ctx.shadowBlur = 8;
+  ctx.shadowOffsetY = 4;
+
   ctx.beginPath();
   if (type === "dwarf") {
     ctx.arc(x, y, 20, 0, Math.PI * 2);
@@ -113,17 +157,23 @@ function drawNodeGraphics(x, y, type) {
     ctx.rect(x - 18, y - 18, 36, 36);
   }
 
-  ctx.fillStyle = type === "dwarf" ? "#1A3A5A" : "#3A2010";
-  ctx.fill();
-  ctx.strokeStyle = "#000";
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  if (img && img.complete && img.naturalWidth !== 0) {
+    ctx.drawImage(img, x - offset, y - offset, size, size);
+  } else {
+    ctx.fillStyle = type === "dwarf" ? "#1A3A5A" : "#3A2010";
+    ctx.fill();
+    ctx.strokeStyle = "#000";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
 
-  ctx.fillStyle = "white";
-  ctx.font = "bold 14px Arial";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(type.charAt(0).toUpperCase(), x, y);
+  // ctx.fillStyle = "white";
+  // ctx.font = "bold 14px Arial";
+  // ctx.textAlign = "center";
+  // ctx.textBaseline = "middle";
+  // ctx.fillText(type.charAt(0).toUpperCase(), x, y);
+
+  ctx.restore();
 }
 
 function drawDwarf(node, options = {}) {
@@ -140,7 +190,7 @@ function drawDwarf(node, options = {}) {
 
   if (highlight) {
     ctx.beginPath();
-    ctx.arc(x, y, 26, 0, Math.PI * 2);
+    ctx.arc(x, y, 60, 0, Math.PI * 2);
     ctx.fillStyle = highlightColor;
     ctx.fill();
   }
@@ -178,10 +228,10 @@ function drawDwarf(node, options = {}) {
 
     if (isLoudest) {
       ctx.fillStyle = "#1A3320";
-      ctx.strokeStyle = "#5FFF5F";
+      // ctx.strokeStyle = "#5FFF5F";
       ctx.lineWidth = 1.5;
 
-      ctx.shadowColor = "#5FFF5F";
+      // ctx.shadowColor = "#5FFF5F";
       ctx.shadowBlur = 8;
     } else {
       ctx.fillStyle = "#2B2D31";
@@ -253,7 +303,7 @@ function drawLoudestDwarf(dwarfId) {
 
   drawDwarf(dwarf, {
     highlight: true,
-    highlightColor: "#6aaa6a",
+    highlightColor: "#5FFF5F",
     isLoudest: true,
     showLoudness: true,
   });
@@ -829,20 +879,6 @@ function showRMQStats(data) {
     <p>Najgłośniejszy krasnolud: <strong>${loudestDwarf ? loudestDwarf.pointId : "Nie znaleziono"}</strong></p>
     <p>Głośność: <strong>${loudestDwarf ? loudestDwarf.voiceLoudness : "Nie znaleziono"}</strong></p>
   `;
-}
-
-function drawLoudestDwarf(dwarfId) {
-  const dwarf = INITIAL_NODES.find(
-    (n) => n.type === "dwarf" && Number(n.pointId) === Number(dwarfId),
-  );
-  if (!dwarf) return;
-
-  drawDwarf(dwarf, {
-    highlight: true,
-    highlightColor: "#6aaa6a",
-    isLoudest: true,
-    showLoudness: true,
-  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
