@@ -15,7 +15,8 @@ System demonstruje wykorzystanie klasycznych algorytmów i struktur danych w sce
 5. [Wymagania wstępne](#wymagania-wstępne)
 6. [Uruchomienie aplikacji webowej](#uruchomienie-aplikacji-webowej)
 7. [Uruchomienie testów jednostkowych](#uruchomienie-testów-jednostkowych)
-8. [Dokumentacja szczegółowa algorytmów](#dokumentacja-szczegółowa-algorytmów)
+8. [Docker](#docker)
+9. [Dokumentacja szczegółowa algorytmów](#dokumentacja-szczegółowa-algorytmów)
 
 ---
 
@@ -170,6 +171,18 @@ dotnet --version
 Polecenie zbuduje rozwiązanie i wykona wszystkie testy jednostkowe, zwracając raport z ich przebiegu.
 
 ---
+
+## Docker
+Aby uruchomić projekt za pomocą Dockera, należy mieć zainstalowany Docker na swoim systemie. Następnie można użyć poniższych poleceń:
+1. Pobranie obrazu Dockera
+```bash
+docker pull ghcr.io/kolumna/k.s.z.k:latest
+```
+2. Uruchomienie kontenera
+```bash
+docker run -d -p 5145:8080 --name kszk ghcr.io/kolumna/k.s.z.k:latest
+```
+Po uruchomieniu kontenera, interfejs będzie dostępny pod adresem http://localhost:5145.
 
 ## Dokumentacja szczegółowa algorytmów
 
