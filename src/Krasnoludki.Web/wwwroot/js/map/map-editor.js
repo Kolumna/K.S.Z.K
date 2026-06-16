@@ -51,15 +51,21 @@ function screenToWorld(sx, sy) {
 }
 
 function applyCamera() {
-  ctx.setTransform(camera.zoom, 0, 0, camera.zoom, camera.x, camera.y);
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(
+    camera.zoom * dpr, 0, 
+    0, camera.zoom * dpr, 
+    camera.x * dpr, camera.y * dpr
+  );
 }
 
 function resetTransform() {
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const dpr = window.devicePixelRatio || 1;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
 
 function drawScene(drawFn) {
-  resetTransform();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   applyCamera();
@@ -481,8 +487,8 @@ canvas.addEventListener(
     e.preventDefault();
 
     const rect = canvas.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const mouseY = (e.clientY - rect.top) * (canvas.height / rect.height);
+const mouseX = e.clientX - rect.left;
+const mouseY = e.clientY - rect.top;
 
     const zoomFactor = e.deltaY < 0 ? 1.1 : 0.9;
     const newZoom = Math.min(
