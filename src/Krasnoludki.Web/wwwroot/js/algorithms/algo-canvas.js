@@ -420,6 +420,12 @@ function fitCameraToNodes() {
     if (y > maxY) maxY = y;
   });
 
+  const nodeRadiusAllowance = 50;
+  minX -= nodeRadiusAllowance;
+  maxX += nodeRadiusAllowance;
+  minY -= nodeRadiusAllowance;
+  maxY += nodeRadiusAllowance;
+
   if (minX === maxX) {
     minX -= 50;
     maxX += 50;
@@ -432,7 +438,8 @@ function fitCameraToNodes() {
   const mapWidth = maxX - minX;
   const mapHeight = maxY - minY;
   const rect = getCanvasRect();
-  const padding = 40;
+
+  const padding = 80;
 
   const requiredZoom = Math.min(
     (rect.width - padding * 2) / mapWidth,
