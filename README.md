@@ -1,6 +1,6 @@
 # Królewski System Zarządzania Królestwem (K.S.Z.K)
 
-Projekt zaliczeniowy realizowany w ramach przedmiotu **Algorytmy i Struktury Danych II**.
+Projekt zaliczeniowy realizowany w ramach przedmiotu **Algorytmy i Struktury Danych II**. Projekt ma na celu implementację algorytmów optymalizacyjnych w kontekście zarządzania zasobami królestwa, z wykorzystaniem języka C# i platformy .NET.
 
 System demonstruje wykorzystanie klasycznych algorytmów i struktur danych w scenerii „królewskiego królestwa krasnoludków” – m.in. przydzielanie krasnoludków do zadań, obliczanie tras, przepływy w sieci czy problemy związane z kosztami transportu.
 
