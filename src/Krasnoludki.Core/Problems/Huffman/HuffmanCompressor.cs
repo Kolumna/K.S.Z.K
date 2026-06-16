@@ -97,10 +97,12 @@ namespace Krasnoludki.Core.Problems.Huffman
             var remainingBytes = reader.ReadBytes((int)(memoryStream.Length - memoryStream.Position));
 
             var bitString = new StringBuilder();
+            // Konwersja bajtów z powrotem na ciąg bitów
             foreach (byte b in remainingBytes)
             {
                 for (int i = 7; i >= 0; i--)
-                {
+                {   
+                    // Dodajemy bity do ciągu bitów, aż osiągniemy długość bitów określoną w nagłówku
                     bitString.Append((b & (1 << i)) != 0 ? '1' : '0');
                 }
             }
