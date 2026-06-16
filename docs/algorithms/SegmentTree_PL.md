@@ -2,10 +2,7 @@
 
 ## Cel struktury danych
 
-Drzewo przedziałowe (Segment Tree) służy do **szybkiego odpowiadania na zapytania dotyczące przedziałów** na tablicy lub liście. W tym projekcie struktura jest używana do:
-
-- znajdowania **najgłośniejszego dekametrowca** (krasnoludka) w zadanym przedziale indeksów,
-- wykonywania zapytań w czasie logarytmicznym względem liczby krasnoludków.
+Drzewo przedziałowe (Segment Tree) służy do **szybkiego odpowiadania na zapytania dotyczące przedziałów** na tablicy lub liście. W tym projekcie struktura jest używana do znajdowania **najgłośniejszego dekametrowca** (krasnoludka).
 
 ## Lokalizacja w projekcie
 

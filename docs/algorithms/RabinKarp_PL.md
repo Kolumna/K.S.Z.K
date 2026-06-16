@@ -64,10 +64,7 @@ Niech:
 
 ## Zastosowanie w projekcie K.S.Z.K
 
-Algorytm może być stosowany do:
-
-- wyszukiwania wzorców w opisach, nazwach, scenariuszach tekstowych związanych z królestwem krasnoludków,
-- szybkiej filtracji potencjalnych dopasowań przy dalszym przetwarzaniu danych tekstowych.
+Algorytm jest stosowany do wyszukiwania wzorców w nazwach i id scenariuszy związanych z królestwem krasnoludków,
 
 ## Przykładowe użycie (koncepcyjnie)
 

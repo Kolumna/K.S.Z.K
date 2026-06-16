@@ -43,7 +43,7 @@ Warstwa logiki biznesowej (biblioteka `Krasnoludki.Core`) jest odseparowana od i
   - algorytmy przypisania/przydziału zadań (`DwarfAssigning`).
 - **Rozwiązania problemów na grafach i przepływach**, w tym:
   - Min Cost Max Flow (minimalny koszt maksymalnego przepływu),
-  - trasy/przepływy w „królewskim” królestwie krasnoludków,
+  - trasy/przepływy w królestwie krasnoludków,
   - kodowanie Huffmana (kompresja danych).
 - **Aplikacja webowa ASP.NET Core** umożliwiająca:
   - wizualizację wyników,
@@ -56,7 +56,7 @@ Warstwa logiki biznesowej (biblioteka `Krasnoludki.Core`) jest odseparowana od i
 ## Stos technologiczny
 
 - **Język**: C#
-- **Platforma**: .NET 6 lub nowszy
+- **Platforma**: .NET 9
 - **Aplikacja webowa**: ASP.NET Core (Razor Pages)
 - **Testy jednostkowe**: xUnit
 - **System budowania**: `dotnet` CLI / MSBuild
@@ -113,7 +113,7 @@ K.S.Z.K-main/
 
 ## Wymagania wstępne
 
-Aby uruchomić projekt, wymagane jest zainstalowane środowisko **.NET SDK 6 lub nowsze**.
+Aby uruchomić projekt, wymagane jest zainstalowane środowisko **.NET SDK 9**.
 
 Pobierz i zainstaluj .NET SDK ze strony:  
 [https://dotnet.microsoft.com/download](https://dotnet.microsoft.com/download)
@@ -173,40 +173,39 @@ Polecenie zbuduje rozwiązanie i wykona wszystkie testy jednostkowe, zwracając 
 ---
 
 ## Docker
+
 Aby uruchomić projekt za pomocą Dockera, należy mieć zainstalowany Docker na swoim systemie. Następnie można użyć poniższych poleceń:
+
 1. Pobranie obrazu Dockera
+
 ```bash
 docker pull ghcr.io/kolumna/k.s.z.k:latest
 ```
+
 2. Uruchomienie kontenera
+
 ```bash
 docker run -d -p 5145:8080 --name kszk ghcr.io/kolumna/k.s.z.k:latest
 ```
+
 Po uruchomieniu kontenera, interfejs będzie dostępny pod adresem http://localhost:5145.
 
 ---
 
-## Dokumentacja szczegółowa algorytmów
+## Dokumentacja
 
-Szczegółowe opisy wybranych algorytmów i problemów znajdują się w osobnych plikach dokumentacji:
-
-- [`docs/algorithms/GrahamScan_PL.md`](docs/problems/GrahamScan_PL.md) – opis implementacji **algorytmu Grahama (Graham Scan)** do wyznaczania otoczki wypukłej:
-- [`docs/DocumentationMCMF_PL.md`](docs/DocumentationMCMF_PL.md) – szczegółowy opis problemu **Min Cost Max Flow** i jego implementacji
-
-### Dokumentacja modeli i warstwy rdzeniowej (`Krasnoludki.Core`)
-
-- [`docs/core/Models_PL.md`](docs/core/Models_PL.md) – opis modeli domenowych (krasnoludki, kopalnie, punkty) oraz ich odpowiedników MCMF.
-- [`docs/core/GraphAndFlow_PL.md`](docs/core/GraphAndFlow_PL.md) – opis warstwy grafowej i sieci przepływu (EdgeFlow, ResidualNetwork, EdgeGen).
-
-### Dokumentacja algorytmów (`src/Krasnoludki.Core/Algorithms`)
+(`src/Krasnoludki.Core/Algorithms`)
 
 - [`docs/algorithms/BellmanFord_PL.md`](docs/algorithms/BellmanFord_PL.md) – algorytm Bellmana–Forda wykorzystywany w Min Cost Max Flow.
 - [`docs/algorithms/DwarfAssigning_PL.md`](docs/algorithms/DwarfAssigning_PL.md) – algorytm przydziału krasnoludków do kopalni (Edmonds–Karp / maksymalny przepływ).
 - [`docs/algorithms/RabinKarp_PL.md`](docs/algorithms/RabinKarp_PL.md) – algorytm Rabina–Karpa do wyszukiwania wzorca w tekście.
 - [`docs/algorithms/SegmentTree_PL.md`](docs/algorithms/SegmentTree_PL.md) – drzewo przedziałowe do wyszukiwania najgłośniejszego dekametrowca.
-
-### Dokumentacja problemów (`src/Krasnoludki.Core/Problems`)
-
 - [`docs/problems/Huffman_PL.md`](docs/problems/Huffman_PL.md) – problem kompresji tekstu z użyciem kodowania Huffmana.
-- [`docs/problems/MinCostMaxFlow_PL.md`](docs/problems/MinCostMaxFlow_PL.md) – problem Min Cost Max Flow krasnoludków i kopalni.
+  Max Flow krasnoludków i kopalni.
 - [`docs/algorithms/GrahamScan_PL.md`](docs/problems/GrahamScan_PL.md) – problem trasy/otoczki wypukłej rozwiązany algorytmem Grahama.
+- [`docs/DocumentationMCMF_PL.md`](docs/DocumentationMCMF_PL.md) – szczegółowy opis problemu **Min Cost Max Flow** i jego implementacji
+
+(`Krasnoludki.Core`)
+
+- [`docs/core/Models_PL.md`](docs/core/Models_PL.md) – opis modeli domenowych (krasnoludki, kopalnie, punkty) oraz ich odpowiedników MCMF.
+- [`docs/core/GraphAndFlow_PL.md`](docs/core/GraphAndFlow_PL.md) – opis warstwy grafowej i sieci przepływu (EdgeFlow, ResidualNetwork, EdgeGen).

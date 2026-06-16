@@ -61,6 +61,7 @@ Krawędzie są generowane przez pomocniczą klasę `EdgeGen.GenerateEdges(dwarve
 ## Złożoność obliczeniowa
 
 Niech:
+
 - `V` – liczba węzłów w sieci,
 - `E` – liczba krawędzi,
 - `F` – maksymalny przepływ (w jednostkach).
@@ -78,7 +79,7 @@ W praktycznych scenariuszach w projekcie liczba węzłów i krawędzi jest ogran
 
 - Algorytm służy do **przydziału krasnoludków do kopalni** zgodnie z pojemnościami i preferencjami,
 - jest wykorzystywany jako samodzielny moduł, a także w powiązaniu z problemem Min Cost Max Flow,
-- krawędzie „niepożądane” (brak preferencji) są modelowane poprzez **bardzo duży koszt**, dzięki czemu są wybierane tylko w ostateczności.
+- krawędzie „niepożądane” (brak preferencji) są modelowane poprzez **bardzo duży koszt**, dzięki czemu są ignorowane.
 
 ## Przykładowe użycie (koncepcyjnie)
 

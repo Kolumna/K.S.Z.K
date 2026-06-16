@@ -96,5 +96,5 @@ Całościowo złożoność jest rzędu **O(n + k log k)**.
 
 ## Zastosowanie w projekcie K.S.Z.K
 
-- Problem Huffmana demonstruje, jak **kompresja bezstratna** może zostać zastosowana do tekstów związanych z królestwem krasnoludków (np. kroniki, raporty z kopalni),
+- Problem Huffmana demonstruje, jak **kompresja bezstratna** może zostać zastosowana do tekstów związanych z królestwem krasnoludków (zapis scenariuszy),
 - pokazuje również praktyczne wykorzystanie struktur drzewiastych i kolejek priorytetowych.

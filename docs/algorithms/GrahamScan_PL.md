@@ -8,7 +8,6 @@ Otoczka wypukła to najmniejszy wielokąt wypukły zawierający wszystkie punkty
 
 ---
 
-
 ## Zastosowany algorytm
 
 W projekcie wykorzystano algorytm Graham Scan.
@@ -24,7 +23,9 @@ gdzie dominującą operacją jest sortowanie punktów według kąta biegunowego.
 ## Opis działania algorytmu
 
 ### 1. Wybór punktu startowego
+
 Algorytm wybiera punkt:
+
 - o najmniejszej współrzędnej Y,
 - w przypadku remisu o najmniejszej współrzędnej X.
 
@@ -33,16 +34,20 @@ Punkt ten zawsze należy do otoczki wypukłej.
 ---
 
 ### 2. Sortowanie punktów
+
 Pozostałe punkty są sortowane:
+
 - według kąta biegunowego względem punktu startowego,
 - w przypadku identycznego kąta według odległości od punktu startowego.
 
 ---
 
 ### 3. Budowa otoczki
+
 Algorytm wykorzystuje strukturę stosu.
 
 Dla kolejnych punktów:
+
 - sprawdzana jest orientacja trzech ostatnich punktów,
 - usuwane są punkty powodujące skręt w prawo,
 - pozostają punkty tworzące otoczkę wypukłą.
@@ -54,6 +59,7 @@ Dla kolejnych punktów:
 Orientacja trzech punktów obliczana jest przy użyciu iloczynu wektorowego.
 
 Interpretacja:
+
 - 0 – punkty współliniowe
 - 1 – skręt w prawo
 - 2 – skręt w lewo
@@ -67,6 +73,7 @@ Główna implementacja znajduje się w pliku:
 **AlgorytmGrahama.cs**
 
 Plik zawiera:
+
 - definicję punktu (record Point)
 - klasę implementującą algorytm Graham Scan
 - metody pomocnicze:
@@ -78,18 +85,11 @@ Plik zawiera:
 
 ## Złożoność obliczeniowa
 
-| Etap | Złożoność |
-|------|----------|
-| Sortowanie punktów | O(n log n) |
-| Przetwarzanie stosu | O(n) |
+| Etap                | Złożoność  |
+| ------------------- | ---------- |
+| Sortowanie punktów  | O(n log n) |
+| Przetwarzanie stosu | O(n)       |
 | Całkowita złożoność | O(n log n) |
-
----
-
-## Wymagania
-
-- .NET 6 lub nowszy
-- C# 10 lub nowszy
 
 ---
 
