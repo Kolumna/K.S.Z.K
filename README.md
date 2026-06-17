@@ -200,10 +200,10 @@ Po uruchomieniu kontenera, interfejs będzie dostępny pod adresem http://localh
 - [`docs/algorithms/DwarfAssigning_PL.md`](docs/algorithms/DwarfAssigning_PL.md) – algorytm przydziału krasnoludków do kopalni (Edmonds–Karp / maksymalny przepływ).
 - [`docs/algorithms/RabinKarp_PL.md`](docs/algorithms/RabinKarp_PL.md) – algorytm Rabina–Karpa do wyszukiwania wzorca w tekście.
 - [`docs/algorithms/SegmentTree_PL.md`](docs/algorithms/SegmentTree_PL.md) – drzewo przedziałowe do wyszukiwania najgłośniejszego dekametrowca.
-- [`docs/problems/Huffman_PL.md`](docs/problems/Huffman_PL.md) – problem kompresji tekstu z użyciem kodowania Huffmana.
+- [`docs/algorithms/Huffman_PL.md`](docs/algorithms/Huffman_PL.md) – problem kompresji tekstu z użyciem kodowania Huffmana.
   Max Flow krasnoludków i kopalni.
-- [`docs/algorithms/GrahamScan_PL.md`](docs/problems/GrahamScan_PL.md) – problem trasy/otoczki wypukłej rozwiązany algorytmem Grahama.
-- [`docs/DocumentationMCMF_PL.md`](docs/DocumentationMCMF_PL.md) – szczegółowy opis problemu **Min Cost Max Flow** i jego implementacji
+- [`docs/algorithms/GrahamScan_PL.md`](docs/algorithms/GrahamScan_PL.md) – problem trasy/otoczki wypukłej rozwiązany algorytmem Grahama.
+- [`docs/algorithms/DocumentationMCMF_PL.md`](docs/algorithms/DocumentationMCMF_PL.md) – szczegółowy opis problemu **Min Cost Max Flow** i jego implementacji
 
 (`Krasnoludki.Core`)
 
